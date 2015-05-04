@@ -72,7 +72,7 @@ public class AllStarGame extends J2hGame
 		
 		setPC98(false, true);
 		
-		setScheme(new AllStarStageScheme(3));
+		setScheme(new AllStarStageScheme(1));
 		getScheme().start();
 	}
 	
