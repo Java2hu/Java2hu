@@ -1,9 +1,9 @@
 package java2hu.conversation;
 
+import com.badlogic.gdx.graphics.g2d.Sprite;
+
 import java2hu.Game;
 import java2hu.object.FreeStageObject;
-
-import com.badlogic.gdx.graphics.g2d.Sprite;
 
 public class DialogueParticipant<T extends IDialogueFaceEnum> extends FreeStageObject
 {

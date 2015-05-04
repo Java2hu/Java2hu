@@ -1,5 +1,11 @@
 package java2hu.allstar;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont.TextBounds;
+import com.badlogic.gdx.graphics.g2d.Sprite;
+
 import java2hu.Game;
 import java2hu.J2hGame;
 import java2hu.Loader;
@@ -8,12 +14,6 @@ import java2hu.allstar.menu.LoadScreen;
 import java2hu.allstar.menu.MainMenu;
 import java2hu.allstar.util.AllStarUtil;
 import java2hu.object.StageObject;
-
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.BitmapFont.TextBounds;
-import com.badlogic.gdx.graphics.g2d.Sprite;
 
 public class AllStarGame extends J2hGame
 {
@@ -72,7 +72,7 @@ public class AllStarGame extends J2hGame
 		
 		setPC98(false, true);
 		
-		setScheme(new AllStarStageScheme(8));
+		setScheme(new AllStarStageScheme(3));
 		getScheme().start();
 	}
 	

@@ -1,11 +1,5 @@
 package java2hu.conversation;
 
-import java2hu.Game;
-import java2hu.Loader;
-import java2hu.conversation.DDCDialogueTextBalloon.DDCBalloonType;
-import java2hu.conversation.DialogueParticipant.Facing;
-import java2hu.touhou.font.TouhouFont;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
@@ -13,8 +7,13 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.BitmapFont.TextBounds;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 
+import java2hu.Game;
+import java2hu.Loader;
+import java2hu.conversation.DialogueParticipant.Facing;
+import java2hu.touhou.font.TouhouFont;
 
-public class DDCDialogueTextBalloon<DDCBalloonType> extends DialogueTextBalloon
+
+public class DDCDialogueTextBalloon extends DialogueTextBalloon
 {
 	BitmapFont font = TouhouFont.get(17);
 	Texture texture = Loader.texture(Gdx.files.internal("sprites/ddc_balloons.png"));
