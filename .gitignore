@@ -8,5 +8,11 @@
 *.war
 *.ear
 
+allstar/assets/*
+allstar/3d scenes/*
+allstar/src/music/*
+*/bin/*
+core/assets/*
+
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
