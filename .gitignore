@@ -35,6 +35,14 @@ proguard/
 # Windows clutter
 Thumbs.db
 
+# All assets
+.jar
+allstar/assets/*
+allstar/3d scenes/*
+allstar/src/music/*
+*/bin/*
+core/assets/*
+
 # Intellij IDEA (see https://intellij-support.jetbrains.com/entries/23393067)
 .idea/workspace.xml
 .idea/tasks.xml
@@ -43,5 +51,5 @@ Thumbs.db
 
 # Custom
 /*.iws
-/allstarremake.jar
+*.jar
 hs_err_pid*
