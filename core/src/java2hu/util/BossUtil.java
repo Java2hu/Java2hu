@@ -581,6 +581,7 @@ public class BossUtil extends J2hObject
 		{
 			{
 				setName("charge_circle");
+				setZIndex(1000);
 			}
 			
 			Mesh mesh;
