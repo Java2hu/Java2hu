@@ -307,11 +307,14 @@ public class Seiran extends AllStarBoss
 			if(tick % 400 == 240)
 			{
 				boss.playSpecial(false);
-				int minX = (int) Math.max(game.getMinX() + 300, Math.min(game.getMaxX() - 300, boss.getX() - 200));
+				
+				float width = 400;
+				
+				int minX = (int) Math.max(game.getMinX() + 300, Math.min(game.getMaxX() - width - 300, boss.getX() - 200));
 				
 				int minY = (int) (game.getCenterY() + 200);
 				
-				Rectangle box = new Rectangle(minX, minY, 400, 200);
+				Rectangle box = new Rectangle(minX, minY, width, 200);
 				
 				BossUtil.moveAroundRandomly(boss, box, 800);
 			}

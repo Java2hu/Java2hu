@@ -4,6 +4,10 @@ import java2hu.Game;
 
 import com.badlogic.gdx.graphics.g2d.Sprite;
 
+/**
+ * Use {@link Background} instead.
+ */
+@Deprecated
 public class VerticalScrollingBackground extends ABackground
 {
 	protected Sprite sprite;
