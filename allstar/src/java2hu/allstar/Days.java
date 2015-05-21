@@ -14,6 +14,7 @@ import java2hu.allstar.enemies.day1.Cirno;
 import java2hu.allstar.enemies.day1.Wakasagihime;
 import java2hu.allstar.enemies.day2.Kagerou;
 import java2hu.allstar.enemies.day2.Mokou;
+import java2hu.allstar.enemies.day5.Seiran;
 import java2hu.allstar.enemies.day6.Sekibanki;
 import java2hu.allstar.enemies.day7.Raiko;
 import java2hu.allstar.enemies.day7.Seija;
@@ -78,10 +79,11 @@ public class Days extends J2hObject
 			
 			type = EnvironmentType.ALT_DIM;
 			
-			// Alternative Dimension: (People who can't use danmaku can here!)
+			// Dream Dimension: (People who can't use danmaku can here!)
 			// Maribel & Renko
 			// Heida no Akyu
 			// Rinnosuke
+			// Doremy Sweet
 		}
 		
 		day++;
@@ -158,6 +160,17 @@ public class Days extends J2hObject
 		// Day 5
 		{
 			// Above the clouds:
+			
+			addCharacter(day, type, "Seiran", new Getter<AllStarBoss>()
+			{
+				@Override
+				public AllStarBoss get()
+				{
+					final Seiran boss = new Seiran(100, startX, startY);
+					return boss;
+				}
+			});
+			
 			// Kogasa
 			// Nazrin
 			// Lily White
@@ -245,6 +258,7 @@ public class Days extends J2hObject
 			type = EnvironmentType.MOON;
 			
 			// The Moon:
+			// Ringo
 			// Rei'sen (Reisen 2)
 			// Reisen
 			// Watatsuki's

@@ -4,7 +4,7 @@ import java2hu.Game;
 
 import com.badlogic.gdx.graphics.g2d.Sprite;
 
-public class ScrollingBackground extends Background
+public class ScrollingBackground extends ABackground
 {
 	protected Sprite sprite;
 	protected float x = Game.getGame().getMinX();

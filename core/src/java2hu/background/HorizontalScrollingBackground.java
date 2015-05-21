@@ -4,7 +4,7 @@ import java2hu.Game;
 
 import com.badlogic.gdx.graphics.g2d.Sprite;
 
-public class HorizontalScrollingBackground extends Background
+public class HorizontalScrollingBackground extends ABackground
 {
 	public Sprite sprite;
 	private float speed;

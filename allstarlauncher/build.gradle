@@ -4,7 +4,7 @@ sourceCompatibility = 1.7
 sourceSets.main.java.srcDirs = [ "src/" ]
 
 project.ext.mainClassName = "java2hu.desktop.SettingsWindow"
-project.ext.assetsDir = new File("../core/assets/");
+project.ext.assetsDir = new File("../core/assets");
 project.ext.assets2Dir = new File("../allstar/assets");
 
 task run(dependsOn: classes, type: JavaExec) {
@@ -20,6 +20,7 @@ task dist(type: Jar) {
     from files(sourceSets.main.output.resourcesDir)
     from {configurations.compile.collect {zipTree(it)}}
     from files(project.assetsDir);
+    from files(project.assets2Dir);
 
     manifest {
         attributes 'Main-Class': project.mainClassName
@@ -30,8 +31,9 @@ dist.dependsOn classes
 
 eclipse {
     project {
-        name = appName + "-desktop"
+        name = "All Star Launcher"
         linkedResource name: 'assets', type: '2', location: 'PARENT-1-PROJECT_LOC/core/assets'
+        linkedResource name: 'assets-allstar', type: '2', location: 'PARENT-1-PROJECT_LOC/allstar/assets'
     }
 }
 
@@ -39,6 +41,7 @@ task afterEclipseImport(description: "Post processing after project generation",
   doLast {
     def classpath = new XmlParser().parse(file(".classpath"))
     new Node(classpath, "classpathentry", [ kind: 'src', path: 'assets' ]);
+    new Node(classpath, "classpathentry", [ kind: 'src', path: 'assets-allstar' ]);
     def writer = new FileWriter(file(".classpath"))
     def printer = new XmlNodePrinter(new PrintWriter(writer))
     printer.setPreserveWhitespace(true)

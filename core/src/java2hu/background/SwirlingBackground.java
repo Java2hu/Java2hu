@@ -13,7 +13,7 @@ import com.badlogic.gdx.graphics.VertexAttribute;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 
-public abstract class SwirlingBackground extends Background
+public abstract class SwirlingBackground extends ABackground
 {
 	ShaderProgram sp;
 	Mesh mesh;
