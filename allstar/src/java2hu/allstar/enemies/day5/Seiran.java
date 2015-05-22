@@ -117,6 +117,7 @@ public class Seiran extends AllStarBoss
 				bg.setVelV(0.1d);
 				bg.setEndU(1d);
 				bg.getSprite().setAlpha(0.99f);
+				bg.setZIndex(bg.getZIndex() + 100);
 				game.spawn(bg);
 				
 				// Layer 1
@@ -135,7 +136,7 @@ public class Seiran extends AllStarBoss
 					};
 					bge.setFrameBuffer(t.getBackgroundBuffer());
 					bge.setRotationDegs(5);
-					bge.getSprite().setAlpha(0.5f);
+					bge.getSprite().setAlpha(1f);
 					bge.setZIndex(bg.getZIndex() - 2);
 					game.spawn(bge);
 				}
@@ -145,7 +146,7 @@ public class Seiran extends AllStarBoss
 					Background bge = new Background(Loader.texture(FOLDER.child("bge.png")));
 					bge.setFrameBuffer(t.getBackgroundBuffer());
 					bge.setRotationDegs(-5);
-					bge.getSprite().setAlpha(0.5f);
+					bge.getSprite().setAlpha(1f);
 					bge.setZIndex(bg.getZIndex() - 4);
 					game.spawn(bge);
 				}

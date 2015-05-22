@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java2hu.Game;
 import java2hu.J2hGame;
 import java2hu.allstar.backgrounds.BambooForestBG;
+import java2hu.allstar.backgrounds.CloudsBG;
 import java2hu.allstar.backgrounds.HokkaiBG;
 import java2hu.allstar.backgrounds.MagicalStormBG;
 import java2hu.allstar.backgrounds.MakaiBG;
@@ -77,7 +78,7 @@ public class Days extends J2hObject
 			// Three Faries
 			// Hong Meiling
 			
-			type = EnvironmentType.ALT_DIM;
+			type = EnvironmentType.DREAM_DIM;
 			
 			// Dream Dimension: (People who can't use danmaku can here!)
 			// Maribel & Renko
@@ -510,7 +511,7 @@ public class Days extends J2hObject
 				return new MistLakeBG();
 			};
 		}),
-		ALT_DIM(null),
+		DREAM_DIM(null),
 		BAMBOO(new Getter<Background3D>()
 		{
 			@Override
@@ -521,7 +522,14 @@ public class Days extends J2hObject
 		}, 30),
 		UNDERGROUND_CITY(null),
 		YOUKAI_MOUNTAIN(null),
-		ABOVE_THE_CLOUDS(null),
+		ABOVE_THE_CLOUDS(new Getter<Background3D>()
+		{
+			@Override
+			public Background3D get()
+			{
+				return new CloudsBG();
+			};
+		}),
 		CEMETRY_ROAD(null),
 		THUNDER_CLOUDS(new Getter<Background3D>()
 		{

@@ -233,6 +233,16 @@ public abstract class Background3D extends DrawObject
 			getFog().update(camera);
 	}
 	
+	@Override
+	public void onUpdateDelta(float delta)
+	{
+		if(screen != null)
+			return;
+		
+		if(getCameraPather() != null)
+			getCameraPather().update(delta);
+	}
+	
 	public abstract void drawBackground(ModelBatch modelBatch, Environment environment, boolean drawFog);
 
 	boolean fadeOut = false;
