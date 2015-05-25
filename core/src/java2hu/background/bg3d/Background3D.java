@@ -12,8 +12,10 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g3d.Environment;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
+import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
+import com.badlogic.gdx.math.Vector3;
 
 public abstract class Background3D extends DrawObject
 {
@@ -31,7 +33,7 @@ public abstract class Background3D extends DrawObject
 	
 	public Background3D()
 	{
-		setZIndex(-10);
+		setZIndex(-1000);
 	}
 	
 	@Override
@@ -185,7 +187,7 @@ public abstract class Background3D extends DrawObject
 		{
 			screen.setBounds(0, 0, Game.getGame().getWidth(), Game.getGame().getHeight());
 			
-			float speed = 0.001f;
+			float speed = 0.005f;
 			
 			if(fadeOut)
 			{
@@ -206,8 +208,6 @@ public abstract class Background3D extends DrawObject
 					}
 				}
 			}
-			
-			System.out.println(alpha);
 			
 			alpha = Math.min(1, Math.max(0, alpha));
 			
@@ -241,6 +241,35 @@ public abstract class Background3D extends DrawObject
 		
 		if(getCameraPather() != null)
 			getCameraPather().update(delta);
+	}
+	
+	/**
+	 * Translate a ModelInstance at a certain velocity, looping the object per UV
+	 * The object gets moved back once it's looped over an entire UV, making it look like it's moving forward forever.
+	 */
+	public void translateLooped(ModelInstance instance, float x, float z, float size, float uv)
+	{
+		instance.transform.translate(x, 0, z);
+		
+		Vector3 trans = instance.transform.getTranslation(new Vector3());
+		
+		if(trans.x < -(size / uv))
+		{
+			instance.transform.setToTranslation((size / uv), trans.y, trans.z);
+		}
+		else if(trans.x > (size / uv))
+		{
+			instance.transform.setToTranslation(-(size / uv), trans.y, trans.z);
+		}
+		
+		if(trans.z < -(size / uv))
+		{
+			instance.transform.setToTranslation(trans.x, trans.y, (size / uv));
+		}
+		else if(trans.z > (size / uv))
+		{
+			instance.transform.setToTranslation(trans.x, trans.y, -(size / uv));
+		}
 	}
 	
 	public abstract void drawBackground(ModelBatch modelBatch, Environment environment, boolean drawFog);

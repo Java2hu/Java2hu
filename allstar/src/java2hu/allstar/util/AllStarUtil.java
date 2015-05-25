@@ -286,9 +286,9 @@ public class AllStarUtil extends J2hObject
 			@Override
 			public void onUpdate(long tick)
 			{
-				float distance = MathUtil.getDistance(x + image.getWidth() / 2, stage.getBoundary().getX() + stage.getBoundary().getWidth() / 2, stage.getBoundary().getX() + stage.getBoundary().getWidth() / 2, stage.getBoundary().getY() + stage.getBoundary().getHeight() / 2) / 30;
+				float distance = MathUtil.getDistance(x + image.getWidth() / 2, stage.getBoundary().getX() + stage.getBoundary().getWidth() / 2, stage.getBoundary().getX() + stage.getBoundary().getWidth() / 2, stage.getBoundary().getY() + stage.getBoundary().getHeight() / 2) / 50;
 				
-				x -= 1F + distance;
+				x -= 1F + (distance * 2f);
 				
 				fade.setObject(x < stage.getMinX());
 				

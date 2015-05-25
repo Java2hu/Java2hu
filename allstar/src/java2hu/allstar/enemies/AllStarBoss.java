@@ -86,6 +86,24 @@ public abstract class AllStarBoss extends Boss
 		this.bgm = music;
 	}
 	
+	private float bgmPosition = 0f;
+	
+	/**
+	 * Bgm start position once the music starts.
+	 */
+	public float getBgmPosition()
+	{
+		return bgmPosition;
+	}
+	
+	/**
+	 * Bgm start position once the music starts.
+	 */
+	public void setBgmPosition(float bgmStartSeconds)
+	{
+		this.bgmPosition = bgmStartSeconds;
+	}
+	
 	public abstract void executeFight(AllStarStageScheme scheme);
 	
 	@Override
@@ -104,6 +122,7 @@ public abstract class AllStarBoss extends Boss
 		};
 	
 		player.getBgm().play();
+		player.getBgm().setPosition(bgmPosition);
 		player.fadeIn();
 
 		game.spawn(player);

@@ -91,6 +91,7 @@ public class SimpleBoss extends AllStarBoss
 		special.setPlayMode(PlayMode.NORMAL);
 	
 		Music bgm = new J2hMusic(Gdx.audio.newMusic(FOLDER.child("bgm.mp3")));
+		bgm.setLooping(true);
 		
 		setColor(new Color(0 / 255f, 0 / 255f, 0 / 255f, 1.0f));
 		

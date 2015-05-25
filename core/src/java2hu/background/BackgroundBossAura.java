@@ -127,7 +127,7 @@ public class BackgroundBossAura extends DrawObject
 					IPosition pos = data.getter.get();
 					
 					// Convert to UV coordinates.
-					set = new Vector2((Game.getGame().getWidth() - pos.getX() - actualSize.x / 2f) / Game.getGame().getWidth() * size.x, (pos.getY() - actualSize.y / 2f) / Game.getGame().getHeight() * size.y);
+					set = new Vector2((pos.getX() - actualSize.x / 2f) / Game.getGame().getWidth() * size.x, (pos.getY() - actualSize.y / 2f) / Game.getGame().getHeight() * size.y);
 				}
 				
 				getShader().setUniformf("size" + (i + 1), size);
@@ -143,7 +143,7 @@ public class BackgroundBossAura extends DrawObject
 		
 		game.camera.applyAspectRatio(true);
 		
-		sprite.setRotation(180);
+		sprite.setFlip(false, true);
 		sprite.draw(game.batch);
 		
 		game.batch.enableBlending();

@@ -121,6 +121,22 @@ public abstract class BGMPlayer extends StageObject implements EventListener
 		fade(0f, 1f, 60, false);
 	}
 	
+	private int fadeDelay = 10;
+	
+	/**
+	 * The delay before a fade starts, default: 10 ticks
+	 * @return
+	 */
+	public int getFadeDelay()
+	{
+		return fadeDelay;
+	}
+	
+	public void setFadeDelay(int fadeDelay)
+	{
+		this.fadeDelay = fadeDelay;
+	}
+	
 	/**
 	 * Standard fadein over 60 seconds.
 	 */
@@ -134,6 +150,8 @@ public abstract class BGMPlayer extends StageObject implements EventListener
 	
 	public void fade(final float start, final float end, int overTicks, final boolean disposeOnFinish)
 	{
+		bgm.setVolume(start);
+		
 		final float increase = (end - start)/overTicks;
 		
 		for(float i = 0; i < overTicks; i++)
@@ -151,7 +169,7 @@ public abstract class BGMPlayer extends StageObject implements EventListener
 					if(disposeOnFinish && bgm.getVolume() < 0.01f)
 						bgm.dispose();
 				}
-			}, (int) i);
+			}, (int) i + getFadeDelay());
 		}
 		
 		Game.getGame().addTaskGame(new Runnable()
@@ -165,6 +183,6 @@ public abstract class BGMPlayer extends StageObject implements EventListener
 				if(disposeOnFinish)
 					bgm.dispose();
 			}
-		}, overTicks);
+		}, overTicks + getFadeDelay());
 	}
 }

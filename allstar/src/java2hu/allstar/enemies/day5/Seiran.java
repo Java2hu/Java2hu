@@ -89,6 +89,7 @@ public class Seiran extends AllStarBoss
 		special.setPlayMode(PlayMode.NORMAL);
 	
 		Music bgm = new J2hMusic(Gdx.audio.newMusic(FOLDER.child("bgm.mp3")));
+		bgm.setLooping(true);
 		
 		setColor(new Color(17 / 255f, 119 / 255f, 204 / 255f, 1.0f));
 		
@@ -410,6 +411,10 @@ public class Seiran extends AllStarBoss
 		{
 			final Player player = game.getPlayer();
 			
+			if(tick == 0)
+			{
+				boss.playSpecial(false);
+			}
 		}
 	}
 }

@@ -603,7 +603,7 @@ public class BossUtil extends J2hObject
 			
 			final int maxSize = 600;
 			double size = outwards ? 0 : maxSize;
-			Color white = new Color(0.0f, 0.0f, 0.0f, 0.0f);
+			Color white = color.cpy().mul(0.4f);
 			
 			@Override
 			public void onUpdate(long tick)
@@ -615,7 +615,7 @@ public class BossUtil extends J2hObject
 					game.delete(this);
 				}
 				
-				mesh = MeshUtil.makeMesh(mesh, MeshUtil.makeCircleVertices(pos.getX(), pos.getY(), 30, 0, (float) size, white, color.cpy()));
+				mesh = MeshUtil.makeMesh(mesh, MeshUtil.makeCircleVertices(pos.getX(), pos.getY(), 30, 0, (float) size, color.cpy().mul(0.4f), color.cpy()));
 				
 				double increment = 20;
 				

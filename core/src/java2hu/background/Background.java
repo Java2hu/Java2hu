@@ -21,7 +21,7 @@ public class Background extends ABackground
 	
 	public Background(Texture backgroundTexture)
 	{
-		setZIndex(-1000);
+		setZIndex(-50);
 		
 		text = backgroundTexture;
 		setWrap(TextureWrap.Repeat, TextureWrap.Repeat);

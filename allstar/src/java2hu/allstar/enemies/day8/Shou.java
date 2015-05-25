@@ -1,12 +1,11 @@
 package java2hu.allstar.enemies.day8;
 
 import java.util.ArrayList;
-
 import java2hu.Game;
 import java2hu.HitboxSprite;
 import java2hu.J2hGame;
-import java2hu.Loader;
 import java2hu.J2hGame.ClearType;
+import java2hu.Loader;
 import java2hu.Position;
 import java2hu.StartupLoopAnimation;
 import java2hu.allstar.AllStarStageScheme;
@@ -37,6 +36,7 @@ import java2hu.util.Getter;
 import java2hu.util.ImageSplitter;
 import java2hu.util.MathUtil;
 import java2hu.util.Scheduler;
+
 import shaders.ShaderLibrary;
 
 import com.badlogic.gdx.Gdx;
@@ -539,8 +539,11 @@ public class Shou extends AllStarBoss
 
 									for(int amount = 0; amount < 2; amount++)
 									{
-										final float xDest = (float) (x + (Math.random() * 400 - 200));
-										final float yDest = (float) (y + (Math.random() * 400 - 200));
+										final int xMovement = 800;
+										final int yMovement = 200;
+										
+										final float xDest = (float) (x + ((Math.random() - 0.5f) * 2) * xMovement);
+										final float yDest = (float) (y + ((Math.random() - 0.5f) * 2) * yMovement);
 
 										Bullet bullet = new Bullet(new ThBullet(ThBulletType.BALL_2, ThBulletColor.WHITE), x, y)
 										{

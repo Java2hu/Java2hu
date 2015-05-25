@@ -6,12 +6,14 @@ import java2hu.Game;
 import java2hu.J2hGame;
 import java2hu.allstar.backgrounds.BambooForestBG;
 import java2hu.allstar.backgrounds.CloudsBG;
+import java2hu.allstar.backgrounds.DreamWorldBG;
 import java2hu.allstar.backgrounds.HokkaiBG;
 import java2hu.allstar.backgrounds.MagicalStormBG;
 import java2hu.allstar.backgrounds.MakaiBG;
 import java2hu.allstar.backgrounds.MistLakeBG;
 import java2hu.allstar.enemies.AllStarBoss;
 import java2hu.allstar.enemies.day1.Cirno;
+import java2hu.allstar.enemies.day1.Doremy;
 import java2hu.allstar.enemies.day1.Wakasagihime;
 import java2hu.allstar.enemies.day2.Kagerou;
 import java2hu.allstar.enemies.day2.Mokou;
@@ -84,7 +86,15 @@ public class Days extends J2hObject
 			// Maribel & Renko
 			// Heida no Akyu
 			// Rinnosuke
-			// Doremy Sweet
+			addCharacter(day, type, Doremy.FULL_NAME, new Getter<AllStarBoss>()
+			{
+				@Override
+				public AllStarBoss get()
+				{
+					final Doremy boss = new Doremy(startHP, startX, startY);
+					return boss;
+				}
+			});
 		}
 		
 		day++;
@@ -167,7 +177,7 @@ public class Days extends J2hObject
 				@Override
 				public AllStarBoss get()
 				{
-					final Seiran boss = new Seiran(100, startX, startY);
+					final Seiran boss = new Seiran(startHP, startX, startY);
 					return boss;
 				}
 			});
@@ -511,7 +521,14 @@ public class Days extends J2hObject
 				return new MistLakeBG();
 			};
 		}),
-		DREAM_DIM(null),
+		DREAM_DIM(new Getter<Background3D>()
+		{
+			@Override
+			public Background3D get()
+			{
+				return new DreamWorldBG();
+			};
+		}),
 		BAMBOO(new Getter<Background3D>()
 		{
 			@Override

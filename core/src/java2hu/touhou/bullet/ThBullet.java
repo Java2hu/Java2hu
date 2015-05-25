@@ -32,6 +32,16 @@ public class ThBullet implements IBulletType
 		this.color = color;
 	}
 	
+	public ThBulletType getType()
+	{
+		return type;
+	}
+	
+	public ThBulletColor getBulletColor()
+	{
+		return color;
+	}
+	
 	public Color getColor()
 	{
 		return color.color;
