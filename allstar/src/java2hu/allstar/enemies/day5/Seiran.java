@@ -383,6 +383,8 @@ public class Seiran extends AllStarBoss
 					{
 						final float bend = (offset > 0 ? -1f : (offset != 0 ? 1f : 0)) * f * 10f;
 						
+						bullet.setZIndex((int) (bullet.getZIndex() + Math.abs(bend * 10)));
+						
 						game.addTaskGame(new Runnable()
 						{
 							@Override
