@@ -5,7 +5,11 @@ import java2hu.gameflow.GameFlowScheme.WaitConditioner;
 import java2hu.object.LivingObject;
 import java2hu.object.StageObject;
 import java2hu.overwrite.J2hObject;
+import java2hu.plugin.Plugin;
 import java2hu.system.SaveableObject;
+import java2hu.touhou.sounds.TouhouSounds;
+
+import com.badlogic.gdx.graphics.Color;
 
 public class SchemeUtil extends J2hObject
 {
@@ -53,5 +57,49 @@ public class SchemeUtil extends J2hObject
 				return !obj.isDead();
 			}
 		});
+	}
+	
+	/**
+	 * Waits for the passed living object to die. (reach <= 0 hp)
+	 * And then plays a death animation, where the object moves to the left and explodes after a few seconds.
+	 * @param obj
+	 */
+	public static void deathAnimation(GameFlowScheme scheme, final LivingObject obj, final Color color)
+	{
+		final int ticksWait = 60;
+		
+		obj.addEffect(new Plugin<StageObject>()
+		{
+			long spawnTick = 0;
+			
+			float x = (float) (1f * ((2 * Math.random()) - 1));
+			float y = (float) (1f * ((2 * Math.random()) - 1));
+			
+			@Override
+			public void update(StageObject object, long tick)
+			{
+				if(spawnTick == 0)
+				{
+					TouhouSounds.Enemy.EXPLOSION_2.play(0.5f);
+					spawnTick = tick;
+				}
+				
+				tick -= spawnTick;
+				
+				if(tick == ticksWait)
+				{
+					BossUtil.charge(object, color, true);
+					TouhouSounds.Enemy.EXPLOSION_2.play(0.5f);
+				}
+				
+				if(tick >= ticksWait)
+					return;
+				
+				object.setX(object.getX() + x);
+				object.setY(object.getY() + y);
+			}
+		});
+		
+		scheme.waitTicks(ticksWait);
 	}
 }

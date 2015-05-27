@@ -17,6 +17,7 @@ import java2hu.system.SaveableObject;
 import java2hu.util.AnimationUtil;
 import java2hu.util.BossUtil;
 import java2hu.util.ImageSplitter;
+import java2hu.util.ObjectUtil;
 import java2hu.util.SchemeUtil;
 import java2hu.util.Setter;
 
@@ -192,22 +193,34 @@ public class SimpleBoss extends AllStarBoss
 		
 		SchemeUtil.waitForDeath(scheme, boss);
 		
-		scheme.doWait();
+		Game.getGame().addTaskGame(new Runnable()
+		{
+			@Override
+			public void run()
+			{
+				Game.getGame().clearCircle(800f, boss, ClearType.ALL);
+			}
+		}, 1);
+		
+		scheme.waitTicks(2);
+		
+		boss.playSpecial(false);
+		SchemeUtil.deathAnimation(scheme, boss, boss.getColor());
 		
 		Game.getGame().addTaskGame(new Runnable()
 		{
 			@Override
 			public void run()
 			{
+				ObjectUtil.deathAnimation(boss);
+				
 				Game.getGame().delete(boss);
 				
 				Game.getGame().clear(ClearType.ALL);
-				
-				BossUtil.mapleExplosion(boss.getX(), boss.getY());
 			}
-		}, 1);
+		}, 5);
 		
-		scheme.waitTicks(5); // Prevent concurrency issues.
+		scheme.waitTicks(10); // Prevent concurrency issues.
 	}
 	
 	public static class NonSpell extends BossSpellcard<SimpleBoss>

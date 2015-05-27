@@ -65,9 +65,6 @@ public abstract class BGMPlayer extends StageObject implements EventListener
 	}
 
 	@Override
-	public abstract boolean isPersistant();
-
-	@Override
 	public float getWidth()
 	{
 		return 0;
@@ -102,7 +99,7 @@ public abstract class BGMPlayer extends StageObject implements EventListener
 	}
 	
 	/**
-	 * Standard fadeout over 60 seconds.
+	 * Standard fadeout over 60 ticks.
 	 */
 	public void fadeOut()
 	{
@@ -114,7 +111,7 @@ public abstract class BGMPlayer extends StageObject implements EventListener
 	}
 	
 	/**
-	 * Standard fadein over 60 seconds.
+	 * Standard fadein over 60 ticks.
 	 */
 	public void fadeIn()
 	{
@@ -138,7 +135,7 @@ public abstract class BGMPlayer extends StageObject implements EventListener
 	}
 	
 	/**
-	 * Standard fadein over 60 seconds.
+	 * Standard fadein over 60 ticks.
 	 */
 	public void fadeIn(float targetVolume)
 	{
@@ -158,7 +155,7 @@ public abstract class BGMPlayer extends StageObject implements EventListener
 		{
 			final int finalI = (int) i;
 			
-			Game.getGame().addTaskGame(new Runnable()
+			Game.getGame().addTask(new Runnable()
 			{
 				@Override
 				public void run()
@@ -167,12 +164,15 @@ public abstract class BGMPlayer extends StageObject implements EventListener
 						bgm.setVolume(start + finalI * increase);
 					
 					if(disposeOnFinish && bgm.getVolume() < 0.01f)
+					{
+						System.out.println("Dispose");
 						bgm.dispose();
+					}
 				}
 			}, (int) i + getFadeDelay());
 		}
 		
-		Game.getGame().addTaskGame(new Runnable()
+		Game.getGame().addTask(new Runnable()
 		{
 			@Override
 			public void run()

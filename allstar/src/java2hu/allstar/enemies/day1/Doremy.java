@@ -25,6 +25,7 @@ import java2hu.touhou.bullet.ThBulletType;
 import java2hu.touhou.sounds.TouhouSounds;
 import java2hu.util.BossUtil;
 import java2hu.util.ImageSplitter;
+import java2hu.util.ObjectUtil;
 import java2hu.util.SchemeUtil;
 import java2hu.util.Setter;
 
@@ -200,39 +201,6 @@ public class Doremy extends AllStarBoss
 		super.onDraw();
 	}
 	
-	public void triangle(double dirDeg, int rows, double speed, double spreadSpeed)
-	{
-		double rad = Math.toRadians(dirDeg - 90);
-		
-		for(int row = 1; row <= rows; row++)
-		{
-			int bullets = row;
-			
-			double offset = bullets / 2d;
-			
-			for(int i = 0; i < bullets; i++)
-			{
-				double number = (i - offset);
-				
-				double x = Math.cos(rad) * (number * spreadSpeed);
-				double y = Math.sin(rad) * (number * spreadSpeed);
-				
-				final Bullet bullet = new Bullet(new ThBullet(ThBulletType.BULLET, ThBulletColor.CYAN), (float)(this.getX() + x), (float)(this.getY() + y));
-				bullet.setDirectionDeg((float)(dirDeg + (spreadSpeed * (number / 4d))), (float)speed);
-				bullet.setRotationFromVelocity(-90);
-				
-				game.addTaskGame(new Runnable()
-				{
-					@Override
-					public void run()
-					{
-						game.spawn(bullet);
-					}
-				}, (int) ((row) * (1600d / speed)));
-			}
-		}
-	}
-
 	@Override
 	public void executeFight(final AllStarStageScheme scheme)
 	{
@@ -302,22 +270,34 @@ public class Doremy extends AllStarBoss
 		
 		SchemeUtil.waitForDeath(scheme, boss);
 		
-		scheme.doWait();
+		Game.getGame().addTaskGame(new Runnable()
+		{
+			@Override
+			public void run()
+			{
+				Game.getGame().clearCircle(800f, boss, ClearType.ALL);
+			}
+		}, 1);
+		
+		scheme.waitTicks(2);
+		
+		boss.playSpecial(false);
+		SchemeUtil.deathAnimation(scheme, boss, boss.getColor());
 		
 		Game.getGame().addTaskGame(new Runnable()
 		{
 			@Override
 			public void run()
 			{
+				ObjectUtil.deathAnimation(boss);
+				
 				Game.getGame().delete(boss);
 				
 				Game.getGame().clear(ClearType.ALL);
-				
-				BossUtil.mapleExplosion(boss.getX(), boss.getY());
 			}
-		}, 1);
+		}, 5);
 		
-		scheme.waitTicks(5); // Prevent concurrency issues.
+		scheme.waitTicks(10); // Prevent concurrency issues.
 	}
 	
 	public static class NonSpell extends BossSpellcard<Doremy>

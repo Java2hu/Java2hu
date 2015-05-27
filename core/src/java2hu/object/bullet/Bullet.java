@@ -582,7 +582,7 @@ public class Bullet extends StageObject
 				
 				alpha += alphaIncrease;
 				
-				if(getTicksAlive() > time)
+				if(getTicksAlive() > time || !bullet.isOnStage())
 				{
 					animationPlaying = false;
 					Game.getGame().delete(this);
@@ -665,7 +665,7 @@ public class Bullet extends StageObject
 				
 				current.setOrigin(0, 0);
 				
-				float longest = Math.max(bullet.getWidth(), bullet.getHeight());
+				float longest = Math.max(bullet.getWidth(), bullet.getHeight()) + 100;
 				
 				current.setSize(longest, longest);
 				

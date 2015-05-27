@@ -539,6 +539,195 @@ public class J2hGame extends ApplicationAdapter implements InputProcessor
 	}
 	
 	/**
+	 * Clears objects in a circle expanding from the center.
+	 * 800f is a normal expansion speed, going lower will lag a lot more.
+	 */
+	public void clearCircle(float expansionSpeed, IPosition center, ClearType... types)
+	{
+		for(ClearType type : types)
+		{
+			clearCircle(expansionSpeed, center, type, false);
+		}
+	}
+	
+	public void clearCircle(float expansionSpeed, IPosition center, ClearType type, boolean ignorePersistance)
+	{
+		System.out.println("Clearing circle with type: " + type + " ignore:" + ignorePersistance);
+		
+		clearCircle(expansionSpeed, center, new Clear(type, ignorePersistance));
+	}
+	
+	public void clearCircle(float expansionSpeed, final IPosition center, Clear... clearDatas)
+	{
+		final HashMap<ClearType, Boolean> types = new HashMap<J2hGame.ClearType, Boolean>();
+		
+		Clear clearSpells = null;
+		Clear clearTasks = null;
+		Clear clearAll = null;
+		Clear clearAllObjects = null;
+		
+		for(Clear type : clearDatas)
+		{
+			if(type.getType() == ClearType.SPELLS)
+			{
+				clearSpells = type;
+				continue;
+			}
+			
+			if(type.getType() == ClearType.TASKS)
+			{
+				clearTasks = type;
+				continue;
+			}
+
+			if(type.getType() == ClearType.ALL)
+			{
+				clearAll = type;
+				System.out.println("Clear all!");
+				continue;
+			}
+			
+			if(type.getType() == ClearType.ALL_OBJECTS)
+			{
+				clearAllObjects = type;
+			}
+			
+			types.put(type.getType(), type.doIgnorePersistant());
+		}
+		
+		if(clearSpells != null || clearAll != null)
+		{
+			clearSpellcards();
+		}
+		
+		if(clearTasks != null || clearAll != null)
+		{
+			delayedGameTasks.clear();
+		}
+		
+		final Clear finalClearAll = clearAll;
+		
+		final Clear finalClearAllObjects = clearAllObjects;
+		
+		final float maxSize = Math.max(Game.getGame().height, Game.getGame().width) * 2;
+		
+		int tick = 0;
+		
+		for(float size = 0; size < maxSize; size += (expansionSpeed / (double)LOGIC_TPS))
+		{
+			tick++;
+			final float finalSize = size;
+			
+			Runnable clear = new Runnable()
+			{
+				@Override
+				public void run()
+				{
+					ArrayList<StageObject> toDelete = new ArrayList<StageObject>();
+
+					for (StageObject obj : Game.getGame().getStageObjects())
+					{
+						double distance = MathUtil.getDistance(obj, center);
+						
+						if(finalSize < distance || finalSize - 100 > distance)
+							continue;
+						
+						boolean persistant = obj.isPersistant();
+
+						if (finalClearAll != null || finalClearAllObjects != null)
+						{
+							if (!persistant || finalClearAll != null && finalClearAll.ignorePersistant || finalClearAllObjects != null && finalClearAllObjects.ignorePersistant)
+							{
+								toDelete.add(obj);
+								continue;
+							}
+						}
+
+						boolean isLiving = obj instanceof LivingObject;
+						boolean isBoss = obj instanceof Boss;
+
+						if (isLiving)
+						{
+							if (types.containsKey(ClearType.LIVING))
+							{
+								if (!persistant || types.get(ClearType.LIVING))
+								{
+									toDelete.add(obj);
+									continue;
+								}
+							}
+
+							if (!isBoss && types.containsKey(ClearType.NON_BOSS_LIVING))
+							{
+								if (!persistant || types.get(ClearType.NON_BOSS_LIVING))
+								{
+									toDelete.add(obj);
+									continue;
+								}
+							}
+						}
+
+						boolean removePlugins = types.containsKey(ClearType.PLUGINS);
+
+						if (removePlugins)
+						{
+							Iterator<Plugin> it = obj.getEffects().iterator();
+
+							while (it.hasNext())
+							{
+								Plugin plugin = it.next();
+
+								if (!plugin.isPersistant() || types.get(ClearType.PLUGINS))
+								{
+									plugin.onDelete();
+									it.remove();
+								}
+							}
+							continue;
+						}
+					}
+
+					for (StageObject obj : toDelete)
+					{
+						delete(obj);
+					}
+
+					toDelete.clear();
+
+					for (Bullet bullet : getBullets())
+					{
+						double distance = MathUtil.getDistance(bullet, center);
+						
+						if(finalSize < distance || finalSize - 100 > distance)
+							continue;
+						
+						boolean clearBullets = types.containsKey(ClearType.BULLETS);
+
+						if (clearBullets || finalClearAll != null || types.containsKey(ClearType.ALL_OBJECTS))
+						{
+							if (!bullet.isPersistant() || clearBullets && types.get(ClearType.BULLETS).booleanValue() || finalClearAll != null && finalClearAll.ignorePersistant || finalClearAllObjects != null && finalClearAllObjects.ignorePersistant)
+							{
+								toDelete.add(bullet);
+								continue;
+							}
+						}
+					}
+
+					for (StageObject obj : toDelete)
+					{
+						obj.onDelete();
+						getBullets().remove(obj);
+					}
+
+					toDelete.clear();
+				}
+			};
+			
+			addTask(clear, tick);
+		}
+	}
+	
+	/**
 	 * Clears all objects
 	 */
 	public void clearObjects()

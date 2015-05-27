@@ -107,24 +107,42 @@ public abstract class AllStarBoss extends Boss
 	public abstract void executeFight(AllStarStageScheme scheme);
 	
 	@Override
+	public void onDelete()
+	{
+		if(bgmPlayer != null)
+			bgmPlayer.fadeOut();
+		
+		Game.getGame().addTask(new Runnable()
+		{
+			@Override
+			public void run()
+			{
+				AllStarBoss.super.onDelete();
+			}
+		}, 10 * 60);
+	}
+	
+	private BGMPlayer bgmPlayer;
+	
+	@Override
 	public void onSpawn()
 	{
 		if(getBackgroundMusic() == null)
 			return;
 		
-		BGMPlayer player = new BGMPlayer(getBackgroundMusic())
+		bgmPlayer = new BGMPlayer(getBackgroundMusic())
 		{
 			@Override
 			public boolean isPersistant()
 			{
-				return AllStarBoss.this.isOnStage();
+				return true;
 			}
 		};
 	
-		player.getBgm().play();
-		player.getBgm().setPosition(bgmPosition);
-		player.fadeIn();
+		bgmPlayer.getBgm().play();
+		bgmPlayer.getBgm().setPosition(bgmPosition);
+		bgmPlayer.fadeIn();
 
-		game.spawn(player);
+		game.spawn(bgmPlayer);
 	}
 }

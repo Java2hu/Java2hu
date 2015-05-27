@@ -1,6 +1,7 @@
 package java2hu.background;
 
 import java2hu.Game;
+import java2hu.ZIndex;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureWrap;
@@ -21,7 +22,7 @@ public class Background extends ABackground
 	
 	public Background(Texture backgroundTexture)
 	{
-		setZIndex(-50);
+		setZIndex(ZIndex.BACKGROUND);
 		
 		text = backgroundTexture;
 		setWrap(TextureWrap.Repeat, TextureWrap.Repeat);

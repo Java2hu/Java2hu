@@ -2,6 +2,7 @@ package java2hu.background.bg3d;
 
 import java2hu.Game;
 import java2hu.J2hGame;
+import java2hu.ZIndex;
 import java2hu.background.bg3d.controllers.RotationPerspectiveCamera;
 import java2hu.object.DrawObject;
 import java2hu.object.UpdateObject;
@@ -33,7 +34,7 @@ public abstract class Background3D extends DrawObject
 	
 	public Background3D()
 	{
-		setZIndex(-1000);
+		setZIndex(-ZIndex.BACKGROUND);
 	}
 	
 	@Override

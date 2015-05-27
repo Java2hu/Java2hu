@@ -1,5 +1,6 @@
 package java2hu.allstar.enemies.day5;
 
+import java2hu.Border;
 import java2hu.Game;
 import java2hu.J2hGame;
 import java2hu.J2hGame.ClearType;
@@ -12,6 +13,7 @@ import java2hu.background.Background;
 import java2hu.background.BackgroundBossAura;
 import java2hu.gameflow.GameFlowScheme.WaitConditioner;
 import java2hu.object.bullet.Bullet;
+import java2hu.object.bullet.ReflectingBullet;
 import java2hu.object.player.Player;
 import java2hu.object.ui.CircleHealthBar;
 import java2hu.overwrite.J2hMusic;
@@ -25,6 +27,7 @@ import java2hu.util.AnimationUtil;
 import java2hu.util.BossUtil;
 import java2hu.util.ImageSplitter;
 import java2hu.util.MathUtil;
+import java2hu.util.ObjectUtil;
 import java2hu.util.SchemeUtil;
 import java2hu.util.Setter;
 
@@ -52,7 +55,7 @@ public class Seiran extends AllStarBoss
 	/**
 	 * Spell Card Name
 	 */
-	final static String SPELLCARD_NAME = "...";
+	final static String SPELLCARD_NAME = "Eagle Sign \"Flock of Claws\"";
 	
 	private Setter<BackgroundBossAura> backgroundSpawner;
 	
@@ -167,7 +170,7 @@ public class Seiran extends AllStarBoss
 		super.onDraw();
 	}
 	
-	public void triangle(double dirDeg, int rows, double speed, double spreadSpeed)
+	public void triangle(double dirDeg, int reflectTimes, ThBulletColor color, int rows, double speed, double spreadSpeed)
 	{
 		double rad = Math.toRadians(dirDeg - 90);
 		
@@ -184,9 +187,32 @@ public class Seiran extends AllStarBoss
 				double x = Math.cos(rad) * (number * spreadSpeed);
 				double y = Math.sin(rad) * (number * spreadSpeed);
 				
-				final Bullet bullet = new Bullet(new ThBullet(ThBulletType.BULLET, ThBulletColor.CYAN), (float)(this.getX() + x), (float)(this.getY() + y));
+				final Bullet bullet = new ReflectingBullet(new ThBullet(ThBulletType.BULLET, color).getAnimation(), (float)(this.getX() + x), (float)(this.getY() + y), reflectTimes)
+				{
+					@Override
+					public void onReflect(java2hu.Border border, int reflectAmount)
+					{
+						if(border == Border.BOT)
+						{
+							setVelocityY(-getVelocityY());
+						}
+						
+						setRotationFromVelocity(-90);
+					};
+				};
+				
+				bullet.setZIndex(bullet.getZIndex() + (row) + i);
 				bullet.setDirectionDeg((float)(dirDeg + (spreadSpeed * (number / 4d))), (float)speed);
 				bullet.setRotationFromVelocity(-90);
+				
+				// This below here fixes weird offsets because the game can only spawn at certain intervals, so it updates the position for the small time offset ahead of time..
+				
+				double time = ((row) * (1600d / speed));
+				double remainder = time % 1;
+				remainder /= J2hGame.LOGIC_TPS;
+				
+				bullet.setX((float) (bullet.getX() + (bullet.getVelocityX() * remainder)));
+				bullet.setY((float) (bullet.getY() + (bullet.getVelocityY() * remainder)));
 				
 				game.addTaskGame(new Runnable()
 				{
@@ -195,7 +221,7 @@ public class Seiran extends AllStarBoss
 					{
 						game.spawn(bullet);
 					}
-				}, (int) ((row) * (1600d / speed)));
+				}, (int)time);
 			}
 		}
 	}
@@ -269,22 +295,34 @@ public class Seiran extends AllStarBoss
 		
 		SchemeUtil.waitForDeath(scheme, boss);
 		
-		scheme.doWait();
+		Game.getGame().addTaskGame(new Runnable()
+		{
+			@Override
+			public void run()
+			{
+				Game.getGame().clearCircle(800f, boss, ClearType.ALL);
+			}
+		}, 1);
+		
+		scheme.waitTicks(2);
+		
+		boss.playSpecial(false);
+		SchemeUtil.deathAnimation(scheme, boss, boss.getColor());
 		
 		Game.getGame().addTaskGame(new Runnable()
 		{
 			@Override
 			public void run()
 			{
+				ObjectUtil.deathAnimation(boss);
+				
 				Game.getGame().delete(boss);
 				
 				Game.getGame().clear(ClearType.ALL);
-				
-				BossUtil.mapleExplosion(boss.getX(), boss.getY());
 			}
-		}, 1);
+		}, 5);
 		
-		scheme.waitTicks(5); // Prevent concurrency issues.
+		scheme.waitTicks(10); // Prevent concurrency issues.
 	}
 	
 	public static class NonSpell extends BossSpellcard<Seiran>
@@ -344,7 +382,7 @@ public class Seiran extends AllStarBoss
 						{
 							TouhouSounds.Enemy.RELEASE_1.play(0.5f);
 							
-							boss.triangle(finalDegree, 6, 400, 8d);
+							boss.triangle(finalDegree, 0, ThBulletColor.CYAN, 6, 400, 8d);
 						}
 					}, (int) ((i / Math.PI) * 120d));
 				}
@@ -416,6 +454,52 @@ public class Seiran extends AllStarBoss
 			if(tick == 0)
 			{
 				boss.playSpecial(false);
+				boss.setDamageModifier(0.5f);
+			}
+			
+			if(tick < 100)
+			{
+				return;
+			}
+			
+			int period = 700;
+			
+			if(tick % period <= 100)
+			{
+				if(tick % period == 40)
+				{
+					boss.playSpecial(false);
+
+					float width = 400;
+
+					int minX = (int) Math.max(game.getMinX() + 300, Math.min(game.getMaxX() - width - 300, boss.getX() - 200));
+
+					int minY = (int) (game.getCenterY() + 200);
+
+					Rectangle box = new Rectangle(minX, minY, width, 200);
+
+					BossUtil.moveAroundRandomly(boss, box, 800);
+				}
+				else if(tick % period == 100)
+					boss.playSpecial(true);
+			}
+			else
+			{
+				float timeMultiplier = Math.min(1.625f, (tick / 500f));
+
+				if(tick % (4 + (int)(26 * timeMultiplier)) == 0)
+				{
+					TouhouSounds.Enemy.RELEASE_1.play(0.5f);
+					
+					float startAngle = (tick % 300f / 300f) * 360f;
+
+					for(float angle : new float[] { 0, 45, 90, 135, 180, 225, 270, 315 })
+					{
+						boolean small = angle % 45 == 0 && angle % 90 != 0;
+
+						boss.triangle(startAngle + angle, small ? 1 : 0, small ? ThBulletColor.BLUE : ThBulletColor.CYAN, (int) (small ? 4 * timeMultiplier : (int) (2 + (5 * timeMultiplier))), small ? 300f : (800f + (-300 * timeMultiplier)), small ? 2f : (1f + (9f * timeMultiplier)));
+					}
+				}
 			}
 		}
 	}

@@ -12,7 +12,7 @@ import com.badlogic.gdx.graphics.g2d.Animation;
  * Bullet that reflects when touching the sides of the game
  * Extend the method onReflect(int time) to do special stuff
  */
-public abstract class ReflectingBullet extends Bullet
+public class ReflectingBullet extends Bullet
 {
 	private int reflectTimes = 0;
 	private int maxReflectTimes = 0;
