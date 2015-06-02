@@ -23,6 +23,7 @@ import java2hu.touhou.bullet.ThBulletType;
 import java2hu.touhou.sounds.TouhouSounds;
 import java2hu.util.AnimationUtil;
 import java2hu.util.BossUtil;
+import java2hu.util.Duration;
 import java2hu.util.ImageSplitter;
 import java2hu.util.MathUtil;
 import java2hu.util.ObjectUtil;
@@ -172,29 +173,43 @@ public class Cirno extends AllStarBoss
 				
 				AllStarUtil.presentSpellCard(boss, SPELLCARD_NAME);
 				
-				Game.getGame().startSpellCard(new Spell(boss));
+				final Spell card = new Spell(boss);
+				
+				Game.getGame().startSpellCard(card);
+
+				BossUtil.spellcardCircle(boss, card, scheme.getBossAura());
 			}
 		}, 1);
 		
 		SchemeUtil.waitForDeath(scheme, boss);
-		
-		scheme.doWait();
 		
 		Game.getGame().addTaskGame(new Runnable()
 		{
 			@Override
 			public void run()
 			{
-				Game.getGame().delete(boss);
-				
-				Game.getGame().clear(ClearType.ALL);
-				
-				BossUtil.mapleExplosion(boss.getX(), boss.getY());
-				ObjectUtil.deathAnimation(boss);
+				Game.getGame().clearCircle(800f, boss, ClearType.ALL);
 			}
 		}, 1);
 		
-		scheme.waitTicks(5); // Prevent concurrency issues.
+		scheme.waitTicks(2);
+		
+		SchemeUtil.deathAnimation(scheme, boss, boss.getAuraColor());
+		
+		Game.getGame().addTaskGame(new Runnable()
+		{
+			@Override
+			public void run()
+			{
+				ObjectUtil.deathAnimation(boss);
+				
+				Game.getGame().delete(boss);
+				
+				Game.getGame().clear(ClearType.ALL);
+			}
+		}, 5);
+		
+		scheme.waitTicks(10); // Prevent concurrency issues.
 	}
 	
 	public static class NonSpell extends PhaseSpellcard<Cirno>
@@ -202,6 +217,7 @@ public class Cirno extends AllStarBoss
 		public NonSpell(Cirno owner)
 		{
 			super(owner);
+			setSpellcardTime(Duration.seconds(25));
 			
 			final Player player = game.getPlayer();
 			
@@ -383,6 +399,7 @@ public class Cirno extends AllStarBoss
 		public Spell(Cirno owner)
 		{
 			super(owner);
+			setSpellcardTime(Duration.seconds(50));
 			
 			addPhase(new Phase<Cirno>(30)
 			{

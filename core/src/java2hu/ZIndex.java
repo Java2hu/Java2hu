@@ -18,6 +18,11 @@ public class ZIndex
 	public static final int BACKGROUND_LAYER_2 = -500;
 	
 	/**
+	 * Z-Index where our Boss Aura draws all the backgrounda and applies a shader.
+	 */
+	public static final int BACKGROUND_AURA = 0;
+	
+	/**
 	 * Above this is considered bullets.
 	 */
 	public static final int BULLETS = 1000;

@@ -27,11 +27,14 @@ import java2hu.touhou.bullet.ThBulletType;
 import java2hu.touhou.sounds.TouhouSounds;
 import java2hu.util.BossUtil;
 import java2hu.util.BossUtil.BackgroundAura;
+import java2hu.util.Duration;
 import java2hu.util.Getter;
 import java2hu.util.ImageSplitter;
 import java2hu.util.ImageUtil;
 import java2hu.util.MathUtil;
 import java2hu.util.MeshUtil;
+import java2hu.util.ObjectUtil;
+import java2hu.util.SchemeUtil;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Music;
@@ -453,7 +456,7 @@ public class Shinki extends AllStarBoss
 	}
 
 	@Override
-	public void executeFight(AllStarStageScheme scheme)
+	public void executeFight(final AllStarStageScheme scheme)
 	{
 		final J2hGame g = Game.getGame();
 		final Shinki boss = this;
@@ -535,43 +538,44 @@ public class Shinki extends AllStarBoss
 				
 				AllStarUtil.presentSpellCard(boss, SPELLCARD_NAME);
 				
-				Game.getGame().startSpellCard(new ShinkiSpell(boss));
+				final ShinkiSpell card = new ShinkiSpell(boss);
+				
+				Game.getGame().startSpellCard(card);
+
+				BossUtil.spellcardCircle(boss, card, scheme.getBossAura());
 			}
 		}, 1);
 		
-		scheme.setWait(new WaitConditioner()
-		{
-			@Override
-			public boolean returnTrueToWait()
-			{
-				try
-				{
-					return !boss.isDead();
-				}
-				catch(Exception e)
-				{
-					return true;
-				}
-			}
-		});
-		
-		scheme.doWait();
+		SchemeUtil.waitForDeath(scheme, boss);
 		
 		Game.getGame().addTaskGame(new Runnable()
 		{
 			@Override
 			public void run()
 			{
-				Game.getGame().delete(boss);
-				
-				Game.getGame().clearSpellcards();
-				Game.getGame().clear(ClearType.ALL_OBJECTS);
-				
-				BossUtil.mapleExplosion(boss.getX(), boss.getY());
+				boss.setNoWings();
+				Game.getGame().clearCircle(800f, boss, ClearType.ALL);
 			}
 		}, 1);
 		
-		scheme.waitTicks(5); // Prevent concurrency issues.
+		scheme.waitTicks(2);
+		
+		SchemeUtil.deathAnimation(scheme, boss, boss.getAuraColor());
+		
+		Game.getGame().addTaskGame(new Runnable()
+		{
+			@Override
+			public void run()
+			{
+				ObjectUtil.deathAnimation(boss);
+				
+				Game.getGame().delete(boss);
+				
+				Game.getGame().clear(ClearType.ALL);
+			}
+		}, 5);
+		
+		scheme.waitTicks(10); // Prevent concurrency issues.
 	}
 	
 	public static class ShinkiNonSpell extends Spellcard
@@ -579,6 +583,7 @@ public class Shinki extends AllStarBoss
 		public ShinkiNonSpell(StageObject owner)
 		{
 			super(owner);
+			setSpellcardTime(Duration.seconds(52));
 		}
 		
 		@Override
@@ -826,6 +831,7 @@ public class Shinki extends AllStarBoss
 		public ShinkiSpell(StageObject owner)
 		{
 			super(owner);
+			setSpellcardTime(Duration.seconds(60));
 			
 			final Shinki boss = (Shinki) getOwner();
 			

@@ -27,6 +27,7 @@ import java2hu.touhou.bullet.ThBulletType;
 import java2hu.touhou.sounds.TouhouSounds;
 import java2hu.util.AnimationUtil;
 import java2hu.util.BossUtil;
+import java2hu.util.Duration;
 import java2hu.util.Getter;
 import java2hu.util.ImageSplitter;
 import java2hu.util.MathUtil;
@@ -386,7 +387,11 @@ public class Wakasagihime extends AllStarBoss
 				
 				background.set(scheme.getBossAura());
 				
-				game.startSpellCard(new WakasagihimeSpell(boss));
+				final WakasagihimeSpell card = new WakasagihimeSpell(boss);
+				
+				game.startSpellCard(card);
+				System.out.println("Circle");
+				BossUtil.spellcardCircle(boss, card, scheme.getBossAura());
 			}
 		}, 1);
 		
@@ -397,15 +402,29 @@ public class Wakasagihime extends AllStarBoss
 			@Override
 			public void run()
 			{
-				Game.getGame().delete(boss);
-				
-				game.clear(ClearType.ALL_OBJECTS, ClearType.SPELLS, ClearType.TASKS);
-				scheme.reset();
-				
-				ObjectUtil.deathAnimation(boss);
-				BossUtil.mapleExplosion(boss.getX(), boss.getY());
+				Game.getGame().clearCircle(800f, boss, ClearType.ALL);
 			}
 		}, 1);
+		
+		scheme.waitTicks(2);
+		
+		boss.playSpecial(false);
+		SchemeUtil.deathAnimation(scheme, boss, boss.getAuraColor());
+		
+		Game.getGame().addTaskGame(new Runnable()
+		{
+			@Override
+			public void run()
+			{
+				ObjectUtil.deathAnimation(boss);
+				
+				Game.getGame().delete(boss);
+				
+				Game.getGame().clear(ClearType.ALL);
+			}
+		}, 5);
+		
+		scheme.waitTicks(10); // Prevent concurrency issues.
 	}
 	
 	public static class WakasagihimeNonSpell extends Spellcard
@@ -413,6 +432,7 @@ public class Wakasagihime extends AllStarBoss
 		public WakasagihimeNonSpell(StageObject owner)
 		{
 			super(owner);
+			setSpellcardTime(Duration.seconds(25));
 		}
 		
 		@SuppressWarnings("unused")
@@ -545,6 +565,7 @@ public class Wakasagihime extends AllStarBoss
 		public WakasagihimeSpell(StageObject owner)
 		{
 			super(owner);
+			setSpellcardTime(Duration.seconds(50));
 		}
 
 		@Override

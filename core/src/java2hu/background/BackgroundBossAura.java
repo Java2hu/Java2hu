@@ -2,6 +2,7 @@ package java2hu.background;
 
 import java2hu.Game;
 import java2hu.IPosition;
+import java2hu.ZIndex;
 import java2hu.object.DrawObject;
 import java2hu.util.Getter;
 
@@ -21,6 +22,11 @@ import com.sun.istack.internal.Nullable;
  */
 public class BackgroundBossAura extends DrawObject
 {
+	public BackgroundBossAura()
+	{
+		setZIndex(ZIndex.BACKGROUND_AURA);
+	}
+	
 	private final int MAX_AURAS = 3; // The shader only supports up to 3.
 	
 	private final FrameBuffer bgBuffer = new FrameBuffer(Format.RGBA8888, Game.getGame().getWidth(), Game.getGame().getHeight(), true);

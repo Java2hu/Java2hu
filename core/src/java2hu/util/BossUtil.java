@@ -8,7 +8,6 @@ import java2hu.J2hGame;
 import java2hu.Loader;
 import java2hu.Position;
 import java2hu.SmartTimer;
-import java2hu.ZIndex;
 import java2hu.background.BackgroundBossAura;
 import java2hu.object.DrawObject;
 import java2hu.object.StageObject;
@@ -1267,7 +1266,7 @@ public class BossUtil extends J2hObject
 	{
 		DrawObject obj = spellcardCircle(boss, card);
 		obj.setFrameBuffer(aura.getBackgroundBuffer());
-		obj.setZIndex(ZIndex.BACKGROUND_LAYER_2 + 200);
+		obj.setZIndex(aura.getZIndex() - 1);
 		
 		return obj;
 	}
@@ -1384,7 +1383,7 @@ public class BossUtil extends J2hObject
 			
 			public float[] makeVertices()
 			{
-				int sections = 100; // How much triangles make up this mesh.
+				int sections = 100; // How much triangles make up this mesh, also how much sections will bend
 				
 				Color color = new Color(2f, 2f, 2f, 1f);
 				
@@ -1398,9 +1397,13 @@ public class BossUtil extends J2hObject
 		        float textureOffsetX = 0f;
 		        float textureOffsetY = 0f;
 		        
+		        int tick = -1;
+		        
 		        // For every section one triangle starting from the middle to the ends.
 		        for(float deg = 0; deg < 360; deg += increment)
 		        {
+		        	tick++;
+		        	
 		        	float sizeMinRight = this.sizeMinRight;
 		        	float sizeMinLeft = this.sizeMinLeft;
 		        	
@@ -1414,7 +1417,7 @@ public class BossUtil extends J2hObject
 		        	/**
 		        	 * Flip the values to make an arch instead of steps
 		        	 */
-		        	if(deg % (2 * increment) <= (1 * increment))
+		        	if(tick % 2 < 1)
 		        	{
 		        		float sizeToLeft = sizeMinRight;
 		        		sizeMinRight = sizeMinLeft;

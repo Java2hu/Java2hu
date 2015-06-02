@@ -16,6 +16,7 @@ import java2hu.spellcard.BossSpellcard;
 import java2hu.system.SaveableObject;
 import java2hu.util.AnimationUtil;
 import java2hu.util.BossUtil;
+import java2hu.util.Duration;
 import java2hu.util.ImageSplitter;
 import java2hu.util.ObjectUtil;
 import java2hu.util.SchemeUtil;
@@ -187,7 +188,11 @@ public class SimpleBoss extends AllStarBoss
 				
 				AllStarUtil.presentSpellCard(boss, SPELLCARD_NAME);
 				
-				Game.getGame().startSpellCard(new Spell(boss));
+				final Spell card = new Spell(boss);
+				
+				Game.getGame().startSpellCard(card);
+				
+				BossUtil.spellcardCircle(boss, card, scheme.getBossAura());
 			}
 		}, 1);
 		
@@ -228,6 +233,7 @@ public class SimpleBoss extends AllStarBoss
 		public NonSpell(SimpleBoss owner)
 		{
 			super(owner);
+			setSpellcardTime(Duration.seconds(25));
 		}
 
 		@Override
@@ -243,6 +249,7 @@ public class SimpleBoss extends AllStarBoss
 		public Spell(SimpleBoss owner)
 		{
 			super(owner);
+			setSpellcardTime(Duration.seconds(50));
 		}
 
 		@Override
