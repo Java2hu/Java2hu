@@ -7,6 +7,46 @@ public class Duration
 {
 	public static Duration ZERO = milliseconds(0);
 	
+	/**
+	 * Convenience method to create a Duration with Unit milliseconds.
+	 */
+	public static Duration milliseconds(double milliseconds)
+	{
+		return new Duration(milliseconds, Unit.MILLISECOND);
+	}
+
+	/**
+	 * Convenience method to create a Duration with Unit ticks.
+	 */
+	public static Duration ticks(double ticks)
+	{
+		return new Duration(ticks, Unit.TICK);
+	}
+
+	/**
+	 * Convenience method to create a Duration with Unit seconds.
+	 */
+	public static Duration seconds(double seconds)
+	{
+		return new Duration(seconds, Unit.SECOND);
+	}
+
+	/**
+	 * Convenience method to create a Duration with Unit minutes.
+	 */
+	public static Duration minutes(double minutes)
+	{
+		return new Duration(minutes, Unit.MINUTE);
+	}
+
+	/**
+	 * Convenience method to create a Duration with Unit hours.
+	 */
+	public static Duration hours(double hours)
+	{
+		return new Duration(hours, Unit.HOUR);
+	}
+	
 	public static enum Unit
 	{
 		MILLISECOND(1d), TICK((1000d / J2hGame.LOGIC_TPS)), SECOND(1000d), MINUTE(60000d), HOUR(3600000d);
@@ -37,39 +77,60 @@ public class Duration
 		return String.valueOf(milliseconds);
 	}
 
+	/**
+	 * @return The raw unrounded value of this duration in milliseconds.
+	 */
 	public double getValue()
 	{
 		return milliseconds;
 	}
 	
-	public int toMilliseconds()
+	/**
+	 * @return how much rounded milliseconds this Duration consists of.
+	 */
+	public long toMilliseconds()
 	{
-		return (int) getValue();
+		return (long) getValue();
 	}
 
-	public int toTicks()
+	/**
+	 * @return how much rounded ticks this Duration consists of.
+	 */
+	public long toTicks()
 	{
-		return (int) getValue(Unit.TICK);
+		return (long) getValue(Unit.TICK);
 	}
 
+	/**
+	 * @return how much rounded seconds this Duration consists of.
+	 */
 	public long toSeconds()
 	{
-		return getValue(Unit.SECOND);
+		return (long) getValue(Unit.SECOND);
 	}
 
+	/**
+	 * @return how much rounded minutes this Duration consists of.
+	 */
 	public long toMinutes()
 	{
-		return getValue(Unit.MINUTE);
+		return (long) getValue(Unit.MINUTE);
 	}
 
+	/**
+	 * @return how much rounded hours this Duration consists of.
+	 */
 	public long toHours()
 	{
-		return getValue(Unit.HOUR);
+		return (long) getValue(Unit.HOUR);
 	}
 
-	public long getValue(Unit unit)
+	/**
+	 * Returns the value of the specific unit, unrounded.
+	 */
+	public double getValue(Unit unit)
 	{
-		return (long) (toMilliseconds() / unit.getMilliseconds());
+		return toMilliseconds() / unit.getMilliseconds();
 	}
 	
 	public Duration add(Duration duration)
@@ -95,31 +156,6 @@ public class Duration
 	@Override
 	public boolean equals(Object o)
 	{
-		return o instanceof Duration && toMilliseconds() == ((Duration) o).toMilliseconds();
-	}
-
-	public static Duration milliseconds(double milliseconds)
-	{
-		return new Duration(milliseconds, Unit.MILLISECOND);
-	}
-
-	public static Duration ticks(double ticks)
-	{
-		return new Duration(ticks, Unit.TICK);
-	}
-
-	public static Duration seconds(double seconds)
-	{
-		return new Duration(seconds, Unit.SECOND);
-	}
-
-	public static Duration minutes(double minutes)
-	{
-		return new Duration(minutes, Unit.MINUTE);
-	}
-
-	public static Duration hours(double hours)
-	{
-		return new Duration(hours, Unit.HOUR);
+		return o instanceof Duration && getValue() == ((Duration) o).getValue();
 	}
 }
