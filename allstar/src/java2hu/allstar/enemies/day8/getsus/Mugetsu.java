@@ -75,7 +75,7 @@ public class Mugetsu extends AllStarBoss
 		addDisposable(special);
 		addDisposable(bg);
 		
-		setColor(Color.BLUE);
+		setAuraColor(Color.BLUE);
 		
 		final Mugetsu boss = this;
 		this.bg = bg;

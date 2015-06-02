@@ -180,7 +180,7 @@ public class Shou extends AllStarBoss
 						AllStarUtil.introduce(boss);
 						
 						boss.healUp();
-						BossUtil.backgroundAura(boss);
+						BossUtil.backgroundAura(boss, boss.getBgAuraColor());
 						
 						Game.getGame().startSpellCard(new ShouNonSpell(boss));
 					}

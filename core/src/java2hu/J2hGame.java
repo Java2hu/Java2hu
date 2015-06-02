@@ -33,6 +33,7 @@ import java2hu.plugin.Plugin;
 import java2hu.spellcard.Spellcard;
 import java2hu.touhou.font.TouhouFont;
 import java2hu.touhou.sounds.TouhouSounds;
+import java2hu.util.Duration;
 import java2hu.util.HitboxUtil;
 import java2hu.util.MathUtil;
 import java2hu.util.Scheduler;
@@ -46,6 +47,7 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.BitmapFont.TextBounds;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -87,6 +89,7 @@ public class J2hGame extends ApplicationAdapter implements InputProcessor
 	 * Standard font, defaults to the default touhou font. (Russel Square)
 	 */
 	public BitmapFont font;
+	public BitmapFont timerFont;
 	
 	/**
 	 * Standard shaperenderer, used for rendering hitboxes.
@@ -155,11 +158,23 @@ public class J2hGame extends ApplicationAdapter implements InputProcessor
 	}
 	
 	/**
+	 * Ran once the stage and all things on it should be reset.
+	 */
+	public void resetStage()
+	{
+		if(getScheme() != null)
+			getScheme().stopScheme();
+		
+		clear(ClearType.ALL, true);
+		setTimer(Duration.ZERO);
+	}
+	
+	/**
 	 * Ran once the player uses the retry button in the standard pause menu.
 	 */
 	public void onRetry()
 	{
-		
+		resetStage();
 	}
 	
 	/**
@@ -167,7 +182,7 @@ public class J2hGame extends ApplicationAdapter implements InputProcessor
 	 */
 	public void onToTitle()
 	{
-		
+		resetStage();
 	}
 	
 	/**
@@ -175,7 +190,7 @@ public class J2hGame extends ApplicationAdapter implements InputProcessor
 	 */
 	public void onStartGame()
 	{
-		
+		resetStage();
 	}
 	
 	private GameFlowScheme scheme;
@@ -253,6 +268,8 @@ public class J2hGame extends ApplicationAdapter implements InputProcessor
 		}
 		
 		spellcards.clear();
+		
+		setTimer(Duration.ZERO);
 	}
 	
 	public Set<Spellcard> getSpellcards()
@@ -743,7 +760,6 @@ public class J2hGame extends ApplicationAdapter implements InputProcessor
 	private RenderSet<Task> delayedGameTasks = new RenderSet<Task>();
 	private RenderSet<Task> delayedPauseTasks = new RenderSet<Task>();
 	private RenderSet<Task> delayedTasks = new RenderSet<Task>();
-	private RenderSet<Runnable> runAfterRender = new RenderSet<Runnable>();
 	
 	private class Task
 	{
@@ -922,11 +938,6 @@ public class J2hGame extends ApplicationAdapter implements InputProcessor
 		task.runnable = run;
 		
 		delayedTasks.add(task);
-	}
-	
-	private void addAfterRenderTask(Runnable run)
-	{
-		runAfterRender.add(run);
 	}
 	
 	/**
@@ -1142,6 +1153,7 @@ public class J2hGame extends ApplicationAdapter implements InputProcessor
 		modelBatch = new ModelBatch();
 		
 		font = TouhouFont.get(16);
+		timerFont = TouhouFont.get(40);
 		shape = new ShapeRenderer(2000000);
 		assets = new AssetManager();
 		musicThread.start();
@@ -1518,19 +1530,6 @@ public class J2hGame extends ApplicationAdapter implements InputProcessor
 			
 			delayedTasks.endReading();
 		}
-//		
-//		Iterator<Runnable> afterIt = runAfterRender.iterator();
-//		
-//		while(afterIt.hasNext())
-//		{
-//			Runnable t = afterIt.next();
-//			
-//			if(t != null)
-//			{
-//				t.run();
-//				it.remove();
-//			}
-//		}
 	}
 	
 	/**
@@ -1545,7 +1544,6 @@ public class J2hGame extends ApplicationAdapter implements InputProcessor
 		ArrayList<StageObject> objects = new ArrayList<StageObject>();
 		objects.addAll(stageObjects);
 		objects.addAll(bullets);
-//		objects.add(player);
 
 		Collections.sort(objects, new Comparator<StageObject>()
 				{
@@ -1696,11 +1694,137 @@ public class J2hGame extends ApplicationAdapter implements InputProcessor
 			batch.setShader(null);
 	}
 	
+	private Duration timer = Duration.ZERO;
+	
+	public void setTimer(Duration timer)
+	{
+		this.timer = timer;
+	};
+	
+	public Duration getTimer()
+	{
+		return timer;
+	}
+	
+	float timerAlpha = 1f;
+	
 	/**
 	 * For drawing UI components, these use a standard @Matrix4 without transformation.
 	 */
 	public void drawUI()
 	{
+		Position timerPos = new Position(getCenterX(), getMaxY() - 118);
+		
+		final int hideDistance = 100;
+		
+		boolean hide = (getPlayer() != null ? MathUtil.getDistance(timerPos, getPlayer()) : hideDistance) < hideDistance;
+		
+		float hideAlpha = 0.4f;
+
+		if(!hide)
+			for(StageObject obj : getStageObjects())
+			{
+				if(obj instanceof Boss)
+				{
+					if(MathUtil.getDistance(timerPos, obj) < hideDistance)
+					{
+						hide = true;
+						hideAlpha = 0.65f;
+						break;
+					}
+				}
+			}
+
+		if(timer.toMilliseconds() > 0)
+		{
+			double seconds = Math.min(99.99d, (timer.toMilliseconds()) / 1000d);
+		
+			final String time = (Math.round(seconds * 100d) / 100d) + "";
+			
+			final int dot = time.indexOf(".");
+			String large = time.substring(0, dot + 1);
+			String small = time.substring(dot + 1, time.length());
+			
+			for(int i = small.length(); i < 2; i++)
+			{
+				small += "0";
+			}
+			
+			final float sizeOffset = 7.5f;
+			float offset = sizeOffset;
+			
+			float scaleMul = 1f;
+			
+			boolean blink = seconds <= Spellcard.BLINK.toSeconds();
+			boolean fastBlink = seconds <= Spellcard.FAST_BLINK.toSeconds();
+			
+			if(blink)
+			{
+				scaleMul = (float) ((seconds + 0.5f) % 1f / 1f) * 2;
+				
+				if(scaleMul > 1f)
+					scaleMul = 1f - scaleMul;
+				
+				scaleMul *= 2f;
+				scaleMul -= 1f;
+				
+				if(scaleMul < 0)
+					scaleMul = 0f;
+				
+				scaleMul *= 0.2f;
+			}
+			else
+			{
+				scaleMul = 0f;
+			}
+			
+			float blinkColor = (fastBlink ? 0.8f : (blink ? 0.5f : 0f));
+			
+			float centerX = timerPos.getX();
+			float centerY = timerPos.getY();
+			
+			final float opacitySpeed = 0.02f;
+			final float max = 1f;
+			final float min = hideAlpha;
+			
+			if(timerAlpha > min && hide || timerAlpha > max && !hide)
+			{
+				timerAlpha = Math.max(min, timerAlpha - opacitySpeed);
+			}
+			else if(timerAlpha < max && !hide || timerAlpha < min && hide)
+			{
+				timerAlpha = Math.min(max, timerAlpha + opacitySpeed);
+			}
+			
+			Color color = new Color(1f, 1f - blinkColor, 1f - blinkColor, timerAlpha);
+			Color black = new Color(0f, 0f, 0f, timerAlpha);
+			
+			timerFont.setColor(black);
+			
+			timerFont.setScale(1f + scaleMul);
+			
+			TextBounds b = timerFont.getBounds(large);
+			
+			timerFont.draw(batch, large, centerX - b.width + offset, centerY - 18 + 2 + b.height);
+			
+			timerFont.setScale(0.5f);
+
+			timerFont.draw(batch, small, centerX + offset, centerY + 2);
+			
+			offset = sizeOffset - 2;
+			
+			timerFont.setColor(color);
+			
+			timerFont.setScale(1f + scaleMul);
+			
+			b = timerFont.getBounds(large);
+			
+			timerFont.draw(batch, large, centerX - b.width + offset, centerY - 18 + b.height);
+			
+			timerFont.setScale(0.5f);
+			timerFont.draw(batch, small, centerX + offset, centerY);
+		}
+		
 		drawDebugUI();
 	}
 	

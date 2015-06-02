@@ -88,7 +88,7 @@ public class Raiko extends AllStarBoss
 	{
 		super(100, nametag, fullBodySprite, idle, left, right, special, bgm, x, y);
 		
-		this.setColor(new Color(196F/255F, 71F/255F, 71F/255F, 1));
+		this.setAuraColor(new Color(196F/255F, 71F/255F, 71F/255F, 1));
 		
 		this.bg = bg;
 	}
@@ -153,7 +153,7 @@ public class Raiko extends AllStarBoss
 							
 							raiko.setHealth(0.1f);
 							raiko.healUp();
-							BossUtil.backgroundAura(raiko);
+							BossUtil.backgroundAura(raiko, raiko.getBgAuraColor());
 
 							Game.getGame().addTaskGame(new Runnable()
 							{

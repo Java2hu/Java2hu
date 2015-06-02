@@ -67,7 +67,7 @@ public class BlazeItScheme extends TestScheme
 						AllStarUtil.introduce(boss);
 						
 						boss.healUp();
-						BossUtil.addBossEffects(boss, boss.getColor());
+						BossUtil.addBossEffects(boss, boss.getAuraColor(), boss.getBgAuraColor());
 						
 						startSpellcard(boss);
 					}

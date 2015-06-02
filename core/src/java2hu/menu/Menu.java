@@ -74,6 +74,12 @@ public abstract class Menu extends StageObject
 		 onShow();
 	}
 	
+	@Override
+	public boolean isPersistant()
+	{
+		return true;
+	}
+	
 	/**
 	 * Called when this menu opens another menu
 	 */

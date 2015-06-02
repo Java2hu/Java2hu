@@ -73,14 +73,14 @@ public class TsukumoGeneral implements SpecialFlowScheme<AllStarStageScheme>
 			@Override
 			public void run()
 			{
-				BossUtil.cloudEntrance(boss1, boss1.getColor(), boss2.getColor(), 60);
+				BossUtil.cloudEntrance(boss1, boss1.getAuraColor(), boss2.getAuraColor(), 60);
 				
 				g.addTaskGame(new Runnable()
 				{
 					@Override
 					public void run()
 					{
-						BossUtil.cloudEntrance(boss2, boss2.getColor(), new Color(149f/255f, 141/255f, 81/255f, 1f), 60);
+						BossUtil.cloudEntrance(boss2, boss2.getAuraColor(), new Color(149f/255f, 141/255f, 81/255f, 1f), 60);
 					}
 				}, 30);
 

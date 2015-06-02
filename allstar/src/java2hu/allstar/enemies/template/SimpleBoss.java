@@ -94,7 +94,7 @@ public class SimpleBoss extends AllStarBoss
 		Music bgm = new J2hMusic(Gdx.audio.newMusic(FOLDER.child("bgm.mp3")));
 		bgm.setLooping(true);
 		
-		setColor(new Color(0 / 255f, 0 / 255f, 0 / 255f, 1.0f));
+		setAuraColor(new Color(0 / 255f, 0 / 255f, 0 / 255f, 1.0f));
 		
 		set(nameTag, bgm);
 		set(fbs, idle, left, right, special);
@@ -154,7 +154,7 @@ public class SimpleBoss extends AllStarBoss
 						AllStarUtil.introduce(boss);
 						
 						boss.healUp();
-						BossUtil.addBossEffects(boss, color);
+						BossUtil.addBossEffects(boss, boss.getAuraColor(), boss.getBgAuraColor());
 						
 						Game.getGame().startSpellCard(new NonSpell(boss));
 					}
@@ -205,7 +205,7 @@ public class SimpleBoss extends AllStarBoss
 		scheme.waitTicks(2);
 		
 		boss.playSpecial(false);
-		SchemeUtil.deathAnimation(scheme, boss, boss.getColor());
+		SchemeUtil.deathAnimation(scheme, boss, boss.getAuraColor());
 		
 		Game.getGame().addTaskGame(new Runnable()
 		{

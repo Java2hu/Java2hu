@@ -3,8 +3,8 @@ package java2hu.allstar.enemies.day2;
 import java2hu.Game;
 import java2hu.HitboxSprite;
 import java2hu.J2hGame;
-import java2hu.Loader;
 import java2hu.J2hGame.ClearType;
+import java2hu.Loader;
 import java2hu.allstar.AllStarStageScheme;
 import java2hu.allstar.enemies.AllStarBoss;
 import java2hu.allstar.util.AllStarUtil;
@@ -107,7 +107,7 @@ public class Mokou extends AllStarBoss
 		addDisposable(bge);
 		addDisposable(phoenix);
 		
-		this.setColor(new Color(140, 0, 0, 1));
+		this.setAuraColor(new Color(140, 0, 0, 1));
 		
 		this.phoenix = phoenix;
 		
@@ -156,7 +156,7 @@ public class Mokou extends AllStarBoss
 						bar.getObject().addSplit(0.7f);
 						
 						AllStarUtil.introduce(mokou);
-						aura.setObject(BossUtil.backgroundAura(mokou));
+						aura.setObject(BossUtil.backgroundAura(mokou, mokou.getBgAuraColor()));
 						
 						mokou.setHealth(0.1f);
 						mokou.healUp();

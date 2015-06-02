@@ -15,7 +15,8 @@ import com.badlogic.gdx.utils.Disposable;
 public abstract class AllStarBoss extends Boss
 {
 	protected TextureRegion nametag;
-	protected Color color = Color.WHITE;
+	protected Color auraColor = Color.WHITE;
+	protected Color bgAuraColor = Color.RED;
 	protected Music bgm;
 	
 	public AllStarBoss(float maxHealth, TextureRegion nametag, Sprite fullBodySprite, Animation idle, Animation left, Animation right, Animation special, final Music bgm, float x, float y)
@@ -58,7 +59,7 @@ public abstract class AllStarBoss extends Boss
 	{
 		super.onUpdate(tick);
 		
-		Game.getGame().batch.setColor(getColor());
+		Game.getGame().batch.setColor(getAuraColor());
 	}
 	
 	public TextureRegion getNametag()
@@ -66,14 +67,24 @@ public abstract class AllStarBoss extends Boss
 		return nametag;
 	}
 
-	public Color getColor()
+	public Color getAuraColor()
 	{
-		return color;
+		return auraColor;
 	}
 
-	public void setColor(Color color)
+	public void setAuraColor(Color color)
 	{
-		this.color = color;
+		this.auraColor = color;
+	}
+	
+	public Color getBgAuraColor()
+	{
+		return bgAuraColor;
+	}
+	
+	public void setBgAuraColor(Color bgAuraColor)
+	{
+		this.bgAuraColor = bgAuraColor;
 	}
 	
 	public Music getBackgroundMusic()

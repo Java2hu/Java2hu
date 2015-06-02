@@ -1,12 +1,11 @@
 package java2hu.allstar.enemies.day2;
 
 import java.util.HashMap;
-
 import java2hu.Game;
 import java2hu.HitboxSprite;
 import java2hu.J2hGame;
-import java2hu.Loader;
 import java2hu.J2hGame.ClearType;
+import java2hu.Loader;
 import java2hu.StartupLoopAnimation;
 import java2hu.allstar.AllStarStageScheme;
 import java2hu.allstar.enemies.AllStarBoss;
@@ -34,6 +33,7 @@ import java2hu.util.Getter;
 import java2hu.util.ImageSplitter;
 import java2hu.util.MathUtil;
 import java2hu.util.SchemeUtil;
+
 import shaders.ShaderLibrary;
 
 import com.badlogic.gdx.Gdx;
@@ -320,7 +320,7 @@ public class Kagerou extends AllStarBoss
 						AllStarUtil.introduce(boss);
 						
 						boss.healUp();
-						BossUtil.backgroundAura(boss);
+						BossUtil.backgroundAura(boss, boss.getBgAuraColor());
 						
 						Game.getGame().startSpellCard(new KagerouNonSpell(boss));
 					}

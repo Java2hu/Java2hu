@@ -8,11 +8,14 @@ import java2hu.J2hGame;
 import java2hu.Loader;
 import java2hu.Position;
 import java2hu.SmartTimer;
+import java2hu.ZIndex;
+import java2hu.background.BackgroundBossAura;
 import java2hu.object.DrawObject;
 import java2hu.object.StageObject;
 import java2hu.object.bullet.Bullet;
 import java2hu.object.enemy.greater.Boss;
 import java2hu.overwrite.J2hObject;
+import java2hu.spellcard.Spellcard;
 import java2hu.touhou.sounds.TouhouSounds;
 
 import shaders.ShaderLibrary;
@@ -564,12 +567,12 @@ public class BossUtil extends J2hObject
 		}, i + 1);
 	}
 	
-	public static void addBossEffects(Boss boss, Color color)
+	public static void addBossEffects(Boss boss, Color color, Color bgAura)
 	{
-		backgroundAura(boss);
+		backgroundAura(boss, bgAura);
 		bossAura(boss, Color.WHITE, color);
 	}
-	
+
 	public static void charge(float x, float y, final Color color, final boolean outwards)
 	{
 		charge(new Position(x, y), color, outwards);
@@ -786,7 +789,7 @@ public class BossUtil extends J2hObject
 	 * Distorts the background and places the "Magic Square" (Star of David) effect around them 
 	 * @param boss
 	 */
-	public static BackgroundAura backgroundAura(final Boss boss)
+	public static BackgroundAura backgroundAura(final Boss boss, final Color color)
 	{
 		final Texture texture = Loader.texture(Gdx.files.internal("sprites/enemy/magic_square.png"));
 		texture.setWrap(TextureWrap.ClampToEdge, TextureWrap.ClampToEdge);
@@ -1027,7 +1030,6 @@ public class BossUtil extends J2hObject
 				int size = 700; // How much triangles make up this mesh.
 				
 				Color color = Color.WHITE.cpy();
-				
 				color.a = 0.4f;
 				
 		        ArrayList<Float> verticesList = new ArrayList<Float>();
@@ -1100,15 +1102,15 @@ public class BossUtil extends J2hObject
 			{
 				int size = 130; // How much triangles make up this mesh.
 				
-				Color inner = Color.BLACK.cpy();
+				Color inner = color.cpy();
 				inner.a = 0.6f;
 				
-				Color middle = Color.BLACK.cpy();
+				Color middle = color.cpy();
 				middle.a = 0.2f;
 				
 				float middleMultiplier = 0.7f; // Between 0 and 1
 
-				Color outer = Color.DARK_GRAY.cpy();
+				Color outer = color.cpy();
 				outer.a = 0.0f;
 				
 		        ArrayList<Float> verticesList = new ArrayList<Float>();
@@ -1255,6 +1257,260 @@ public class BossUtil extends J2hObject
 	{
 		public abstract boolean isMagicSquareEnabled();
 		public abstract void setMagicSquareEnabled(boolean bool);
+	}
+	
+	/**
+	 * Places a circle around the boss, that decreases how long the spellcard has left.
+	 * Also binds the object to a boss aura instance, which will distort it.
+	 */
+	public static DrawObject spellcardCircle(final Boss boss, final Spellcard card, BackgroundBossAura aura)
+	{
+		DrawObject obj = spellcardCircle(boss, card);
+		obj.setFrameBuffer(aura.getBackgroundBuffer());
+		obj.setZIndex(ZIndex.BACKGROUND_LAYER_2 + 200);
+		
+		return obj;
+	}
+	
+	/**
+	 * Places a circle around the boss, that decreases how long the spellcard has left.
+	 */
+	public static DrawObject spellcardCircle(final Boss boss, final Spellcard card)
+	{
+		final Texture text = Loader.texture(Gdx.files.internal("sprites/eff_line.png"));
+	
+		DrawObject obj = new DrawObject()
+		{
+			{
+				addDisposable(text);
+			}
+			
+			ShaderProgram program = ShaderLibrary.STANDARD.getProgram();
+			Mesh mesh;
+			
+			float sizeMinLeft = -100;
+			float sizeMaxLeft = 0;
+			
+			float sizeMinRight = 0;
+			float sizeMaxRight = 100;
+			
+			float rotation = 0f;
+			
+			@Override
+			public void onDraw()
+			{
+				float[] vertices = makeVertices();
+				
+				boolean createNewMesh = mesh == null || mesh.getMaxVertices() < vertices.length;
+				
+				if(createNewMesh)
+				{
+					if(mesh != null)
+						mesh.dispose();
+					
+					mesh = new Mesh(false, vertices.length, 0,
+			                new VertexAttribute(Usage.Position, 2, "a_position"),
+			                new VertexAttribute(Usage.TextureCoordinates, 2, "a_texCoord0"),
+			                new VertexAttribute(Usage.ColorPacked, 4, "a_color"));
+				}
+				
+				mesh.setVertices(vertices);
+				
+				if(mesh != null)
+				{
+					game.batch.end();
+					
+					program.begin();
+					program.setUniformMatrix("u_projTrans", Game.getGame().camera.camera.combined);
+					
+					program.setUniformi("u_texture", 0);
+					text.bind();
+					
+					Gdx.gl.glEnable(GL20.GL_BLEND);
+					Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+					
+					mesh.render(program, GL20.GL_TRIANGLES);
+					
+					program.end();
+					
+					game.batch.begin();
+				}
+			}
+			
+			float size = 400;
+			float speed = 350;
+			
+			float width = 30;
+			
+			@Override
+			public void onUpdateDelta(float delta)
+			{
+				final boolean onStage = boss.isOnStage();
+				
+				if(!onStage)
+				{
+					speed *= 1.025f;
+					
+					if(sizeMaxRight > Math.max(game.getWidth(), game.getHeight()) * 2f)
+					{
+						game.delete(this);
+					}
+				}
+				else
+				{
+					final double cardMultiplier = card.getTimeLeft().getValue() / card.getSpellcardTime().getValue();
+
+					size = 50f + (float) (350 * cardMultiplier);
+				}
+
+				rotation += 60f * delta;
+				
+				sizeMaxRight += delta * speed;
+
+				sizeMaxLeft += delta * speed;
+
+				sizeMinRight += delta * speed;
+
+				sizeMinLeft += delta * speed;
+				
+				if(onStage)
+				{
+					sizeMaxRight = Math.min(size, sizeMaxRight);
+					sizeMaxLeft = Math.min(size, sizeMaxLeft);
+					sizeMinRight = Math.min(size - width, sizeMinRight);
+					sizeMinLeft = Math.min(size - width, sizeMinLeft);
+				}
+			}
+			
+			public float[] makeVertices()
+			{
+				int sections = 100; // How much triangles make up this mesh.
+				
+				Color color = new Color(2f, 2f, 2f, 1f);
+				
+		        ArrayList<Float> verticesList = new ArrayList<Float>();
+		        
+		        float centerX = boss.getX();
+		        float centerY = boss.getY();
+		        
+		        float increment = 360f / sections;
+		        
+		        float textureOffsetX = 0f;
+		        float textureOffsetY = 0f;
+		        
+		        // For every section one triangle starting from the middle to the ends.
+		        for(float deg = 0; deg < 360; deg += increment)
+		        {
+		        	float sizeMinRight = this.sizeMinRight;
+		        	float sizeMinLeft = this.sizeMinLeft;
+		        	
+		        	float sizeMaxRight = this.sizeMaxRight;
+		        	float sizeMaxLeft = this.sizeMaxLeft;
+		        	
+		        	float loopAmount = 20f;
+		        	float degreeMul1 = (deg / 360f) * loopAmount;
+		        	float degreeMul2 = ((deg + increment) / 360f) * loopAmount;
+		        	
+		        	/**
+		        	 * Flip the values to make an arch instead of steps
+		        	 */
+		        	if(deg % (2 * increment) <= (1 * increment))
+		        	{
+		        		float sizeToLeft = sizeMinRight;
+		        		sizeMinRight = sizeMinLeft;
+		        		sizeMinLeft = sizeToLeft;
+		        		
+		        		sizeToLeft = sizeMaxRight;
+		        		sizeMaxRight = sizeMaxLeft;
+		        		sizeMaxLeft = sizeToLeft;
+		        	}
+		        	
+			        double rad1 = Math.toRadians(deg + rotation);
+			        double sin1 = Math.sin(rad1);
+			        double cos1 = Math.cos(rad1);
+			        
+			        double sinLeftTex = degreeMul2;
+			        double cosBotTex = 0f;
+			        
+			        double rad2 = Math.toRadians(deg + increment + rotation);
+			        double sin2 = Math.sin(rad2);
+			        double cos2 = Math.cos(rad2);
+			        
+			        double sinRightTex = degreeMul1;
+			        double cosTopTex = 0.125f;
+			        
+			        // Triangle one
+			        
+		        	// Left top
+		        	verticesList.add((float) (sin1 * sizeMaxLeft) + centerX);
+		        	verticesList.add((float) (cos1 * sizeMaxLeft) + centerY);
+		        	verticesList.add((float) (cosTopTex) + textureOffsetX);
+		        	verticesList.add((float) (sinLeftTex) + textureOffsetY);
+		        	verticesList.add(color.toFloatBits());
+		        	
+		        	// Right bot
+		        	verticesList.add((float) (sin2 * sizeMinRight) + centerX);
+		        	verticesList.add((float) (cos2 * sizeMinRight) + centerY);
+		        	verticesList.add((float) (cosBotTex) + textureOffsetX);
+		        	verticesList.add((float) (sinRightTex) + textureOffsetY);
+		        	verticesList.add(color.toFloatBits());
+		        	
+		        	// Right top
+		        	verticesList.add((float) (sin2 * sizeMaxRight) + centerX);
+		        	verticesList.add((float) (cos2 * sizeMaxRight) + centerY);
+		        	verticesList.add((float) (cosTopTex) + textureOffsetX);
+		        	verticesList.add((float) (sinRightTex) + textureOffsetY);
+		        	verticesList.add(color.toFloatBits());
+		        	
+		        	// Triangle two
+		        	
+		        	// Left bot
+		        	verticesList.add((float) (sin1 * sizeMinLeft) + centerX);
+		        	verticesList.add((float) (cos1 * sizeMinLeft) + centerY);
+		        	verticesList.add((float) (cosBotTex) + textureOffsetX);
+		        	verticesList.add((float) (sinLeftTex) + textureOffsetY);
+		        	verticesList.add(color.toFloatBits());
+		        	
+		        	// Right bot
+		        	verticesList.add((float) (sin2 * sizeMinRight) + centerX);
+		        	verticesList.add((float) (cos2 * sizeMinRight) + centerY);
+		        	verticesList.add((float) (cosBotTex) + textureOffsetX);
+		        	verticesList.add((float) (sinRightTex) + textureOffsetY);
+		        	verticesList.add(color.toFloatBits());
+		        	
+		        	// Left top
+		        	verticesList.add((float) (sin1 * sizeMaxLeft) + centerX);
+		        	verticesList.add((float) (cos1 * sizeMaxLeft) + centerY);
+		        	verticesList.add((float) (cosTopTex) + textureOffsetX);
+		        	verticesList.add((float) (sinLeftTex) + textureOffsetY);
+		        	verticesList.add(color.toFloatBits());
+		        }
+		    	
+		    	float[] vertices = new float[verticesList.size()];
+		    	
+		    	int i = 0;
+		    	
+		    	for(Float flo : verticesList)
+		    	{
+		    		vertices[i] = flo;
+		    		i++;
+		    	}
+				
+				return vertices;
+			}
+			
+			@Override
+			public boolean isPersistant()
+			{
+				return true; // Disposes itself.
+			}
+		};
+		
+		obj.setZIndex(boss.getZIndex() - 15);
+		
+		game.spawn(obj);
+		
+		return obj;
 	}
 
 	public static Texture cloudTexture = bossAuraTexture;

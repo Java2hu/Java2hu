@@ -3,6 +3,7 @@ import java2hu.Game;
 import java2hu.HitboxSprite;
 import java2hu.J2hGame;
 import java2hu.Loader;
+import java2hu.ZIndex;
 import java2hu.object.DrawObject;
 import java2hu.object.StageObject;
 import java2hu.overwrite.J2hObject;
@@ -45,6 +46,11 @@ public class Bullet extends StageObject
 	 */
 	public Bullet(final Animation animation, float x, float y)
 	{
+		this(animation, null, x, y);
+	}
+	
+	public Bullet(final Animation animation, final Color color, float x, float y)
+	{
 		super(x, y);
 		
 		this.animation = animation;
@@ -54,7 +60,7 @@ public class Bullet extends StageObject
 			@Override
 			public Color getEffectColor()
 			{
-				return null;
+				return color;
 			}
 			
 			@Override
@@ -64,7 +70,7 @@ public class Bullet extends StageObject
 			}
 		};
 		
-		this.setZIndex(1000);
+		this.setZIndex(ZIndex.BULLETS);
 	}
 	
 	@Override
@@ -702,6 +708,7 @@ public class Bullet extends StageObject
 		};
 		
 		obj.setShader(ShaderLibrary.GLOW.getProgram());
+		obj.setZIndex(getZIndex());
 		
 		Game.getGame().spawn(obj);
 	}

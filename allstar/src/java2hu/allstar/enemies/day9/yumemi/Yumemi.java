@@ -88,7 +88,7 @@ public class Yumemi extends AllStarBoss
 		
 		Music bgm = new J2hMusic(Gdx.audio.newMusic(FOLDER.child("bgm.mp3")));
 		
-		setColor(new Color(137 / 255f, 0 / 255f, 0 / 255f, 1.0f));
+		setAuraColor(new Color(137 / 255f, 0 / 255f, 0 / 255f, 1.0f));
 		
 		set(nameTag, bgm);
 		set(fbs, idle, idle, idle, special);
@@ -136,7 +136,7 @@ public class Yumemi extends AllStarBoss
 						AllStarUtil.introduce(boss);
 						
 						boss.healUp();
-						BossUtil.backgroundAura(boss);
+						BossUtil.backgroundAura(boss, boss.getBgAuraColor());
 						
 						Game.getGame().startSpellCard(new NonSpell(boss));
 					}

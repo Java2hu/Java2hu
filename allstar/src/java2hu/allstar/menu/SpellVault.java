@@ -92,7 +92,10 @@ public class SpellVault extends AllStarMenu
 							});
 							
 							BossUtil.startFight(dummy);
-							BossUtil.addBossEffects(dummy, Color.BLUE.cpy().mul(0.7f));
+							
+							final Color blue = Color.BLUE.cpy().mul(0.7f);
+							
+							BossUtil.addBossEffects(dummy, blue, blue);
 						}
 					}, 1 * 60);
 					

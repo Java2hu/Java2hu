@@ -1,12 +1,11 @@
 package java2hu.allstar.enemies.day8;
 
 import java.util.ArrayList;
-
 import java2hu.Game;
 import java2hu.HitboxSprite;
 import java2hu.J2hGame;
-import java2hu.Loader;
 import java2hu.J2hGame.ClearType;
+import java2hu.Loader;
 import java2hu.allstar.AllStarStageScheme;
 import java2hu.allstar.enemies.AllStarBoss;
 import java2hu.allstar.util.AllStarUtil;
@@ -484,7 +483,7 @@ public class Shinki extends AllStarBoss
 						
 						boss.healUp();
 						
-						aura = BossUtil.backgroundAura(boss);
+						aura = BossUtil.backgroundAura(boss, boss.getBgAuraColor());
 						
 						if(activeWings != null)
 							aura.setMagicSquareEnabled(false);

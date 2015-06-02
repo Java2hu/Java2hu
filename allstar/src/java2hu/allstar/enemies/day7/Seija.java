@@ -110,8 +110,8 @@ public class Seija extends AllStarBoss
 	{
 		super.onUpdate(tick);
 		
-		this.setColor(new Color((float)Math.random(), (float)Math.random(), (float)Math.random(), 1));
-		Game.getGame().batch.setColor(getColor());
+		this.setAuraColor(new Color((float)Math.random(), (float)Math.random(), (float)Math.random(), 1));
+		Game.getGame().batch.setColor(getAuraColor());
 	}
 	
 	@Override
@@ -176,7 +176,7 @@ public class Seija extends AllStarBoss
 						
 						seija.setHealth(0.1f);
 						seija.healUp();
-						BossUtil.backgroundAura(seija);
+						BossUtil.backgroundAura(seija, seija.getBgAuraColor());
 
 						g.startSpellCard(new SeijaNonSpell(seija));
 					}

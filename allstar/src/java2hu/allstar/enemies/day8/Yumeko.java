@@ -2,8 +2,8 @@ package java2hu.allstar.enemies.day8;
 
 import java2hu.Game;
 import java2hu.J2hGame;
-import java2hu.Loader;
 import java2hu.J2hGame.ClearType;
+import java2hu.Loader;
 import java2hu.allstar.AllStarStageScheme;
 import java2hu.allstar.enemies.AllStarBoss;
 import java2hu.allstar.util.AllStarUtil;
@@ -11,7 +11,6 @@ import java2hu.gameflow.GameFlowScheme.WaitConditioner;
 import java2hu.object.DrawObject;
 import java2hu.object.StageObject;
 import java2hu.object.bullet.Bullet;
-import java2hu.object.bullet.Laser;
 import java2hu.object.enemy.greater.Boss;
 import java2hu.object.player.Player;
 import java2hu.object.ui.CircleHealthBar;
@@ -21,9 +20,6 @@ import java2hu.system.SaveableObject;
 import java2hu.touhou.bullet.ThBullet;
 import java2hu.touhou.bullet.ThBulletColor;
 import java2hu.touhou.bullet.ThBulletType;
-import java2hu.touhou.bullet.ThLaser;
-import java2hu.touhou.bullet.ThLaserColor;
-import java2hu.touhou.bullet.ThLaserType;
 import java2hu.touhou.sounds.TouhouSounds;
 import java2hu.util.BossUtil;
 import java2hu.util.Getter;
@@ -158,7 +154,7 @@ public class Yumeko extends AllStarBoss
 						AllStarUtil.introduce(boss);
 						
 						boss.healUp();
-						BossUtil.backgroundAura(boss);
+						BossUtil.backgroundAura(boss, boss.getBgAuraColor());
 						
 						Game.getGame().startSpellCard(new YumekoNonSpell(boss));
 					}

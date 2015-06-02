@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 
 public class ShaderLibrary extends J2hObject
 {
+	public static ShaderPath STANDARD = new ShaderPath("standard.vertex.glsl", "standard.fragment.glsl");
 	public static ShaderPath GLOW = new ShaderPath("standard.vertex.glsl", "glow.fragment.glsl");
 	public static ShaderPath RELIEF = new ShaderPath("standard.vertex.glsl", "relief.fragment.glsl");
 	public static ShaderPath PIXELATE = new ShaderPath("standard.vertex.glsl", "pixelate.fragment.glsl");

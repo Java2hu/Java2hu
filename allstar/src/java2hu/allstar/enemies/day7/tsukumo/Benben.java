@@ -36,7 +36,7 @@ public class Benben extends AllStarBoss
 	{
 		super(maxHealth, x, y);
 		
-		setColor(new Color(97f/255f, 66f/255f, 50f/255f, 1f));
+		setAuraColor(new Color(97f/255f, 66f/255f, 50f/255f, 1f));
 		
 		int chunkHeight = 168;
 		int chunkWidth = 128;

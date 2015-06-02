@@ -164,7 +164,7 @@ public class Byakuren extends AllStarBoss
 						AllStarUtil.introduce(boss);
 						
 						boss.healUp();
-						aura.setObject(BossUtil.backgroundAura(boss));
+						aura.setObject(BossUtil.backgroundAura(boss, boss.getBgAuraColor()));
 						
 						Game.getGame().startSpellCard(new ByakurenNonSpell(boss));
 					}

@@ -2,12 +2,11 @@ package java2hu.allstar.enemies.day6;
 
 import java.util.ArrayList;
 import java.util.Iterator;
-
 import java2hu.Game;
 import java2hu.HitboxSprite;
 import java2hu.J2hGame;
-import java2hu.Loader;
 import java2hu.J2hGame.ClearType;
+import java2hu.Loader;
 import java2hu.allstar.AllStarStageScheme;
 import java2hu.allstar.enemies.AllStarBoss;
 import java2hu.allstar.util.AllStarUtil;
@@ -34,6 +33,7 @@ import java2hu.util.HitboxUtil;
 import java2hu.util.ImageSplitter;
 import java2hu.util.MathUtil;
 import java2hu.util.Scheduler;
+
 import shaders.ShaderLibrary;
 
 import com.badlogic.gdx.Gdx;
@@ -148,7 +148,7 @@ public class Sekibanki extends AllStarBoss
 		addDisposable(bg);
 		addDisposable(bge);
 		
-		setColor(Color.RED);
+		setAuraColor(Color.RED);
 		
 		final Sekibanki boss = this;
 		
@@ -314,7 +314,7 @@ public class Sekibanki extends AllStarBoss
 						
 						boss.setHealth(0.1f);
 						boss.healUp();
-						BossUtil.backgroundAura(boss);
+						BossUtil.backgroundAura(boss, boss.getBgAuraColor());
 						
 						Game.getGame().startSpellCard(new SekibankiNonSpell(boss));
 					}

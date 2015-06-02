@@ -3,8 +3,8 @@ package java2hu.allstar.enemies.day1;
 import java2hu.Game;
 import java2hu.IPosition;
 import java2hu.J2hGame;
-import java2hu.Loader;
 import java2hu.J2hGame.ClearType;
+import java2hu.Loader;
 import java2hu.allstar.AllStarStageScheme;
 import java2hu.allstar.enemies.AllStarBoss;
 import java2hu.allstar.util.AllStarUtil;
@@ -134,7 +134,7 @@ public class Wakasagihime extends AllStarBoss
 		addDisposable(bge1d);
 		addDisposable(bge2);
 		
-		setColor(new Color(52 / 256f, 99 / 256f, 229 / 256f, 1.0f));
+		setAuraColor(new Color(52 / 256f, 99 / 256f, 229 / 256f, 1.0f));
 
 		final Wakasagihime boss = this;
 		
@@ -348,7 +348,7 @@ public class Wakasagihime extends AllStarBoss
 							@Override
 							public void run()
 							{
-								BossUtil.addBossEffects(boss, getColor());
+								BossUtil.addBossEffects(boss, getAuraColor(), getBgAuraColor());
 								BossUtil.startFight(boss);
 
 								Game.getGame().startSpellCard(new WakasagihimeNonSpell(boss));
@@ -480,7 +480,7 @@ public class Wakasagihime extends AllStarBoss
 			}
 			
 			if(tick % 400 == 330)
-				BossUtil.cloudSpecial(boss, Color.BLUE, boss.getColor(), 30);
+				BossUtil.cloudSpecial(boss, Color.BLUE, boss.getAuraColor(), 30);
 			
 			if(tick % 400 <= 300 && tick % 6 == 0)
 			{

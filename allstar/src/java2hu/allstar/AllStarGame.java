@@ -1,11 +1,5 @@
 package java2hu.allstar;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.BitmapFont.TextBounds;
-import com.badlogic.gdx.graphics.g2d.Sprite;
-
 import java2hu.Game;
 import java2hu.J2hGame;
 import java2hu.Loader;
@@ -14,6 +8,12 @@ import java2hu.allstar.menu.LoadScreen;
 import java2hu.allstar.menu.MainMenu;
 import java2hu.allstar.util.AllStarUtil;
 import java2hu.object.StageObject;
+
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont.TextBounds;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 
 public class AllStarGame extends J2hGame
 {
@@ -127,6 +127,8 @@ public class AllStarGame extends J2hGame
 		if(isOutOfGame())
 			return;
 		
+		super.drawUI();
+		
 		deathScore.setColor(new Color(52 / 256f, 99 / 256f, 229 / 256f, 1.0f));
 		deathScore.setPosition(getWidth() - deathScore.getWidth() - 100, getHeight() - deathScore.getHeight());
 		deathScore.setScale(1f, 1f);
@@ -141,8 +143,6 @@ public class AllStarGame extends J2hGame
 		bounds = font.getBounds(deathLabel);
 		
 		font.draw(batch, deathLabel, deathScore.getX() + 20, deathScore.getY() + 35 + bounds.height);
-		
-//		drawDebugUI();
 	}
 	
 	@Override
@@ -176,15 +176,20 @@ public class AllStarGame extends J2hGame
 	};
 	
 	@Override
-	public void onRetry()
+	public void resetStage()
 	{
-		clear(ClearType.ALL, true);
+		super.resetStage();
 		
 		setPC98(false, true);
 		
-		if(Game.getGame().getScheme() != null)
-			Game.getGame().getScheme().stopScheme();
-
+		((AllStarGame)Game.getGame()).deaths = 0;
+	}
+	
+	@Override
+	public void onRetry()
+	{
+		super.onRetry();
+		
 		addTask(new Runnable()
 		{
 			@Override
@@ -197,20 +202,12 @@ public class AllStarGame extends J2hGame
 				}
 			}
 		}, 5);
-
-		((AllStarGame)Game.getGame()).deaths = 0;
 	}
 	
 	@Override
 	public void onToTitle()
 	{
-		clear(ClearType.ALL, true);
-		
-		setPC98(false, true);
-		
-		Game.getGame().clearObjects();
-		Game.getGame().getSpellcards().clear();
-		Game.getGame().getStageObjects().clear();
+		super.onToTitle();
 
 		Game.getGame().setOutOfGame(true);
 
@@ -219,8 +216,5 @@ public class AllStarGame extends J2hGame
 
 		onDePause();
 		Game.getGame().setPaused(true);
-
-		if(Game.getGame().getScheme() != null)
-			Game.getGame().getScheme().stopScheme();
 	}
 }

@@ -12,6 +12,7 @@ import java2hu.Loader;
 import java2hu.Position;
 import java2hu.allstar.AllStarStageScheme;
 import java2hu.allstar.util.AllStarUtil;
+import java2hu.background.BackgroundBossAura;
 import java2hu.gameflow.GameFlowScheme.WaitConditioner;
 import java2hu.gameflow.SpecialFlowScheme;
 import java2hu.object.DrawObject;
@@ -36,6 +37,7 @@ import java2hu.touhou.bullet.ThLaserColor;
 import java2hu.touhou.bullet.ThLaserType;
 import java2hu.touhou.sounds.TouhouSounds;
 import java2hu.util.BossUtil;
+import java2hu.util.Duration;
 import java2hu.util.Getter;
 import java2hu.util.ImageUtil;
 import java2hu.util.MathUtil;
@@ -293,7 +295,7 @@ public class GetsusGeneral implements SpecialFlowScheme<AllStarStageScheme>
 				
 				AllStarUtil.presentSpellCard(mugetsu, gengetsu, "Memories of a Nightmare - \"Galactic Storm\"");
 				
-				Game.getGame().startSpellCard(new GetsusSpell(mugetsu, gengetsu));
+				Game.getGame().startSpellCard(new GetsusSpell(mugetsu, gengetsu, scheme.getBossAura()));
 			}
 		}, 1);
 		
@@ -440,6 +442,11 @@ public class GetsusGeneral implements SpecialFlowScheme<AllStarStageScheme>
 			float total = 930;
 
 			float rapeTime = 2950;
+			
+			if(tick == 0)
+			{
+				setSpellcardTime(Duration.ticks((long) rapeTime).add(Duration.seconds(10)));
+			}
 
 			if(tick < rapeTime - 100)
 			{
@@ -1582,13 +1589,20 @@ public class GetsusGeneral implements SpecialFlowScheme<AllStarStageScheme>
 		Random rand = new Random();
 		ArrayList<Position> marks = new ArrayList<Position>();
 		
-		public GetsusSpell(Mugetsu mugetsu, Gengetsu gengetsu)
+		final int rapeTimeTime = 1400;
+		
+		public GetsusSpell(Mugetsu mugetsu, Gengetsu gengetsu, BackgroundBossAura aura)
 		{
 			super(mugetsu);
 
+			setSpellcardTime(Duration.ticks(rapeTimeTime).add(Duration.seconds(20)));
+
+			BossUtil.spellcardCircle(gengetsu, this, aura);
+			BossUtil.spellcardCircle(mugetsu, this, aura);
+
 			this.mugetsu = mugetsu;
 			this.gengetsu = gengetsu;
-			
+
 			gengetsu.setHandUp();
 			
 			mugetsu.setDamageModifier(1.1f);
@@ -1601,7 +1615,6 @@ public class GetsusGeneral implements SpecialFlowScheme<AllStarStageScheme>
 			final J2hGame game = Game.getGame();
 			final Player player = game.getPlayer();
 
-			int rapeTimeTime = 1400;
 			final boolean rapeTime = tick > rapeTimeTime;
 			
 			if(tick == rapeTimeTime - 100)

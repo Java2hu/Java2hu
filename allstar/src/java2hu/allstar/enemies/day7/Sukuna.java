@@ -126,7 +126,7 @@ public class Sukuna extends AllStarBoss
 	{
 		super(100, nametag, fullBodySprite, idle, left, right, special, bgm, x, y);
 		
-		this.setColor(new Color(226F/255F, 104F/255F, 74/255F, 1));
+		this.setAuraColor(new Color(226F/255F, 104F/255F, 74/255F, 1));
 		
 		this.bg = bg;
 		this.bge = bge2;
@@ -441,7 +441,7 @@ public class Sukuna extends AllStarBoss
 
 							sukuna.setHealth(0.1f);
 							sukuna.healUp();
-							aura.setObject(BossUtil.backgroundAura(sukuna));
+							aura.setObject(BossUtil.backgroundAura(sukuna, sukuna.getBgAuraColor()));
 							
 							Game.getGame().addTaskGame(new Runnable()
 							{
@@ -959,7 +959,7 @@ public class Sukuna extends AllStarBoss
 			final Sukuna sukuna = (Sukuna)owner;
 			final J2hGame game = Game.getGame();
 			
-			BossUtil.backgroundAura(sukuna);
+			BossUtil.backgroundAura(sukuna, sukuna.getBgAuraColor());
 			
 			sukuna.setDamageModifier(0.1F);
 			
@@ -1224,6 +1224,7 @@ public class Sukuna extends AllStarBoss
 						Bullet bullet = new Bullet(new ThBullet(ThBulletType.ORB_LARGE, ThBulletColor.GREEN), boss.getX(), boss.getY());
 						bullet.setDirectionRadsTick((float) Math.toRadians(i), 2f);
 						bullet.setScale(Math.max(bulletScale - 0.3f, 0.5f));
+						bullet.setZIndex(bullet.getZIndex() + i);
 						game.spawn(bullet);
 					}
 				}
@@ -1250,6 +1251,7 @@ public class Sukuna extends AllStarBoss
 						bullet.getSpawnAnimationSettings().setAlpha(-1f);
 						bullet.getSpawnAnimationSettings().setAddedScale(3f);
 						bullet.getSpawnAnimationSettings().setTime(30f);
+						bullet.setZIndex(bullet.getZIndex() + rotation);
 						game.spawn(bullet);
 					}
 				}

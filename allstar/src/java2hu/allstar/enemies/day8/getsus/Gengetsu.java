@@ -101,7 +101,7 @@ public class Gengetsu extends AllStarBoss
 		this.handLeft = handLeft;
 		this.handUp = handUp;
 		
-		setColor(Color.PINK);
+		setAuraColor(Color.PINK);
 		
 		final Gengetsu boss = this;
 		this.bg = bg;

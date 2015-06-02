@@ -34,7 +34,7 @@ public abstract class Background3D extends DrawObject
 	
 	public Background3D()
 	{
-		setZIndex(-ZIndex.BACKGROUND);
+		setZIndex(-ZIndex.BACKGROUND_LAYER_1);
 	}
 	
 	@Override

@@ -22,7 +22,7 @@ public class Background extends ABackground
 	
 	public Background(Texture backgroundTexture)
 	{
-		setZIndex(ZIndex.BACKGROUND);
+		setZIndex(ZIndex.BACKGROUND_LAYER_2);
 		
 		text = backgroundTexture;
 		setWrap(TextureWrap.Repeat, TextureWrap.Repeat);

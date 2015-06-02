@@ -110,7 +110,7 @@ public class AllStarUtil extends J2hObject
 							return;
 
 						bg.setPosition(0, yStart);
-						bg.setColor(boss.getColor());
+						bg.setColor(boss.getAuraColor());
 						bg.setAlpha(1f);
 						bg.draw(game.batch);
 					}

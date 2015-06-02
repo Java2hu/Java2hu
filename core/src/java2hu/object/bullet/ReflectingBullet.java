@@ -4,6 +4,7 @@ import java2hu.Border;
 import java2hu.Game;
 import java2hu.J2hGame;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Animation;
 
 
@@ -18,14 +19,19 @@ public class ReflectingBullet extends Bullet
 	private int maxReflectTimes = 0;
 	
 	/**
-	 * @param scheme
-	 * @param x
-	 * @param y
 	 * @param maxReflectTimes - How many times to reflect, insert -1 for infinite.
 	 */
 	public ReflectingBullet(Animation scheme, float x, float y, int maxReflectTimes)
 	{
-		super(scheme, x, y);
+		this(scheme, null, x, y, maxReflectTimes);
+	}
+	
+	/**
+	 * @param maxReflectTimes - How many times to reflect, insert -1 for infinite.
+	 */
+	public ReflectingBullet(Animation scheme, Color color, float x, float y, int maxReflectTimes)
+	{
+		super(scheme, color, x, y);
 		
 		setMaxReflectTimes(maxReflectTimes);
 	}

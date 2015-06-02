@@ -25,6 +25,7 @@ import java2hu.touhou.bullet.ThBulletType;
 import java2hu.touhou.sounds.TouhouSounds;
 import java2hu.util.AnimationUtil;
 import java2hu.util.BossUtil;
+import java2hu.util.Duration;
 import java2hu.util.ImageSplitter;
 import java2hu.util.MathUtil;
 import java2hu.util.ObjectUtil;
@@ -94,7 +95,7 @@ public class Seiran extends AllStarBoss
 		Music bgm = new J2hMusic(Gdx.audio.newMusic(FOLDER.child("bgm.mp3")));
 		bgm.setLooping(true);
 		
-		setColor(new Color(17 / 255f, 119 / 255f, 204 / 255f, 1.0f));
+		setAuraColor(new Color(17 / 255f, 119 / 255f, 204 / 255f, 1.0f));
 		
 		set(nameTag, bgm);
 		set(fbs, idle, left, right, special);
@@ -187,8 +188,12 @@ public class Seiran extends AllStarBoss
 				double x = Math.cos(rad) * (number * spreadSpeed);
 				double y = Math.sin(rad) * (number * spreadSpeed);
 				
-				final Bullet bullet = new ReflectingBullet(new ThBullet(ThBulletType.BULLET, color).getAnimation(), (float)(this.getX() + x), (float)(this.getY() + y), reflectTimes)
+				final Bullet bullet = new ReflectingBullet(new ThBullet(ThBulletType.BULLET, color).getAnimation(), color.getColor(), (float)(this.getX() + x), (float)(this.getY() + y), reflectTimes)
 				{
+					{
+						this.setBullet(type);
+					}
+					
 					@Override
 					public void onReflect(java2hu.Border border, int reflectAmount)
 					{
@@ -256,7 +261,7 @@ public class Seiran extends AllStarBoss
 						AllStarUtil.introduce(boss);
 						
 						boss.healUp();
-						BossUtil.addBossEffects(boss, color);
+						BossUtil.addBossEffects(boss, boss.getAuraColor(), boss.getBgAuraColor());
 						
 						Game.getGame().startSpellCard(new NonSpell(boss));
 					}
@@ -289,7 +294,11 @@ public class Seiran extends AllStarBoss
 				
 				AllStarUtil.presentSpellCard(boss, SPELLCARD_NAME);
 				
-				Game.getGame().startSpellCard(new Spell(boss));
+				final Spell card = new Spell(boss);
+				
+				Game.getGame().startSpellCard(card);
+				
+				BossUtil.spellcardCircle(boss, card, scheme.getBossAura());
 			}
 		}, 1);
 		
@@ -307,7 +316,7 @@ public class Seiran extends AllStarBoss
 		scheme.waitTicks(2);
 		
 		boss.playSpecial(false);
-		SchemeUtil.deathAnimation(scheme, boss, boss.getColor());
+		SchemeUtil.deathAnimation(scheme, boss, boss.getAuraColor());
 		
 		Game.getGame().addTaskGame(new Runnable()
 		{
@@ -330,6 +339,8 @@ public class Seiran extends AllStarBoss
 		public NonSpell(Seiran owner)
 		{
 			super(owner);
+			
+			setSpellcardTime(Duration.seconds(30));
 		}
 
 		@Override
@@ -361,7 +372,7 @@ public class Seiran extends AllStarBoss
 			
 			if(tick % 400 == 340)
 			{
-				BossUtil.charge(boss, boss.getColor(), true);
+				BossUtil.charge(boss, boss.getAuraColor(), true);
 				TouhouSounds.Enemy.EXPLOSION_3.play(0.6f);
 				
 				boss.playSpecial(true);
@@ -444,6 +455,8 @@ public class Seiran extends AllStarBoss
 		public Spell(Seiran owner)
 		{
 			super(owner);
+			
+			setSpellcardTime(Duration.seconds(40));
 		}
 
 		@Override

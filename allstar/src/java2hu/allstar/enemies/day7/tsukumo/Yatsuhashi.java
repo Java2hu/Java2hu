@@ -36,7 +36,7 @@ public class Yatsuhashi extends AllStarBoss
 	{
 		super(maxHealth, x, y);
 		
-		setColor(new Color(170f/255f, 160f/255f, 201f/255f, 1f));
+		setAuraColor(new Color(170f/255f, 160f/255f, 201f/255f, 1f));
 		
 		int chunkHeight = 200;
 		int chunkWidth = 128;

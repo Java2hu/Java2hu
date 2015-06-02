@@ -109,7 +109,7 @@ public class AliceGeneral implements SpecialFlowScheme<AllStarStageScheme>
 							boss.setDamageModifier(0.8f);
 
 							boss.healUp();
-							BossUtil.backgroundAura(boss);
+							BossUtil.backgroundAura(boss, boss.getBgAuraColor());
 
 							Game.getGame().startSpellCard(new AliceSpell(boss));
 						}

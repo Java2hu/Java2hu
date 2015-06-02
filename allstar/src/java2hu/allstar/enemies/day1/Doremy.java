@@ -24,6 +24,7 @@ import java2hu.touhou.bullet.ThBulletColor;
 import java2hu.touhou.bullet.ThBulletType;
 import java2hu.touhou.sounds.TouhouSounds;
 import java2hu.util.BossUtil;
+import java2hu.util.Duration;
 import java2hu.util.ImageSplitter;
 import java2hu.util.ObjectUtil;
 import java2hu.util.SchemeUtil;
@@ -83,7 +84,7 @@ public class Doremy extends AllStarBoss
 		bgm.setLooping(true);
 		setBgmPosition(107.18f);
 		
-		setColor(new Color(238 / 255f, 136 / 255f, 204 / 255f, 1.0f));
+		setAuraColor(new Color(238 / 255f, 136 / 255f, 204 / 255f, 1.0f));
 		
 		set(nameTag, bgm);
 		set(fbs, idle, left, right, special);
@@ -231,7 +232,7 @@ public class Doremy extends AllStarBoss
 						AllStarUtil.introduce(boss);
 						
 						boss.healUp();
-						BossUtil.addBossEffects(boss, color);
+						BossUtil.addBossEffects(boss, boss.getAuraColor(), boss.getBgAuraColor());
 						
 						Game.getGame().startSpellCard(new NonSpell(boss));
 					}
@@ -264,7 +265,11 @@ public class Doremy extends AllStarBoss
 				
 				AllStarUtil.presentSpellCard(boss, SPELLCARD_NAME);
 				
-				Game.getGame().startSpellCard(new Spell(boss));
+				final Spell card = new Spell(boss);
+				
+				Game.getGame().startSpellCard(card);
+				
+				BossUtil.spellcardCircle(boss, card, scheme.getBossAura());
 			}
 		}, 1);
 		
@@ -282,7 +287,7 @@ public class Doremy extends AllStarBoss
 		scheme.waitTicks(2);
 		
 		boss.playSpecial(false);
-		SchemeUtil.deathAnimation(scheme, boss, boss.getColor());
+		SchemeUtil.deathAnimation(scheme, boss, boss.getAuraColor());
 		
 		Game.getGame().addTaskGame(new Runnable()
 		{
@@ -307,6 +312,7 @@ public class Doremy extends AllStarBoss
 			super(owner);
 			
 			owner.setDamageModifier(0.75f);
+			setSpellcardTime(Duration.seconds(24));
 		}
 		
 		private long rotationTick;
@@ -320,7 +326,7 @@ public class Doremy extends AllStarBoss
 			
 			if(tick == 100)
 			{
-				BossUtil.charge(boss, boss.getColor(), false);
+				BossUtil.charge(boss, boss.getAuraColor(), false);
 				TouhouSounds.Enemy.ACTIVATE_1.play();
 			}
 			
@@ -331,7 +337,7 @@ public class Doremy extends AllStarBoss
 			
 			if(tick == 150)
 			{
-				BossUtil.chargeExplosion(boss, boss.getColor());
+				BossUtil.chargeExplosion(boss, boss.getAuraColor());
 			}
 			
 			if(tick < waitPeriod)
@@ -436,6 +442,7 @@ public class Doremy extends AllStarBoss
 			super(owner);
 			
 			owner.setDamageModifier(0.5f);
+			setSpellcardTime(Duration.seconds(40));
 		}
 
 		@Override
@@ -458,7 +465,7 @@ public class Doremy extends AllStarBoss
 			
 			if(tick == 150)
 			{
-				BossUtil.chargeExplosion(boss, boss.getColor());
+				BossUtil.chargeExplosion(boss, boss.getAuraColor());
 			}
 			
 			if(tick < waitPeriod)

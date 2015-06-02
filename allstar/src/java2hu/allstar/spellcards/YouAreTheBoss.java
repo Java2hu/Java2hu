@@ -7,6 +7,8 @@ import java2hu.object.enemy.greater.Boss;
 import java2hu.object.player.Player;
 import java2hu.plugin.Plugin;
 import java2hu.spellcard.Spellcard;
+import java2hu.util.BossUtil;
+import java2hu.util.Duration;
 import java2hu.util.InputUtil;
 
 public class YouAreTheBoss extends Spellcard
@@ -14,6 +16,8 @@ public class YouAreTheBoss extends Spellcard
 	public YouAreTheBoss(StageObject owner)
 	{
 		super(owner);
+		System.out.println("Here");
+		setSpellcardTime(Duration.minutes(5));
 	}
 
 	@Override
@@ -35,6 +39,8 @@ public class YouAreTheBoss extends Spellcard
 					InputUtil.handleMovementArrowKeys(object, 5f, 2.5f);
 				}
 			});
+			
+			BossUtil.spellcardCircle(boss, this);
 		}
 	}
 }
