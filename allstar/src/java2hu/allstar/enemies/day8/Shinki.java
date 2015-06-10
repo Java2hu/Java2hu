@@ -859,6 +859,17 @@ public class Shinki extends AllStarBoss
 
 		Bullet laser1;
 		Bullet laser2;
+		
+		ArrayList<Bullet> lasers = new ArrayList<Bullet>();
+		
+		@Override
+		public void onRemove()
+		{
+			for(Bullet b : lasers)
+				game.delete(b);
+			
+			super.onRemove();
+		}
 
 		@Override
 		public void tick(int tick)
@@ -904,7 +915,7 @@ public class Shinki extends AllStarBoss
 				{
 					LaserAnimation ani = new LaserAnimation(1, new ThBullet(ThBulletType.LAZER_STATIONARY, ThBulletColor.RED).getAnimation().getKeyFrames()[0].getTexture());
 					
-					StationaryLaser laser = new StationaryLaser(ani, 0, 0)
+					final StationaryLaser laser = new StationaryLaser(ani, 0, 0)
 					{
 						long doneTick = -1;
 						
@@ -937,6 +948,8 @@ public class Shinki extends AllStarBoss
 					
 					laser.setZIndex(8);
 					laser.setDirectionDeg(boss.getX() + (bool ? -130 : 130), boss.getY(), 270f, 1000);
+					
+					lasers.add(laser);
 					
 					game.spawn(laser);
 				}
