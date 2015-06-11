@@ -16,6 +16,8 @@ import java2hu.events.Event;
 import java2hu.events.EventHandler;
 import java2hu.events.EventListener;
 import java2hu.events.ICancellable;
+import java2hu.events.game.ObjectRemoveEvent;
+import java2hu.events.game.ObjectSpawnEvent;
 import java2hu.events.input.KeyDownEvent;
 import java2hu.events.sound.MusicModifierChangeEvent;
 import java2hu.events.sound.SoundModifierChangeEvent;
@@ -38,8 +40,6 @@ import java2hu.util.HitboxUtil;
 import java2hu.util.MathUtil;
 import java2hu.util.Scheduler;
 import java2hu.util.Setter;
-
-import javafx.embed.swing.JFXPanel;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
@@ -218,11 +218,14 @@ public class J2hGame extends ApplicationAdapter implements InputProcessor
 	
 	public void spawn(Player player)
 	{
-		this.player = player;
-		
-		stageObjects.add(player);
-		player.onSpawn();
-		player.update(getActiveTick());
+		if(canSpawn(player))
+		{
+			this.player = player;
+			
+			stageObjects.add(player);
+			
+			onSpawn(player);
+		}
 	}
 	
 	public void clearPlayer()
@@ -293,17 +296,21 @@ public class J2hGame extends ApplicationAdapter implements InputProcessor
 			return;
 		}
 		
-		stageObjects.add(object);
-		object.onSpawn();
-		object.update(getActiveTick());
+		if(canSpawn(object))
+		{
+			stageObjects.add(object);
+			onSpawn(object);
+		}
 	}
 	
 	public void delete(StageObject object)
 	{
-		stageObjects.remove(object);
-		bullets.remove(object);
-		
-		object.onDelete();
+		if(canDelete(object))
+		{
+			stageObjects.remove(object);
+			bullets.remove(object);
+			onDelete(object);
+		}
 	}
 	
 	public Set<StageObject> getStageObjects()
@@ -331,15 +338,20 @@ public class J2hGame extends ApplicationAdapter implements InputProcessor
 	
 	public void spawn(Bullet object)
 	{
-		bullets.add(object);
-		object.onSpawn();
-		object.update(getActiveTick());
+		if(canSpawn(object))
+		{
+			bullets.add(object);
+			onSpawn(object);
+		}
 	}
 	
 	public void delete(Bullet object)
 	{
-		bullets.remove(object);
-		object.onDelete();
+		if(canDelete(object))
+		{
+			bullets.remove(object);
+			onDelete(object);
+		}
 	}
 	
 	public static enum ClearType
@@ -544,8 +556,7 @@ public class J2hGame extends ApplicationAdapter implements InputProcessor
 				
 				for (StageObject obj : toDelete)
 				{
-					obj.onDelete();
-					getBullets().remove(obj);
+					delete((Bullet)obj);
 				}
 				
 				toDelete.clear();
@@ -732,8 +743,7 @@ public class J2hGame extends ApplicationAdapter implements InputProcessor
 
 					for (StageObject obj : toDelete)
 					{
-						obj.onDelete();
-						getBullets().remove(obj);
+						delete((Bullet)obj);
 					}
 
 					toDelete.clear();
@@ -742,6 +752,41 @@ public class J2hGame extends ApplicationAdapter implements InputProcessor
 			
 			addTask(clear, tick);
 		}
+	}
+	
+	/**
+	 * Returns whether or not the object is allowed to be deleted based on the event.
+	 */
+	private boolean canDelete(StageObject obj)
+	{
+		ObjectRemoveEvent event = new ObjectRemoveEvent(obj);
+		callEvent(event);
+		
+		boolean allowed = !event.isCancelled();
+		
+		return allowed;
+	}
+	
+	private void onDelete(StageObject obj)
+	{
+		obj.onDelete();
+	}
+	
+	private boolean canSpawn(StageObject obj)
+	{
+		ObjectSpawnEvent event = new ObjectSpawnEvent(obj);
+		callEvent(event);
+		
+		boolean allowed = !event.isCancelled();
+		
+		return allowed;
+	}
+	
+	private void onSpawn(StageObject obj)
+	{
+		obj.onSpawn();
+		
+		obj.update(getActiveTick());
 	}
 	
 	/**
@@ -791,25 +836,23 @@ public class J2hGame extends ApplicationAdapter implements InputProcessor
 		return transformation;
 	}
 	
-	private Set<Runnable> musicThreadQueue = Sets.newSetFromMap(new ConcurrentHashMap<Runnable, Boolean>());
+	private Set<Runnable> asyncQueue = Sets.newSetFromMap(new ConcurrentHashMap<Runnable, Boolean>());
 	
-	private Thread musicThread = new Thread()
+	private Thread asyncThread = new Thread()
 	{
 		@Override
 		public synchronized void start()
 		{
 			super.start();
-			this.setName("Music Thread (JavaFX)");
+			this.setName("Async Thread");
 		};
 		
 		@Override
 		public void run()
 		{
-			new JFXPanel(); // Initialize JavaFX environment so we can use JavaFX's MediaPlayer, which _can_ set starting positions.
-			
 			while(true)
 			{
-				Iterator<Runnable> it = musicThreadQueue.iterator();
+				Iterator<Runnable> it = asyncQueue.iterator();
 
 				while(it.hasNext())
 				{
@@ -824,8 +867,6 @@ public class J2hGame extends ApplicationAdapter implements InputProcessor
 						e.printStackTrace();
 					}
 					
-					System.out.println("[Music Thread] Executed something on the music thread succesfully.");
-
 					it.remove();
 				}
 
@@ -841,9 +882,12 @@ public class J2hGame extends ApplicationAdapter implements InputProcessor
 		};
 	};
 	
-	public void runOnMusicThread(Runnable run)
+	/**
+	 * Runs a runnable async on a special thread, this thread is shared so do not interrupt it.
+	 */
+	public void runAsync(Runnable run)
 	{
-		musicThreadQueue.add(run);
+		asyncQueue.add(run);
 	}
 	
 	private float musicModifier = 1f;
@@ -1156,7 +1200,7 @@ public class J2hGame extends ApplicationAdapter implements InputProcessor
 		timerFont = TouhouFont.get(40);
 		shape = new ShapeRenderer(2000000);
 		assets = new AssetManager();
-		musicThread.start();
+		asyncThread.start();
 		
 		camera = new AspectRatioCamera(width, height);
 		camera.camera.position.set(width/2, height/2, 0);
@@ -2149,7 +2193,7 @@ public class J2hGame extends ApplicationAdapter implements InputProcessor
 		methodsToCall.sort(priorityComperator);
 		
 		boolean cancellable = event instanceof ICancellable;
-		ICancellable ican = (ICancellable) event;
+		ICancellable ican = cancellable ? (ICancellable) event : null;
 		
 		for(CallMethod m : methodsToCall)
 		{

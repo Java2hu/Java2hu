@@ -85,7 +85,7 @@ public abstract class Spellcard extends J2hObject
 		
 		double ticks = timeLeft.toTicks();
 		
-		if(ticks < BLINK.toTicks())
+		if(ticks < BLINK.toTicks() && timeLeft.toMilliseconds() > 500) // Don't play the count sound at 0.00
 		{
 			if(ticks % Duration.seconds(1).toTicks() == 0)
 			{

@@ -4,6 +4,7 @@ import java2hu.Game;
 import java2hu.HitboxSprite;
 import java2hu.J2hGame;
 import java2hu.Loader;
+import java2hu.MovementAnimation;
 import java2hu.StartupLoopAnimation;
 import java2hu.overwrite.J2hObject;
 
@@ -73,6 +74,12 @@ public class AnimationUtil extends J2hObject
 	
 	public static Animation copyAnimation(Animation animation, float frameDuration)
 	{
+		if(animation instanceof MovementAnimation)
+		{
+			MovementAnimation ani = (MovementAnimation) animation;
+			
+			return new MovementAnimation(ani);
+		}
 		if(animation instanceof StartupLoopAnimation)
 		{
 			StartupLoopAnimation ani = (StartupLoopAnimation) animation;

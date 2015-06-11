@@ -1,10 +1,12 @@
 package java2hu.util;
 
+import java2hu.Position;
 import java2hu.gameflow.GameFlowScheme;
 import java2hu.gameflow.GameFlowScheme.WaitConditioner;
 import java2hu.object.LivingObject;
 import java2hu.object.StageObject;
 import java2hu.overwrite.J2hObject;
+import java2hu.pathing.SinglePositionPath;
 import java2hu.plugin.Plugin;
 import java2hu.system.SaveableObject;
 import java2hu.touhou.sounds.TouhouSounds;
@@ -68,12 +70,14 @@ public class SchemeUtil extends J2hObject
 	{
 		final int ticksWait = 60;
 		
+		float x = (float) (1f * ((2 * Math.random()) - 1)) * 300f;
+		float y = (float) (1f * ((2 * Math.random()) - 1)) * 300f;
+		
+		obj.getPathing().setCurrentPath(new SinglePositionPath(obj, new Position(obj).add(new Position(x, y)), Duration.ticks(60).multiply(2f)));
+		
 		obj.addEffect(new Plugin<StageObject>()
 		{
 			long spawnTick = 0;
-			
-			float x = (float) (1f * ((2 * Math.random()) - 1));
-			float y = (float) (1f * ((2 * Math.random()) - 1));
 			
 			@Override
 			public void update(StageObject object, long tick)
@@ -91,12 +95,6 @@ public class SchemeUtil extends J2hObject
 					BossUtil.charge(object, color, true);
 					TouhouSounds.Enemy.EXPLOSION_2.play(0.5f);
 				}
-				
-				if(tick >= ticksWait)
-					return;
-				
-				object.setX(object.getX() + x);
-				object.setY(object.getY() + y);
 			}
 		});
 		

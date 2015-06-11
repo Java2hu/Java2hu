@@ -773,6 +773,7 @@ public class Raiko extends AllStarBoss
 									}
 								};
 								
+								rain.setZIndex(rain.getZIndex() + finalI);
 								rain.setDirectionRadsTick((float) Math.toRadians(finalI), 4F);
 								rain.setRotationDeg(finalI);
 								rain.getSpawnAnimationSettings().setAddedScale(3f);

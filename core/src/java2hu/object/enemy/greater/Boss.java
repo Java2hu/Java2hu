@@ -2,6 +2,7 @@ package java2hu.object.enemy.greater;
 import java2hu.Game;
 import java2hu.HitboxSprite;
 import java2hu.J2hGame;
+import java2hu.MovementAnimation;
 import java2hu.SmartTimer;
 import java2hu.StartupLoopAnimation;
 import java2hu.object.LivingObject;
@@ -38,9 +39,9 @@ public abstract class Boss extends LivingObject
 	 * Assumes all animations consist of HitboxSprite frames. (Don't need to contain hitboxes though)
 	 * @param maxHealth
 	 * @param fullBodySprite
-	 * @param idle - Support for: Animation, StartupLoopAnimation
-	 * @param left - Support for: Animation, StartupLoopAnimation
-	 * @param right - Support for: Animation, StartupLoopAnimation
+	 * @param idle - Support for: Animation, StartupLoopAnimation, MovementAnimation
+	 * @param left - Support for: Animation, StartupLoopAnimation, MovementAnimation
+	 * @param right - Support for: Animation, StartupLoopAnimation, MovementAnimation
 	 * @param special
 	 * @param x
 	 * @param y
@@ -102,20 +103,26 @@ public abstract class Boss extends LivingObject
 		
 		hoverTime.tick();
 		
-		Rectangle b = getPlayerHitHitbox().getBoundingRectangle();
-		getPlayerHitHitbox().setPosition(getX() - b.width / 2, getY() - b.height / 2);
-		
 		if(System.currentTimeMillis() - getLastMoveTime() > 100)
 		{
 			lastX = getX();
 			lastY = getY();
 		}
 		
+		Rectangle b = getPlayerHitHitbox().getBoundingRectangle();
+		getPlayerHitHitbox().setPosition(getX() - b.width / 2, getY() - b.height / 2);
+		
 		if(Intersector.overlapConvexPolygons(g.getPlayer().getHitbox(), getPlayerHitHitbox()))
 			g.getPlayer().onHit(this);
 		
 		if(lastAnimation instanceof StartupLoopAnimation)
 			((StartupLoopAnimation)lastAnimation).increase(1);
+		
+		if(lastAnimation instanceof MovementAnimation)
+		{
+			if(getPathing().getCurrentPath() != null)
+				((MovementAnimation)lastAnimation).checkEnd(getPathing().getCurrentPath().getTimeLeft());
+		}
 		
 		if(special != null && playSpecial)
 		{

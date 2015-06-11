@@ -123,6 +123,8 @@ public abstract class AllStarBoss extends Boss
 		if(bgmPlayer != null)
 			bgmPlayer.fadeOut();
 		
+		super.disposeChildren();
+		
 		Game.getGame().addTask(new Runnable()
 		{
 			@Override
@@ -149,10 +151,20 @@ public abstract class AllStarBoss extends Boss
 				return true;
 			}
 		};
-	
-		bgmPlayer.getBgm().play();
-		bgmPlayer.getBgm().setPosition(bgmPosition);
-		bgmPlayer.fadeIn();
+		
+		game.runAsync(new Runnable()
+		{
+			@Override
+			public void run()
+			{
+				bgmPlayer.getBgm().play();
+				bgmPlayer.getBgm().setVolume(0f);
+				
+				bgmPlayer.getBgm().setPosition(bgmPosition);
+				
+				bgmPlayer.fadeIn();
+			}
+		});
 
 		game.spawn(bgmPlayer);
 	}

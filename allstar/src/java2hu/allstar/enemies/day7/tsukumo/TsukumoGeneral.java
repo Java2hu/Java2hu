@@ -495,6 +495,7 @@ public class TsukumoGeneral implements SpecialFlowScheme<AllStarStageScheme>
 							}
 						}
 					};
+					b.setZIndex((int) (b.getZIndex() + i));
 					b.setDirectionDegTick(i, 1f);
 					b.setRotationFromVelocity(-90);
 					
@@ -710,6 +711,8 @@ public class TsukumoGeneral implements SpecialFlowScheme<AllStarStageScheme>
 							return false;
 						}
 					};
+					
+					laser.setZIndex(laser.getZIndex() + i);
 
 					game.spawn(laser);
 				}

@@ -590,7 +590,6 @@ public class Bullet extends StageObject
 				
 				if(getTicksAlive() > time || !bullet.isOnStage())
 				{
-					animationPlaying = false;
 					Game.getGame().delete(this);
 				}
 			}
@@ -598,6 +597,7 @@ public class Bullet extends StageObject
 			@Override
 			public void onDelete()
 			{
+				animationPlaying = false;
 				// Don't destroy assets.
 			}
 			

@@ -14,6 +14,8 @@ import java2hu.object.StageObject;
 import java2hu.object.bullet.Bullet;
 import java2hu.object.enemy.greater.Boss;
 import java2hu.overwrite.J2hObject;
+import java2hu.pathing.PathingHelper.Path;
+import java2hu.pathing.SimpleTouhouBossPath;
 import java2hu.spellcard.Spellcard;
 import java2hu.touhou.sounds.TouhouSounds;
 
@@ -93,11 +95,9 @@ public class BossUtil extends J2hObject
 	 */
 	public static void moveAroundRandomly(final Boss boss, final Rectangle box, final int millis, boolean drawBox)
 	{
-		float destinationX = (float) (box.getX() + box.getWidth() * Math.random());
-		float destinationY = (float) (box.getY() + box.getHeight() * Math.random());
-		
-		moveTo(boss, destinationX, destinationY, millis);
-		
+		boss.getPathing().setCurrentPath(new SimpleTouhouBossPath(boss, box));
+		boss.getPathing().getCurrentPath().setTime(Duration.milliseconds(millis));
+
 		if(drawBox)
 		{
 			Game.getGame().spawn(new DrawObject()
@@ -135,29 +135,14 @@ public class BossUtil extends J2hObject
 	 * @param y
 	 * @param millis
 	 */
-	public static void moveTo(final Boss boss, float x, float y, float millis)
+	public static void moveTo(final Boss boss, final float x, final float y, float millis)
 	{
-		float destinationX = x - boss.getX();
-		float destinationY = y - boss.getY();
-		
-		float sectionX = (float) (destinationX / ((double)millis / (double)1000 * 60));
-		float sectionY = (float) (destinationY / ((double)millis / (double)1000 * 60));
-		
-		for(int i = 0; i < (double)millis / (double)1000 * 60; i += 1)
+		boss.getPathing().setCurrentPath(new Path(boss, Duration.milliseconds(millis))
 		{
-			final float tickX = boss.getX() + sectionX * i;
-			final float tickY = boss.getY() + sectionY * i;
-			
-			Scheduler.delay(Game.getGame(), new Runnable()
 			{
-				@Override
-				public void run()
-				{
-					boss.setX(tickX);
-					boss.setY(tickY);
-				}
-			}, i);
-		}
+				addPosition(new Position(x, y));
+			}
+		});
 	}
 	
 	/**
@@ -640,7 +625,9 @@ public class BossUtil extends J2hObject
 	public static BossAura bossAura(Boss boss, Color aura, Color energyLeak)
 	{
 		BossAura ba = new BossAura();
-		ba.boss = boss;
+		ba.boss = boss; 
+		
+		boss.addChild(ba);
 		
 		Animation auraAnimation = ImageSplitter.getAnimationFromSprite(bossAuraTexture, 48, 48, 0.08f, 1,2,3,4,5,6,7,8);
 		
@@ -675,6 +662,12 @@ public class BossUtil extends J2hObject
 		}
 		
 		@Override
+		public boolean isPersistant()
+		{
+			return true;
+		}
+		
+		@Override
 		public void onUpdate(long tick)
 		{
 			final J2hGame game = Game.getGame();
@@ -686,6 +679,7 @@ public class BossUtil extends J2hObject
 				game.spawn(new DrawObject()
 				{
 					{
+						ba.addChild(this);
 						setZIndex(boss.getZIndex() - 2);
 						setName("Boss Aura (Clouds)");
 					}
@@ -715,6 +709,11 @@ public class BossUtil extends J2hObject
 					@Override
 					public void onUpdate(long tick)
 					{
+						if(!ba.isOnStage())
+						{
+							game.delete(this);
+						}
+						
 						distance = MathUtil.getDistance(0, 0, x, y);
 						
 						if(distance < 2f)
@@ -736,6 +735,7 @@ public class BossUtil extends J2hObject
 				game.spawn(new DrawObject()
 				{
 					{
+						ba.addChild(this);
 						setZIndex(boss.getZIndex() - 1);
 						setName("Boss Aura (Energy Leak)");
 						setShader(ShaderLibrary.GLOW.getProgram());
@@ -766,6 +766,11 @@ public class BossUtil extends J2hObject
 					@Override
 					public void onUpdate(long tick)
 					{
+						if(!ba.isOnStage())
+						{
+							game.delete(this);
+						}
+						
 						height += heightIncrease;
 						
 						leak.setPosition(boss.getX() + x, boss.getY() + y);

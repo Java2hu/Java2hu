@@ -11,6 +11,9 @@ import java2hu.allstar.enemies.AllStarBoss;
 import java2hu.allstar.players.Marisa;
 import java2hu.background.BackgroundBossAura;
 import java2hu.background.bg3d.Background3D;
+import java2hu.events.EventHandler;
+import java2hu.events.EventListener;
+import java2hu.events.game.ObjectSpawnEvent;
 import java2hu.gameflow.GameFlowScheme;
 import java2hu.gameflow.SpecialFlowScheme;
 import java2hu.object.player.Player;
@@ -37,6 +40,36 @@ public class AllStarStageScheme extends GameFlowScheme
 			{
 				bossAura = new BackgroundBossAura();
 				Game.getGame().spawn(bossAura);
+				
+				Game.getGame().registerEvents(new EventListener()
+				{
+					{
+						bossAura.addDisposable(this);
+					}
+					
+					@EventHandler(skipCancelled = true)
+					public void onBossSpawn(ObjectSpawnEvent event)
+					{
+						if(event.getObject() instanceof AllStarBoss)
+						{
+							final AllStarBoss b = (AllStarBoss) event.getObject();
+							
+							int id = bossAura.getNextEmptyAura();
+							
+							if(id <= -1)
+								return;
+							
+							bossAura.setAura(id, new Getter<IPosition>()
+							{
+								@Override
+								public IPosition get()
+								{
+									return b;
+								}
+							});
+						}
+					}
+				});
 			}
 		}, 1);
 		
@@ -237,20 +270,11 @@ public class AllStarStageScheme extends GameFlowScheme
 			@Override
 			public void run()
 			{
+				getBossAura().clearAuras();
+				
 				final AllStarBoss boss = create.get();
 				
 				((AllStarGame)Game.getGame()).setPC98(boss.isPC98());
-				
-				getBossAura().clearAuras();
-				
-				getBossAura().setAura(0, new Getter<IPosition>()
-				{
-					@Override
-					public IPosition get()
-					{
-						return boss;
-					}
-				});
 				
 				save.setObject(boss);
 			}
@@ -312,8 +336,6 @@ public class AllStarStageScheme extends GameFlowScheme
 	
 	public void reset()
 	{
-		System.out.println("Reset");
-		
 		if(getBossAura() != null)
 			getBossAura().clearAuras();
 		

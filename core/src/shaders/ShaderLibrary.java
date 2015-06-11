@@ -17,7 +17,15 @@ public class ShaderLibrary extends J2hObject
 	 * Special shader that combines a fish eye effect and a water effect.
 	 * Special usage is needed, see @BackgroundBossAura
 	 */
-	public static ShaderPath BOSS_BACKGROUND = new ShaderPath("standard.vertex.glsl", "fisheye.fragment.glsl");
+	public static ShaderPath BOSS_BACKGROUND = new ShaderPath("standard.vertex.glsl", "fisheye.fragment.glsl")
+	{
+		@Override
+		public ShaderProgram getProgram()
+		{
+			new Exception().printStackTrace();
+			return super.getProgram();
+		};
+	};
 	
 	public static class ShaderPath extends J2hObject
 	{

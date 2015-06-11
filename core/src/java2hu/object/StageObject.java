@@ -4,7 +4,10 @@ import java.util.ArrayList;
 import java2hu.Game;
 import java2hu.IPosition;
 import java2hu.J2hGame;
+import java2hu.events.EventListener;
+import java2hu.object.bullet.Bullet;
 import java2hu.overwrite.J2hObject;
+import java2hu.pathing.PathingHelper;
 import java2hu.plugin.Plugin;
 
 import com.badlogic.gdx.graphics.g2d.Animation;
@@ -139,8 +142,37 @@ public abstract class StageObject extends J2hObject implements IPosition
 	
 	public void disposeAll()
 	{
-		// Draw method is usually still called afterwards, before getting removed.
-		Game.getGame().addTask(new Runnable()
+		disposeDisposables();
+		
+		disposeChildren();
+	}
+	
+	/**
+	 * Disposes of all children by deleting them, done over 5 ticks.
+	 */
+	public void disposeChildren()
+	{
+		Game.getGame().runAsync(new Runnable()
+		{
+			@Override
+			public void run()
+			{
+				for(StageObject obj : children)
+				{
+					game.delete(obj);
+				}
+				
+				children.clear();
+			}
+		});
+	}
+	
+	/**
+	 * Disposes all the disposables of this object, done over 5 ticks.
+	 */
+	public void disposeDisposables()
+	{
+		Game.getGame().runAsync(new Runnable()
 		{
 			@Override
 			public void run()
@@ -149,8 +181,10 @@ public abstract class StageObject extends J2hObject implements IPosition
 				{
 					disp.dispose();
 				}
+				
+				disposables.clear();
 			}
-		}, 5);
+		});
 	}
 	
 	public void addDisposable(TextureRegion disp)
@@ -168,6 +202,24 @@ public abstract class StageObject extends J2hObject implements IPosition
 		
 		for(TextureRegion r : disp.getKeyFrames())
 			addDisposable(r);
+	}
+	
+	/**
+	 * Unregisters a listener once this object is deleted.
+	 * @param listener
+	 */
+	public void addDisposable(final EventListener listener)
+	{
+		Disposable disp = new Disposable()
+		{
+			@Override
+			public void dispose()
+			{
+				Game.getGame().unregisterEvents(listener);
+			}
+		};
+		
+		addDisposable(disp);
 	}
 	
 	public void addDisposable(Disposable disp)
@@ -209,6 +261,101 @@ public abstract class StageObject extends J2hObject implements IPosition
 	}
 	
 	/**
+	 * A child object is an object which will be deleted once it's parent is deleted, therefore rendering them a "managed" object.
+	 * Child status is gained by being added to the list of children, parent status is having objects in your childrens list.
+	 * So you can only influence that by removing or adding children, you can't remove or add a parent to an object.
+	 */
+	private ArrayList<StageObject> children = new ArrayList<StageObject>();
+	
+	/**
+	 * Returns a read only list of the children of this object.
+	 */
+	public ArrayList<StageObject> getChildren()
+	{
+		return new ArrayList<StageObject>(children);
+	}
+	
+	/**
+	 * Returns a read only list of all active stage objects that have this object as a child.
+	 */
+	public ArrayList<StageObject> getParents()
+	{
+		ArrayList<StageObject> list = new ArrayList<StageObject>();
+		
+		for(StageObject obj : game.getStageObjects())
+		{
+			if(obj.isChild(this))
+			{
+				list.add(obj);
+			}
+		}
+		
+		for(Bullet obj : game.getBullets())
+		{
+			if(obj.isChild(this))
+			{
+				list.add(obj);
+			}
+		}
+		
+		return list;
+	}
+	
+	/**
+	 * Adds the specified object as a child for this object.
+	 * See {@link #children} for working.
+	 */
+	public void addChild(StageObject obj)
+	{
+		children.add(obj);
+	}
+	
+	/**
+	 * Removes the specified object as a child for this object.
+	 * See {@link #children} for working.
+	 */
+	public boolean removeChild(StageObject obj)
+	{
+		return children.remove(obj);
+	}
+	
+	/**
+	 * Adds this object as a child to the specified object.
+	 * See {@link #children} for working.
+	 */
+	public void addParent(StageObject obj)
+	{
+		obj.addChild(this);
+	}
+	
+	/**
+	 * Removes this object as a child to the specified object.
+	 * See {@link #children} for working.
+	 */
+	public boolean removeParent(StageObject obj)
+	{
+		return obj.removeChild(this);
+	}
+	
+	/**
+	 * Returns if the specified object is a child to this object.
+	 * See {@link #children} for working.
+	 */
+	public boolean isChild(StageObject obj)
+	{
+		return children.contains(obj);
+	}
+	
+	/**
+	 * Returns if the specified object is a parent of this object.
+	 * See {@link #children} for working.
+	 */
+	public boolean isParent(StageObject obj)
+	{
+		return obj.children.contains(this);
+	}
+	
+	/**
 	 * If this object remains on the stage when it gets cleared.
 	 * @return
 	 */
@@ -231,11 +378,24 @@ public abstract class StageObject extends J2hObject implements IPosition
 		J2hGame g = Game.getGame();
 		
 		if(g.getStageObjects().contains(this))
+		{
 			return true;
+		}
 		else if(g.getBullets().contains(this))
+		{
 			return true;
+		}
 		else
+		{
 			return false;
+		}
+	}
+	
+	protected PathingHelper pathing = new PathingHelper();
+	
+	public PathingHelper getPathing()
+	{
+		return pathing;
 	}
 	
 	protected ShaderProgram shader = null;
@@ -306,6 +466,8 @@ public abstract class StageObject extends J2hObject implements IPosition
 		{
 			effect.update(this, tick);
 		}
+		
+		getPathing().tick();
 	}
 	
 	public void update(float tick)

@@ -1,7 +1,6 @@
 package java2hu.allstar.menu;
 
 import java2hu.Game;
-import java2hu.IPosition;
 import java2hu.J2hGame;
 import java2hu.allstar.AllStarGame;
 import java2hu.allstar.AllStarStageScheme;
@@ -82,15 +81,6 @@ public class SpellVault extends AllStarMenu
 						@Override
 						public void run()
 						{
-							getBossAura().setAura(0, new Getter<IPosition>()
-							{
-								@Override
-								public IPosition get()
-								{
-									return dummy;
-								}
-							});
-							
 							BossUtil.startFight(dummy);
 							
 							final Color blue = Color.BLUE.cpy().mul(0.7f);

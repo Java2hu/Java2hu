@@ -148,9 +148,19 @@ public class Duration
 		return Duration.milliseconds(this.milliseconds / duration.milliseconds);
 	}
 	
+	public Duration divide(double m)
+	{
+		return Duration.milliseconds(this.milliseconds / m);
+	}
+	
 	public Duration multiply(Duration duration)
 	{
 		return Duration.milliseconds(this.milliseconds * duration.milliseconds);
+	}
+	
+	public Duration multiply(double m)
+	{
+		return Duration.milliseconds(this.milliseconds * m);
 	}
 
 	@Override

@@ -118,10 +118,10 @@ public abstract class BGMPlayer extends StageObject implements EventListener
 		fade(0f, 1f, 60, false);
 	}
 	
-	private int fadeDelay = 10;
+	private int fadeDelay = 0;
 	
 	/**
-	 * The delay before a fade starts, default: 10 ticks
+	 * The delay before a fade starts, default: 0 ticks
 	 * @return
 	 */
 	public int getFadeDelay()

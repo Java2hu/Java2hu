@@ -36,21 +36,16 @@ import java2hu.util.MathUtil;
 import java2hu.util.Scheduler;
 import java2hu.util.Setter;
 
-import shaders.ShaderLibrary;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
-import com.badlogic.gdx.graphics.Texture.TextureWrap;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Animation.PlayMode;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.math.Vector2;
 
 /**
  * Sukuna Shinmyoumaru (DDC)
@@ -141,60 +136,6 @@ public class Sukuna extends AllStarBoss
 			@Override
 			public void set(final BackgroundBossAura t)
 			{
-				Game.getGame().spawn(new DrawObject()
-				{
-					{
-						setZIndex(-1);
-						
-						setShader(ShaderLibrary.BOSS_BACKGROUND.getProgram());
-					}
-					
-					public Sprite sprite = null;
-					
-					@Override
-					public void onDraw()
-					{
-						Texture tex = t.getBackgroundBuffer().getColorBufferTexture();
-						
-						if(sprite == null)
-						{
-							tex.setWrap(TextureWrap.Repeat, TextureWrap.Repeat);
-							sprite = new Sprite(tex);
-						}
-						
-						if(getShader() != null)
-						{
-							float timer = game.getTick() / 20f % 2;
-							
-							if(timer > 1)
-								timer = 2 - timer;
-							
-							float scaleX = 2.5f - timer * 0.4f;
-							float scaleY = 2.5f - timer * 0.2f;
-							
-							float ratio = (float)game.getWidth() / (float)game.getHeight();
-							
-							Vector2 size = new Vector2(ratio * scaleX, 1.0f * scaleY);
-							Vector2 actualSize = new Vector2(1f/size.x * Game.getGame().getWidth(), 1f/size.y * Game.getGame().getHeight());
-							
-							getShader().setUniformi("water", 1);
-							
-							getShader().setUniformf("size1", size);
-							getShader().setUniformf("pos1", new Vector2((1280 - Sukuna.this.getX() - actualSize.x / 2f) / Game.getGame().getWidth() * size.x, (Sukuna.this.getY() - actualSize.y / 2f) / Game.getGame().getHeight() * size.y));
-							
-							getShader().setUniformf("time", game.getElapsedTime() * 0.75f);
-						}
-						
-						Gdx.gl.glClearColor(0, 0, 0, 0);
-						Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-						
-						game.camera.applyAspectRatio();
-
-						sprite.setRotation(180);
-						sprite.draw(game.batch);
-					}
-				});
-				
 				Game.getGame().spawn(new HorizontalScrollingBackground(bg, 0.2F, false)
 				{
 					{

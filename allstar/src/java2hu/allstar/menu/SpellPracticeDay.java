@@ -2,7 +2,6 @@ package java2hu.allstar.menu;
 
 import java.util.ArrayList;
 import java2hu.Game;
-import java2hu.IPosition;
 import java2hu.J2hGame;
 import java2hu.J2hGame.ClearType;
 import java2hu.allstar.AllStarGame;
@@ -263,15 +262,6 @@ public class SpellPracticeDay extends AllStarMenu
 								final AllStarBoss boss = create.get();
 								
 								((AllStarGame)Game.getGame()).setPC98(boss.isPC98());
-								
-								getBossAura().setAura(0, new Getter<IPosition>()
-								{
-									@Override
-									public IPosition get()
-									{
-										return boss;
-									}
-								});
 								
 								save.setObject(boss);
 							}

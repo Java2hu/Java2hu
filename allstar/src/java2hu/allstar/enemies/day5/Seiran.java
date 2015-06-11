@@ -5,6 +5,7 @@ import java2hu.Game;
 import java2hu.J2hGame;
 import java2hu.J2hGame.ClearType;
 import java2hu.Loader;
+import java2hu.MovementAnimation;
 import java2hu.StartupLoopAnimation;
 import java2hu.allstar.AllStarStageScheme;
 import java2hu.allstar.enemies.AllStarBoss;
@@ -17,6 +18,7 @@ import java2hu.object.bullet.ReflectingBullet;
 import java2hu.object.player.Player;
 import java2hu.object.ui.CircleHealthBar;
 import java2hu.overwrite.J2hMusic;
+import java2hu.pathing.SimpleTouhouBossPath;
 import java2hu.spellcard.BossSpellcard;
 import java2hu.system.SaveableObject;
 import java2hu.touhou.bullet.ThBullet;
@@ -45,7 +47,6 @@ import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Animation.PlayMode;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.math.Rectangle;
 
 public class Seiran extends AllStarBoss
 {
@@ -80,7 +81,7 @@ public class Seiran extends AllStarBoss
 		
 		boolean faceLeft = false; // Is the character moving left on the sprite.
 		
-		Animation dir1 = ImageSplitter.getAnimationFromSprite(sprite, chunkHeight, chunkWidth, 8F, 6,7,8,9,10);
+		Animation dir1 = new MovementAnimation(ImageSplitter.getAnimationFromSprite(sprite, chunkHeight, chunkWidth, 8F, 6,7,8,9,10), ImageSplitter.getAnimationFromSprite(sprite, chunkHeight, chunkWidth, 8F, 10), 8f);
 		Animation dir2 = AnimationUtil.copyAnimation(dir1);
 		
 		Animation left = faceLeft ? dir1 : dir2; 
@@ -359,15 +360,12 @@ public class Seiran extends AllStarBoss
 			{
 				boss.playSpecial(false);
 				
-				float width = 400;
-				
-				int minX = (int) Math.max(game.getMinX() + 300, Math.min(game.getMaxX() - width - 300, boss.getX() - 200));
-				
-				int minY = (int) (game.getCenterY() + 200);
-				
-				Rectangle box = new Rectangle(minX, minY, width, 200);
-				
-				BossUtil.moveAroundRandomly(boss, box, 800);
+				boss.getPathing().setCurrentPath(new SimpleTouhouBossPath(boss)
+				{
+					{
+						setTime(Duration.ticks(80));
+					}
+				});
 			}
 			
 			if(tick % 400 == 340)
@@ -482,16 +480,12 @@ public class Seiran extends AllStarBoss
 				if(tick % period == 40)
 				{
 					boss.playSpecial(false);
-
-					float width = 400;
-
-					int minX = (int) Math.max(game.getMinX() + 300, Math.min(game.getMaxX() - width - 300, boss.getX() - 200));
-
-					int minY = (int) (game.getCenterY() + 200);
-
-					Rectangle box = new Rectangle(minX, minY, width, 200);
-
-					BossUtil.moveAroundRandomly(boss, box, 800);
+					boss.getPathing().setCurrentPath(new SimpleTouhouBossPath(boss)
+					{
+						{
+							setTime(Duration.ticks(80));
+						}
+					});
 				}
 				else if(tick % period == 100)
 					boss.playSpecial(true);

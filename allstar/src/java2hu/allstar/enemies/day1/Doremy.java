@@ -4,6 +4,7 @@ import java2hu.Game;
 import java2hu.J2hGame;
 import java2hu.J2hGame.ClearType;
 import java2hu.Loader;
+import java2hu.MovementAnimation;
 import java2hu.Position;
 import java2hu.StartupLoopAnimation;
 import java2hu.allstar.AllStarStageScheme;
@@ -17,6 +18,7 @@ import java2hu.object.bullet.Bullet;
 import java2hu.object.player.Player;
 import java2hu.object.ui.CircleHealthBar;
 import java2hu.overwrite.J2hMusic;
+import java2hu.pathing.SimpleTouhouBossPath;
 import java2hu.spellcard.BossSpellcard;
 import java2hu.system.SaveableObject;
 import java2hu.touhou.bullet.ThBullet;
@@ -41,7 +43,6 @@ import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Animation.PlayMode;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.math.Rectangle;
 
 public class Doremy extends AllStarBoss
 {
@@ -74,8 +75,8 @@ public class Doremy extends AllStarBoss
 		Animation idle = ImageSplitter.getAnimationFromSprite(sprite, chunkHeight, chunkWidth, 8F, 1,2,3,4,3,2,1);
 		idle.setPlayMode(PlayMode.LOOP);
 		
-		Animation left = ImageSplitter.getAnimationFromSprite(sprite, chunkHeight, chunkWidth, 8F, 13,14,15,16,17,18);
-		Animation right = ImageSplitter.getAnimationFromSprite(sprite, chunkHeight, chunkWidth, 8F, 7,8,9,10,11,12);
+		Animation left = new MovementAnimation(ImageSplitter.getAnimationFromSprite(sprite, chunkHeight, chunkWidth, 8F, 13,14,15), ImageSplitter.getAnimationFromSprite(sprite, chunkHeight, chunkWidth, 8F, 16,17,18), 8f);
+		Animation right = new MovementAnimation(ImageSplitter.getAnimationFromSprite(sprite, chunkHeight, chunkWidth, 8F, 7,8,9), ImageSplitter.getAnimationFromSprite(sprite, chunkHeight, chunkWidth, 8F, 10,11,12), 8f);
 
 		Animation special = new StartupLoopAnimation(ImageSplitter.getAnimationFromSprite(sprite, chunkHeight, chunkWidth, 8F, 19,20,21), ImageSplitter.getAnimationFromSprite(sprite, chunkHeight, chunkWidth, 8F, 22,23,24,23,22), 6f);
 		special.setPlayMode(PlayMode.NORMAL);
@@ -411,15 +412,10 @@ public class Doremy extends AllStarBoss
 			}
 			else if (tick % 900 == 760)
 			{
-				float width = 400;
+				boss.playSpecial(false);
 				
-				int minX = (int) Math.max(game.getMinX() + 300, Math.min(game.getMaxX() - width - 300, boss.getX() - 200));
-				
-				int minY = (int) (game.getCenterY() + 200);
-				
-				Rectangle box = new Rectangle(minX, minY, width, 200);
-				
-				BossUtil.moveAroundRandomly(boss, box, 800);
+				boss.getPathing().setCurrentPath(new SimpleTouhouBossPath(boss));
+				boss.getPathing().getCurrentPath().setTime(Duration.ticks(80));
 			}
 			else
 			{

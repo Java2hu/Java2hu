@@ -18,7 +18,7 @@ import com.sun.istack.internal.Nullable;
 
 /**
  * Boss aura that is applied to the background of the game.
- * The underlying shader supports up to 3 aura's visible at the same time, to add more you'd need to update the shader to work with more.
+ * The underlying shader supports up to {@value #MAX_AURAS} aura's visible at the same time, to add more you'd need to update the shader to work with more.
  */
 public class BackgroundBossAura extends DrawObject
 {
@@ -27,7 +27,7 @@ public class BackgroundBossAura extends DrawObject
 		setZIndex(ZIndex.BACKGROUND_AURA);
 	}
 	
-	private final int MAX_AURAS = 3; // The shader only supports up to 3.
+	public static final int MAX_AURAS = 3; // The shader only supports up to this amount.
 	
 	private final FrameBuffer bgBuffer = new FrameBuffer(Format.RGBA8888, Game.getGame().getWidth(), Game.getGame().getHeight(), true);
 	
@@ -50,7 +50,7 @@ public class BackgroundBossAura extends DrawObject
 	
 	/**
 	 * The getter should return the coordinates to display this bubble.
-	 * @param id - Which aura you're setting, this shader supports up to 3.
+	 * @param id - Which aura you're setting, this shader supports up to {@value #MAX_AURAS}.
 	 * @param getter - Null will disable this aura.
 	 */
 	public void setAura(int id, @Nullable Getter<IPosition> getter)
@@ -62,6 +62,25 @@ public class BackgroundBossAura extends DrawObject
 		data.getter = getter;
 		
 		auras[id] = data;
+	}
+	
+	/**
+	 * @return the next empty aura slot, or -1 if no slots are available.
+	 */
+	public int getNextEmptyAura()
+	{
+		int empty = -1;
+		
+		for(int i = 0; i < auras.length; i++)
+		{
+			if(auras[i] == null)
+			{
+				empty = i;
+				break;
+			}
+		}
+		
+		return empty;
 	}
 	
 	public void clearAuras()

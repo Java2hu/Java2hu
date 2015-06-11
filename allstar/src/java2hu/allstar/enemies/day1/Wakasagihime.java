@@ -1,7 +1,6 @@
 package java2hu.allstar.enemies.day1;
 
 import java2hu.Game;
-import java2hu.IPosition;
 import java2hu.J2hGame;
 import java2hu.J2hGame.ClearType;
 import java2hu.Loader;
@@ -28,7 +27,6 @@ import java2hu.touhou.sounds.TouhouSounds;
 import java2hu.util.AnimationUtil;
 import java2hu.util.BossUtil;
 import java2hu.util.Duration;
-import java2hu.util.Getter;
 import java2hu.util.ImageSplitter;
 import java2hu.util.MathUtil;
 import java2hu.util.ObjectUtil;
@@ -334,15 +332,6 @@ public class Wakasagihime extends AllStarBoss
 						AllStarUtil.introduce(boss);
 						
 						boss.healUp();
-						
-						scheme.getBossAura().setAura(0, new Getter<IPosition>()
-						{
-							@Override
-							public IPosition get()
-							{
-								return boss;
-							}
-						});
 						
 						g.addTaskGame(new Runnable()
 						{
