@@ -216,7 +216,7 @@ public class Doremy extends AllStarBoss
 			@Override
 			public void run()
 			{
-				BossUtil.cloudEntrance(boss, 60);
+				BossUtil.cloudEntrance(boss, Color.WHITE, Color.RED, 60);
 
 				g.addTaskGame(new Runnable()
 				{
@@ -397,6 +397,8 @@ public class Doremy extends AllStarBoss
 							
 							bullet.setScale(0.5f);
 							
+							bullet.setGlowing();
+							
 							float speed = (200f + (200f * rotationMul));
 
 							bullet.getSpawnAnimationSettings().setTime(10f + (1/speed * 20f));
@@ -494,6 +496,7 @@ public class Doremy extends AllStarBoss
 					bullet.setZIndex(bullet.getZIndex() + (20 - (tick % 20)));
 					
 					bullet.setScale(0.9f);
+					bullet.setGlowing();
 					
 					final float cos = (float) Math.cos(((tick % 60) / 60d) * 2 * Math.PI);
 					

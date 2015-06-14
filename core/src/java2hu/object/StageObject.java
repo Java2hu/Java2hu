@@ -1,6 +1,9 @@
 package java2hu.object;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map.Entry;
 import java2hu.Game;
 import java2hu.IPosition;
 import java2hu.J2hGame;
@@ -10,6 +13,7 @@ import java2hu.overwrite.J2hObject;
 import java2hu.pathing.PathingHelper;
 import java2hu.plugin.Plugin;
 
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
@@ -135,6 +139,14 @@ public abstract class StageObject extends J2hObject implements IPosition
 		gameTick = Game.getGame().getActiveTick() == Game.getGame().getTick();
 	}
 	
+	public void delete()
+	{
+		if(getOwnedBy() != null)
+			return;
+		
+		onDelete();
+	}
+	
 	public void onDelete()
 	{
 		disposeAll();
@@ -148,7 +160,7 @@ public abstract class StageObject extends J2hObject implements IPosition
 	}
 	
 	/**
-	 * Disposes of all children by deleting them, done over 5 ticks.
+	 * Disposes of all children by deleting them.
 	 */
 	public void disposeChildren()
 	{
@@ -168,7 +180,7 @@ public abstract class StageObject extends J2hObject implements IPosition
 	}
 	
 	/**
-	 * Disposes all the disposables of this object, done over 5 ticks.
+	 * Disposes all the disposables of this object.
 	 */
 	public void disposeDisposables()
 	{
@@ -176,13 +188,36 @@ public abstract class StageObject extends J2hObject implements IPosition
 		{
 			@Override
 			public void run()
-			{
-				for(Disposable disp : disposables)
+			{ 
+				Iterator<Disposable> it = disposables.iterator();
+				
+				while(it.hasNext())
 				{
-					disp.dispose();
+					Disposable disp = it.next();
+					
+					try
+					{
+						disp.dispose();
+						
+						it.remove();
+					}
+					catch(Exception e)
+					{
+						// If an error has presented itself, don't remove it from the list and dispose of this in the main thread instead.
+					}
 				}
 				
-				disposables.clear();
+				Game.getGame().addTask(new Runnable()
+				{
+					@Override
+					public void run()
+					{
+						for(Disposable disp : disposables)
+						{
+							disp.dispose();
+						}
+					}
+				}, 0);
 			}
 		});
 	}
@@ -373,7 +408,43 @@ public abstract class StageObject extends J2hObject implements IPosition
 		return false;
 	}
 	
+	private StageObject ownedBy;
+	
+	/**
+	 * Sets the object this one is owned by, which will make some methods return the status of the owner instead.
+	 * @param ownedBy
+	 */
+	public void setOwnedBy(StageObject ownedBy)
+	{
+		this.ownedBy = ownedBy;
+	}
+	
+	/**
+	 * Null if unowned.
+	 */
+	public StageObject getOwnedBy()
+	{
+		return ownedBy;
+	}
+	
+	/**
+	 * Returns if this object is on stage.
+	 * Or, if this object is owned, returns if it's owner is on stage.
+	 */
 	public boolean isOnStage()
+	{
+		if(ownedBy != null)
+		{
+			return ownedBy.isOnStage();
+		}
+		
+		return isOnStageRaw();
+	}
+	
+	/**
+	 * Returns if this object is on the stage.
+	 */
+	public boolean isOnStageRaw()
 	{
 		J2hGame g = Game.getGame();
 		
@@ -444,12 +515,111 @@ public abstract class StageObject extends J2hObject implements IPosition
 		setFrameBuffer(null);
 	}
 	
+	/**
+	 * A list of owned objects, any owned objects will be rendered/updated in the same draw/update calls with this object.
+	 * The boolean key decides when the object will be drawn.
+	 */
+	private HashMap<StageObject, OwnedObjectData> ownedObjects = new HashMap<StageObject, OwnedObjectData>();
+	
+	public static class OwnedObjectData
+	{
+		/**
+		 * Draw the owned object after it's owner.
+		 */
+		public boolean drawAfter = true;
+	}
+	
+	/**
+	 * Adds the specified object as owned by this one.
+	 * This method will now call the tick/render methods for this object and it is removed from the stage.
+	 * This will use the default data, which will draw after the owned object
+	 */
+	public void addOwnedObject(StageObject obj)
+	{
+		addOwnedObject(obj, new OwnedObjectData());
+	}
+	
+	/**
+	 * Adds the specified object as owned by this one.
+	 * This method will now call the tick/render methods for this object and it is removed from the stage.
+	 */
+	public void addOwnedObject(StageObject obj, OwnedObjectData data)
+	{
+		ownedObjects.put(obj, data);
+		obj.setOwnedBy(this);
+	}
+	
+	public void removeOwnedObject(StageObject obj)
+	{
+		ownedObjects.remove(obj);
+		obj.setOwnedBy(null);
+	}
+	
+	private int SRC = GL20.GL_SRC_ALPHA;
+	private int DST = GL20.GL_ONE_MINUS_SRC_ALPHA;
+	
+	/**
+	 * Sets this objects blend mode to one that will make it appear to be glowing hot.
+	 */
+	public void setGlowing()
+	{
+		setBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE);
+	}
+	
+	/**
+	 * Sets this object's blend mode to the default.
+	 * SRC: GL_SRC_ALPHA
+	 * DST: GL_ONE_MINUS_SRC_ALPHA
+	 */
+	public void setBlendFuncDefault()
+	{
+		setBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+	}
+	
+	public void setBlendFunc(int sFactor, int dFactor)
+	{
+		SRC = sFactor;
+		DST = dFactor;
+	}
+	
+	public int getBlendFuncSrc()
+	{
+		return SRC;
+	}
+	
+	public int getBlendFuncDst()
+	{
+		return DST;
+	}
+	
 	public void draw()
 	{
 		if(!isOnStage())
 			return;
 		
+		if(getOwnedBy() == null)
+			game.batch.setBlendFunction(SRC, DST);
+		
+		for(Entry<StageObject, OwnedObjectData> owned : ownedObjects.entrySet())
+		{
+			if(owned.getValue().drawAfter)
+				continue;
+			
+			owned.getKey().draw();
+		}
+		
 		onDraw();
+		
+		for(Entry<StageObject, OwnedObjectData> owned : ownedObjects.entrySet())
+		{
+			if(!owned.getValue().drawAfter)
+				continue;
+			
+			owned.getKey().draw();
+		}
+		
+		if(getOwnedBy() == null)
+			game.batch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
 	}
 	
 	/**
@@ -468,29 +638,40 @@ public abstract class StageObject extends J2hObject implements IPosition
 		}
 		
 		getPathing().tick();
+		
+		for(Entry<StageObject, OwnedObjectData> owned : ownedObjects.entrySet())
+		{
+			owned.getKey().update(tick);
+			
+			if(owned.getKey().isOnStageRaw())
+			{
+				game.delete(owned.getKey()); // Shouldn't be drawn on it's own.
+			}
+		}
 	}
 	
-	public void update(float tick)
+	public void update(float second)
 	{
-		onUpdateDelta(tick);
+		onUpdateDelta(second);
 		
-//		for(Plugin effect : effects)
-//		{
-//			effect.update(this, tick);
-//		}
+		for(Entry<StageObject, OwnedObjectData> owned : ownedObjects.entrySet())
+		{
+			owned.getKey().update(second);
+		}
 	}
 	
 	/**
 	 * The update method should be used to update any logic, positioning, etc.
 	 * This will halt when the game is paused.
-	 * This methods runs on the logic loop, which runs at 60 tps by default, but can be different. 
+	 * This methods runs on the logic loop, which runs at {@value J2hGame#LOGIC_TPS} tps by default, but can be different. 
 	 * @param tick
 	 */
 	public abstract void onUpdate(long tick);
 	
 	/**
-	 * This update method will be called instead with the 
-	 * @param delta
+	 * This update method will be called every frame, with delta as the time passed since the last frame was rendered.
+	 * Basically any visual things should be updated here, like movement.
+	 * This is because they can be smoothed out to look really good at all framerates.
 	 */
 	public void onUpdateDelta(float delta)
 	{

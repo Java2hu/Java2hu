@@ -342,6 +342,8 @@ public class TsukumoGeneral implements SpecialFlowScheme<AllStarStageScheme>
 					bullet.getSpawnAnimationSettings().scaleUp();
 					bullet.getSpawnAnimationSettings().setAddedScale(0);
 					bullet.getSpawnAnimationSettings().setTime(80);
+					bullet.setGlowing();
+					
 					game.spawn(bullet);
 					
 					bullet = new Bullet(new ThBullet(ThBulletType.NOTE_EIGHT, ThBulletColor.BLUE), benben.getX(), benben.getY())
@@ -374,6 +376,7 @@ public class TsukumoGeneral implements SpecialFlowScheme<AllStarStageScheme>
 					bullet.getSpawnAnimationSettings().scaleUp();
 					bullet.getSpawnAnimationSettings().setAddedScale(0);
 					bullet.getSpawnAnimationSettings().setTime(80);
+					bullet.setGlowing();
 					game.spawn(bullet);
 				}
 			}
@@ -554,6 +557,7 @@ public class TsukumoGeneral implements SpecialFlowScheme<AllStarStageScheme>
 				Laser laser = new Laser(new ThLaser(ThLaserType.NORMAL, Math.random() > 0.5f ? ThLaserColor.BLUE_LIGHT : ThLaserColor.PURPLE), yatsuhashi.getX(), yatsuhashi.getY(), 400f);
 			
 				laser.setDirectionDegTick(angle, 30f);
+				laser.setGlowing();
 				
 				game.spawn(laser);
 			}
@@ -713,6 +717,7 @@ public class TsukumoGeneral implements SpecialFlowScheme<AllStarStageScheme>
 					};
 					
 					laser.setZIndex(laser.getZIndex() + i);
+					laser.setGlowing();
 
 					game.spawn(laser);
 				}

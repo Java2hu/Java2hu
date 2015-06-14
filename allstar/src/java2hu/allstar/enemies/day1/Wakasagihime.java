@@ -18,6 +18,7 @@ import java2hu.object.bullet.GravityBullet;
 import java2hu.object.player.Player;
 import java2hu.object.ui.CircleHealthBar;
 import java2hu.overwrite.J2hMusic;
+import java2hu.plugin.sprites.FadeInSprite;
 import java2hu.spellcard.Spellcard;
 import java2hu.system.SaveableObject;
 import java2hu.touhou.bullet.ThBullet;
@@ -27,6 +28,7 @@ import java2hu.touhou.sounds.TouhouSounds;
 import java2hu.util.AnimationUtil;
 import java2hu.util.BossUtil;
 import java2hu.util.Duration;
+import java2hu.util.Getter;
 import java2hu.util.ImageSplitter;
 import java2hu.util.MathUtil;
 import java2hu.util.ObjectUtil;
@@ -38,7 +40,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
@@ -63,7 +64,7 @@ public class Wakasagihime extends AllStarBoss
 	/**
 	 * Spell Card Name
 	 */
-	final static String SPELLCARD_NAME = "Deep Unknown - \"Small Fry\"";
+	final static String SPELLCARD_NAME = "Deep Unknown \"Small Fry\"";
 	
 	private Setter<BackgroundBossAura> background;
 	
@@ -134,15 +135,19 @@ public class Wakasagihime extends AllStarBoss
 		addDisposable(bge2);
 		
 		setAuraColor(new Color(52 / 256f, 99 / 256f, 229 / 256f, 1.0f));
+		setBgAuraColor(AllStarUtil.from255RGB(40, 161, 220));
 
 		final Wakasagihime boss = this;
 		
 		background = new Setter<BackgroundBossAura>()
 		{
+			@SuppressWarnings("deprecation")
 			@Override
 			public void set(final BackgroundBossAura aura)
 			{
 				final FrameBuffer combineBuffer = new FrameBuffer(Format.RGBA8888, Game.getGame().getWidth(), Game.getGame().getHeight(), false);
+				
+				final float fadeSpeed = 0.01f;
 				
 				Game.getGame().spawn(new DrawObject()
 				{
@@ -160,15 +165,24 @@ public class Wakasagihime extends AllStarBoss
 						if(sprite == null)
 						{
 							sprite = new Sprite(combineBuffer.getColorBufferTexture());
+							
+							addEffect(new FadeInSprite(new Getter<Sprite>()
+							{
+								@Override
+								public Sprite get()
+								{
+									return sprite;
+								}
+							}, 0f, 1f, fadeSpeed));
 						}
-						
-						game.batch.flush();
 
-						Gdx.gl.glClearColor(0, 0, 0, 0);
-						Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+						game.batch.flush();
+						sprite.setColor(1f, 1f, 1f, 1f);
 						
 						sprite.setBounds(0, 0, Game.getGame().getWidth(), Game.getGame().getHeight());
 						sprite.draw(game.batch);
+						
+						game.batch.enableBlending();
 					}
 					
 					@Override
@@ -258,7 +272,7 @@ public class Wakasagihime extends AllStarBoss
 				Game.getGame().spawn(new ScrollingBackground(bge2, 0.3f, -0.3f)
 				{
 					{
-						bge2.setAlpha(1f);
+						bge2.setAlpha(2f);
 						
 						setFrameBuffer(combineBuffer);
 						
@@ -315,8 +329,8 @@ public class Wakasagihime extends AllStarBoss
 			@Override
 			public void run()
 			{
-				BossUtil.cloudEntrance(boss, 60);
-
+				BossUtil.cloudEntrance(boss, boss.getAuraColor(), boss.getBgAuraColor(), 60);
+				
 				g.addTaskGame(new Runnable()
 				{
 					@Override
@@ -472,6 +486,8 @@ public class Wakasagihime extends AllStarBoss
 
 					bullet.getCurrentSprite().setScale(1.5f, 3f);
 					bullet.setDirectionRadsTick((float) Math.toRadians(i), 5f);
+					bullet.setGlowing();
+					
 					Game.getGame().spawn(bullet);
 				}
 			}
@@ -638,7 +654,7 @@ public class Wakasagihime extends AllStarBoss
 				final SaveableObject<Boolean> hasBroken = new SaveableObject<Boolean>();
 				hasBroken.setObject(false);
 				
-				for(int i = 0; i < body + tail; i += 2)
+				for(int i = 0; i < body + tail; i += 1)
 				{
 					int size = i;
 					
@@ -668,7 +684,7 @@ public class Wakasagihime extends AllStarBoss
 								getCurrentSprite().setColor(new Color(color, color, color, (color + 0.5f) * 5f));
 								
 								if(color < 1)
-									color += 0.02f;
+									color += 0.08f;
 								
 								if(isTail && !game.inBoundary(getX(), getY()) && tick % 70 == 0 && !hasBroken.getObject())
 								{
@@ -737,6 +753,7 @@ public class Wakasagihime extends AllStarBoss
 						fish.useSpawnAnimation(false);
 						fish.setDirectionRadsTick((float) Math.toRadians(rotation), 10f);
 						fish.setRotationFromVelocity(270f);
+						fish.setGlowing();
 						
 						game.addTaskGame(new Runnable()
 						{

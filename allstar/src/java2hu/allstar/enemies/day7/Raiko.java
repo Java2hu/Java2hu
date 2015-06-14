@@ -5,6 +5,7 @@ import java2hu.HitboxSprite;
 import java2hu.J2hGame;
 import java2hu.J2hGame.ClearType;
 import java2hu.Loader;
+import java2hu.MovementAnimation;
 import java2hu.allstar.AllStarStageScheme;
 import java2hu.allstar.enemies.AllStarBoss;
 import java2hu.allstar.util.AllStarUtil;
@@ -64,8 +65,8 @@ public class Raiko extends AllStarBoss
 		Animation idle = ImageSplitter.getAnimationFromSprite(sprite, chunkHeight, chunkWidth, 12F, 1,2,3,4);
 		idle.setPlayMode(PlayMode.LOOP);
 		
-		Animation right = ImageSplitter.getAnimationFromSprite(sprite, 0, 96 * 2, chunkHeight, chunkWidth, 12F, 1,2,3,4,5);
-		Animation left = ImageSplitter.getAnimationFromSprite(sprite, 0, 2 * 96 * 2, chunkHeight, chunkWidth, 12F, 1,2,3,4,5);
+		Animation right = new MovementAnimation(ImageSplitter.getAnimationFromSprite(sprite, 0, 96 * 2, chunkHeight, chunkWidth, 12F, 1,2,3), ImageSplitter.getAnimationFromSprite(sprite, 0, 96 * 2, chunkHeight, chunkWidth, 12F, 4,5), 12f);
+		Animation left = new MovementAnimation(ImageSplitter.getAnimationFromSprite(sprite, 0, 2 * 96 * 2, chunkHeight, chunkWidth, 12F, 1,2,3), ImageSplitter.getAnimationFromSprite(sprite, 0, 2 * 96 * 2, chunkHeight, chunkWidth, 12F, 4,5), 12f);
 		
 		Animation special = ImageSplitter.getAnimationFromSprite(sprite, 0, 3 * 96 * 2, chunkHeight, chunkWidth, 10F, 1,2,3,4,5);
 

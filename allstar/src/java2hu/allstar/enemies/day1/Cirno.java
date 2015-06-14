@@ -4,6 +4,7 @@ import java2hu.Game;
 import java2hu.J2hGame;
 import java2hu.J2hGame.ClearType;
 import java2hu.Loader;
+import java2hu.MovementAnimation;
 import java2hu.allstar.AllStarStageScheme;
 import java2hu.allstar.enemies.AllStarBoss;
 import java2hu.allstar.util.AllStarUtil;
@@ -14,6 +15,7 @@ import java2hu.object.bullet.Bullet;
 import java2hu.object.player.Player;
 import java2hu.object.ui.CircleHealthBar;
 import java2hu.overwrite.J2hMusic;
+import java2hu.pathing.SimpleTouhouBossPath;
 import java2hu.plugin.Plugin;
 import java2hu.spellcard.PhaseSpellcard;
 import java2hu.system.SaveableObject;
@@ -53,7 +55,7 @@ public class Cirno extends AllStarBoss
 	/**
 	 * Spell Card Name
 	 */
-	final static String SPELLCARD_NAME = "Ice Sign - \"Frozen Wall\"";
+	final static String SPELLCARD_NAME = "Ice Sign \"Frozen Wall\"";
 	
 	public Setter<BackgroundBossAura> backgroundSpawner;
 	
@@ -72,10 +74,10 @@ public class Cirno extends AllStarBoss
 
 		TextureRegion nameTag = new TextureRegion(Loader.texture(FOLDER.child("nametag.png")));
 
-		Animation idle = ImageSplitter.getAnimationFromSprite(sprite, chunkHeight, chunkWidth, 15F, 1,2,3,4);
+		Animation idle = ImageSplitter.getAnimationFromSprite(sprite, chunkHeight, chunkWidth, 10F, 1,2,3,4);
 		idle.setPlayMode(PlayMode.LOOP);
 		
-		Animation left = ImageSplitter.getAnimationFromSprite(sprite, chunkHeight, chunkWidth, 15F, 5,6,7,8);
+		Animation left = new MovementAnimation(ImageSplitter.getAnimationFromSprite(sprite, chunkHeight, chunkWidth, 10F, 5,6,7), ImageSplitter.getAnimationFromSprite(sprite, chunkHeight, chunkWidth, 15F, 8), 10f);
 		Animation right = AnimationUtil.copyAnimation(left);
 
 		for(TextureRegion reg : left.getKeyFrames())
@@ -87,6 +89,7 @@ public class Cirno extends AllStarBoss
 		Music bgm = new J2hMusic(Gdx.audio.newMusic(FOLDER.child("bgm.mp3")));
 		
 		setAuraColor(new Color(0 / 255f, 102 / 255f, 187 / 255f, 1.0f));
+		setBgAuraColor(AllStarUtil.from255RGB(40, 161, 220));
 		
 		set(nameTag, bgm);
 		set(fbs, idle, left, right, special);
@@ -98,8 +101,9 @@ public class Cirno extends AllStarBoss
 			{
 				final Sprite bg = new Sprite(Loader.texture(FOLDER.child("bg.png")));
 				bg.setRegion(0f, 0f, 3f, 3f);
+				bg.setColor(new Color(0.5f, 0.5f, 0.5f, 1f));
 				
-				game.spawn(new VerticalScrollingBackground(bg, 2f, false)
+				game.spawn(new VerticalScrollingBackground(bg, 0.7f, false)
 				{
 					{
 						setFrameBuffer(t.getBackgroundBuffer());
@@ -123,7 +127,7 @@ public class Cirno extends AllStarBoss
 			@Override
 			public void run()
 			{
-				BossUtil.cloudEntrance(boss, 60);
+				BossUtil.cloudEntrance(boss, boss.getAuraColor(), boss.getBgAuraColor(), 60);
 
 				g.addTaskGame(new Runnable()
 				{
@@ -363,6 +367,7 @@ public class Cirno extends AllStarBoss
 						Bullet bullet = new Bullet(bullets[time], boss.getX(), boss.getY());
 						
 						bullet.setDirectionDeg(i, 500f);
+						bullet.setGlowing();
 						
 						game.spawn(bullet);
 					}
@@ -377,7 +382,9 @@ public class Cirno extends AllStarBoss
 					if(tick != 0)
 						return;
 					
-					BossUtil.moveAroundRandomly(boss, (int) (getGame().getMaxX() / 2) - 100, (int)(getGame().getMaxX() / 2) + 100, Game.getGame().getHeight() - 100, Game.getGame().getHeight() - 300, 800);
+					final SimpleTouhouBossPath p = new SimpleTouhouBossPath(boss);
+					p.setTime(Duration.ticks(80));
+					boss.getPathing().setCurrentPath(p);
 				}
 			});
 		}
@@ -416,9 +423,14 @@ public class Cirno extends AllStarBoss
 						
 						for(int i = 0; i < 360; i += 360 / 6f)
 						{
-							Bullet bullet = new Bullet(new ThBullet(ThBulletType.BALL_BIG, ThBulletColor.BLUE), boss.getX(), boss.getY());
+							Bullet bullet = new Bullet(new ThBullet(ThBulletType.POINTER, ThBulletColor.WHITE), boss.getX(), boss.getY());
+							
+							bullet.setGlowing();
+
+							bullet.setScale(1f, 3f);
 							
 							bullet.setDirectionDeg(i + angle, 600f);
+							bullet.setRotationFromVelocity(-90);
 							
 							game.spawn(bullet);
 						}
@@ -504,10 +516,15 @@ public class Cirno extends AllStarBoss
 					
 					if(tick == 0)
 					{
-						for(int i = 0; i < 2; i++)
+						for(int i = 0; i < 5; i++)
 						for(final boolean bool : i == 0 ? new boolean[]{ true, false } : new boolean[] { Math.random() < 0.5f ? false : true })
 						{
-							int pos = (int) (game.getWidth() * Math.random());
+							int pos = 0;
+							
+							while(pos == 0 || MathUtil.getDistance(pos, 0, game.getPlayer().getX(), 0) < 150)
+							{
+								pos = (int) (game.getWidth() * Math.random());
+							}
 
 							final int maxTime = 60;
 
@@ -523,12 +540,15 @@ public class Cirno extends AllStarBoss
 										@Override
 										public void run()
 										{
-											Bullet bullet = new Bullet(new ThBullet(ThBulletType.CRYSTAL, ThBulletColor.WHITE), x + (side ? -10 : 10), y);
+											Bullet bullet = new Bullet(new ThBullet(ThBulletType.RICE, ThBulletColor.WHITE), x + (side ? -10 : 10), y);
 
 											bullet.setDirectionDeg(bool ? 90 : 270, 500f);
+											bullet.setGlowing();
 
 											bullet.addEffect(new Plugin<Bullet>()
 											{
+												float offset = (float) (Math.random() * 30f);
+												
 												@Override
 												public void update(Bullet object, long tick)
 												{
@@ -536,7 +556,8 @@ public class Cirno extends AllStarBoss
 
 													if(object.getTicksAlive() > maxTime - finalTime)
 													{
-														object.setDirectionDeg(bool ? 90 + (side ? -1 : 1) * 30f : 270 + (side ? 1 : -1) * 30f, 300f + 300f * modifier);
+														final float degree = bool ? 90 + (side ? -1 : 1) * 30f : 270 + (side ? 1 : -1) * 30f;
+														object.setDirectionDeg(degree + offset, 100f + 300f * modifier);
 														object.setRotationFromVelocity();
 													}
 												}
@@ -561,7 +582,10 @@ public class Cirno extends AllStarBoss
 					if(tick != 0)
 						return;
 					
-					BossUtil.moveAroundRandomly(boss, (int) (getGame().getMaxX() / 2) - 100, (int)(getGame().getMaxX() / 2) + 100, Game.getGame().getHeight() - 300, Game.getGame().getHeight() - 600, 600);
+					SimpleTouhouBossPath p = new SimpleTouhouBossPath(boss);
+					p.setTime(Duration.ticks(40));
+					
+					boss.getPathing().setCurrentPath(p);
 				}
 			});
 		}

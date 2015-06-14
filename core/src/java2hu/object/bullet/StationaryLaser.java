@@ -1,5 +1,7 @@
 package java2hu.object.bullet;
 
+import java2hu.Position;
+
 
 public class StationaryLaser extends LaserDrawer
 {
@@ -27,11 +29,6 @@ public class StationaryLaser extends LaserDrawer
 	public void update(long tick)
 	{
 		super.update(tick);
-		
-		getPoints().clear();
-		
-		addPoint(getStartX(), getStartY());
-		addPoint(getEndX(), getEndY());
 	}
 	
 	@Override
@@ -40,9 +37,24 @@ public class StationaryLaser extends LaserDrawer
 		return false;
 	}
 	
+	@Override
+	public void deletePoint(Position pos)
+	{
+		
+	}
+	
+	private void updatePoints()
+	{
+		getPoints().clear();
+		
+		addPoint(getStartX(), getStartY());
+		addPoint(getEndX(), getEndY());
+	}
+	
 	public void setStartX(float startX)
 	{
 		this.startX = startX;
+		updatePoints();
 	}
 	
 	public float getStartX()
@@ -53,6 +65,7 @@ public class StationaryLaser extends LaserDrawer
 	public void setStartY(float startY)
 	{
 		this.startY = startY;
+		updatePoints();
 	}
 	
 	public float getStartY()
@@ -69,6 +82,8 @@ public class StationaryLaser extends LaserDrawer
 	public void setEndX(float endX)
 	{
 		this.endX = endX;
+		
+		updatePoints();
 	}
 	
 	public float getEndX()
@@ -79,6 +94,8 @@ public class StationaryLaser extends LaserDrawer
 	public void setEndY(float endY)
 	{
 		this.endY = endY;
+		
+		updatePoints();
 	}
 	
 	public float getEndY()

@@ -6,9 +6,11 @@ import java2hu.HitboxSprite;
 import java2hu.J2hGame;
 import java2hu.J2hGame.ClearType;
 import java2hu.Loader;
+import java2hu.ZIndex;
 import java2hu.allstar.AllStarStageScheme;
 import java2hu.allstar.enemies.AllStarBoss;
 import java2hu.allstar.util.AllStarUtil;
+import java2hu.background.BackgroundBossAura;
 import java2hu.gameflow.GameFlowScheme.WaitConditioner;
 import java2hu.object.DrawObject;
 import java2hu.object.StageObject;
@@ -35,6 +37,7 @@ import java2hu.util.MathUtil;
 import java2hu.util.MeshUtil;
 import java2hu.util.ObjectUtil;
 import java2hu.util.SchemeUtil;
+import java2hu.util.Setter;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Music;
@@ -123,6 +126,8 @@ public class Shinki extends AllStarBoss
 	
 	public Sprite bg;
 	
+	public Setter<BackgroundBossAura> backgroundSetter;
+	
 	public Shinki(float maxHealth, TextureRegion nametag, final Sprite bg, final Sprite wingsNormal, final Sprite wingsDemon, Sprite fullBodySprite, Animation idle, Animation left, Animation right, Animation special, Animation specialWings, Music bgm, float x, float y)
 	{
 		super(maxHealth, nametag, fullBodySprite, idle, left, right, special, bgm, x, y);
@@ -142,6 +147,39 @@ public class Shinki extends AllStarBoss
 		addDisposable(wingsDemon);
 		
 		this.bg = bg;
+		
+		backgroundSetter = new Setter<BackgroundBossAura>()
+		{
+			@Override
+			public void set(final BackgroundBossAura t)
+			{
+				Game.getGame().spawn(new DrawObject()
+				{
+					{
+						bg.setPosition(0, 0);
+						bg.setBounds(game.getMinX(), game.getMinY(), game.getWidth(), game.getHeight());
+						setFrameBuffer(t.getBackgroundBuffer());
+						setZIndex(ZIndex.BACKGROUND_LAYER_2);
+						
+						addEffect(new FadeInSprite(new Getter<Sprite>()
+						{
+							@Override
+							public Sprite get()
+							{
+								return bg;
+							}
+						}
+						, 0, 1f, 0.01F));
+					}
+					
+					@Override
+					public void onDraw()
+					{
+						bg.draw(Game.getGame().batch);
+					}
+				});
+			}
+		};
 	}
 	
 	@Override
@@ -543,6 +581,8 @@ public class Shinki extends AllStarBoss
 				Game.getGame().startSpellCard(card);
 
 				BossUtil.spellcardCircle(boss, card, scheme.getBossAura());
+				
+				boss.backgroundSetter.set(scheme.getBossAura());
 			}
 		}, 1);
 		
@@ -554,6 +594,7 @@ public class Shinki extends AllStarBoss
 			public void run()
 			{
 				boss.setNoWings();
+				
 				Game.getGame().clearCircle(800f, boss, ClearType.ALL);
 			}
 		}, 1);
@@ -645,6 +686,7 @@ public class Shinki extends AllStarBoss
 									{
 										Bullet bullet = new Bullet(new ThBullet(ThBulletType.BUTTERFLY, ThBulletColor.RED), boss.getX(), boss.getY());
 										bullet.setDirectionDegTick(MathUtil.getAngle(bullet, player) + angle, 2f + i * 3f);
+										bullet.setGlowing();
 										game.spawn(bullet);
 									}
 								}
@@ -754,6 +796,7 @@ public class Shinki extends AllStarBoss
 			super(getCheetosAnimation(texture), x, y);
 			this.size = size * 2;
 			this.lastPositions = new float[size * 2];
+			setGlowing();
 		}
 		
 		@Override
@@ -832,44 +875,10 @@ public class Shinki extends AllStarBoss
 		{
 			super(owner);
 			setSpellcardTime(Duration.seconds(60));
-			
-			final Shinki boss = (Shinki) getOwner();
-			
-			Game.getGame().spawn(new DrawObject()
-			{
-				{
-					addEffect(new FadeInSprite(new Getter<Sprite>()
-							{
-						@Override
-						public Sprite get()
-						{
-							return boss.bg;
-						}
-							}
-					, 0, 1f, 0.01F));
-				}
-				
-				@Override
-				public void onDraw()
-				{
-					boss.bg.draw(Game.getGame().batch);
-				}
-			});
 		}
 
 		Bullet laser1;
 		Bullet laser2;
-		
-		ArrayList<Bullet> lasers = new ArrayList<Bullet>();
-		
-		@Override
-		public void onRemove()
-		{
-			for(Bullet b : lasers)
-				game.delete(b);
-			
-			super.onRemove();
-		}
 
 		@Override
 		public void tick(int tick)
@@ -946,10 +955,10 @@ public class Shinki extends AllStarBoss
 						}
 					};
 					
+					laser.setGlowing();
 					laser.setZIndex(8);
 					laser.setDirectionDeg(boss.getX() + (bool ? -130 : 130), boss.getY(), 270f, 1000);
-					
-					lasers.add(laser);
+					laser.setPosition(boss);
 					
 					game.spawn(laser);
 				}
@@ -1011,7 +1020,8 @@ public class Shinki extends AllStarBoss
 						knife.setDirectionRadsTick((float) Math.toRadians(f + (xAdd < 0 ? addRotation : -addRotation)), 20f);
 						knife.setRotationFromVelocity(-90);
 						knife.setZIndex(boss.getZIndex() - 3);
-
+						knife.setGlowing();
+						
 						Bullet spawner = new Bullet(new ThBullet(ThBulletType.BALL_BIG, ThBulletColor.RED), boss.getX() + xAdd, boss.getY() + 50)
 						{
 							@Override
@@ -1045,6 +1055,8 @@ public class Shinki extends AllStarBoss
 						small.setVelocityXTick((float) (Math.random() * 20 - 10f));
 
 						small.setVelocityYTick((float) -(1f + Math.random() * 2f));
+						small.setGlowing();
+						small.setZIndex(small.getZIndex() - 10);
 
 						game.spawn(small);
 					}

@@ -250,7 +250,7 @@ public class Days extends J2hObject
 				@Override
 				public AllStarBoss get()
 				{
-					final Sukuna boss = Sukuna.newInstance(startX, startY);
+					final Sukuna boss = new Sukuna(startHP, startX, startY);
 					return boss;
 				}
 			});

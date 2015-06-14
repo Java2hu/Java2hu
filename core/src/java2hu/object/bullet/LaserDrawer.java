@@ -1,7 +1,6 @@
 package java2hu.object.bullet;
 
 import java.util.ArrayList;
-
 import java2hu.Game;
 import java2hu.HitboxSprite;
 import java2hu.J2hGame;
@@ -144,6 +143,12 @@ public class LaserDrawer extends Bullet
 
 	}
 	
+	@Override
+	public void deleteAnimation()
+	{
+
+	}
+	
 	@Deprecated
 	@Override
 	public void oldDeleteAnimation()
@@ -183,6 +188,9 @@ public class LaserDrawer extends Bullet
 			sp.setUniformMatrix("u_projTrans", combined);
 
 			Gdx.graphics.getGL20().glEnable(GL20.GL_BLEND);
+			
+			Gdx.gl.glBlendFunc(getBlendFuncSrc(), getBlendFuncDst());
+			
 			Gdx.graphics.getGL20().glEnable(GL20.GL_TEXTURE_2D);
 			Gdx.graphics.getGL20().glActiveTexture(GL20.GL_TEXTURE0);
 

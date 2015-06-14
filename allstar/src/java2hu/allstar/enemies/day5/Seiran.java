@@ -34,8 +34,6 @@ import java2hu.util.ObjectUtil;
 import java2hu.util.SchemeUtil;
 import java2hu.util.Setter;
 
-import shaders.ShaderLibrary;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.files.FileHandle;
@@ -97,6 +95,7 @@ public class Seiran extends AllStarBoss
 		bgm.setLooping(true);
 		
 		setAuraColor(new Color(17 / 255f, 119 / 255f, 204 / 255f, 1.0f));
+		setBgAuraColor(AllStarUtil.from255RGB(104, 19, 52).mul(6f));
 		
 		set(nameTag, bgm);
 		set(fbs, idle, left, right, special);
@@ -245,7 +244,7 @@ public class Seiran extends AllStarBoss
 			@Override
 			public void run()
 			{
-				BossUtil.cloudEntrance(boss, 60);
+				BossUtil.cloudEntrance(boss, AllStarUtil.from255RGB(248, 6, 13), AllStarUtil.from255RGB(54, 106, 200), 60);
 
 				g.addTaskGame(new Runnable()
 				{
@@ -407,8 +406,6 @@ public class Seiran extends AllStarBoss
 				for(int i = 0; i < amount; i++)
 				{
 					final Bullet bullet = new Bullet(new ThBullet(ThBulletType.RICE_LARGE, ThBulletColor.BLUE), boss.getX(), boss.getY());
-					
-					bullet.setShader(ShaderLibrary.GLOW.getProgram());
 					
 					final float degree = offset + MathUtil.getAngle(boss, player);
 					

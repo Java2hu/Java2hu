@@ -13,6 +13,7 @@ import java2hu.allstar.util.AllStarUtil;
 import java2hu.background.BackgroundBossAura;
 import java2hu.background.HorizontalScrollingBackground;
 import java2hu.gameflow.GameFlowScheme.WaitConditioner;
+import java2hu.helpers.ZIndexHelper;
 import java2hu.object.DrawObject;
 import java2hu.object.StageObject;
 import java2hu.object.bullet.Bullet;
@@ -29,12 +30,12 @@ import java2hu.touhou.bullet.ThBulletType;
 import java2hu.touhou.sounds.TouhouSounds;
 import java2hu.util.AnimationUtil;
 import java2hu.util.BossUtil;
+import java2hu.util.Duration;
 import java2hu.util.Getter;
 import java2hu.util.ImageSplitter;
 import java2hu.util.MathUtil;
+import java2hu.util.ObjectUtil;
 import java2hu.util.SchemeUtil;
-
-import shaders.ShaderLibrary;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Music;
@@ -61,8 +62,8 @@ public class Kagerou extends AllStarBoss
 	/**
 	 * Spell Card Name
 	 */
-	final static String SPELLCARD_NAME = "Werewolf Sign - \"Pack Hunt\"";
-	final static String NONSPELL_NAME = "Hairy Wolf - \"Heavily Shedding Fur\"";
+	final static String SPELLCARD_NAME = "Werewolf Sign \"Pack Hunt\"";
+	final static String NONSPELL_NAME = "Hairy Wolf \"Heavily Shedding Fur\"";
 	
 	protected boolean werewolf = false;
 	protected Animation werewolfAniRight;
@@ -353,9 +354,13 @@ public class Kagerou extends AllStarBoss
 				Game.getGame().clearObjects();
 				AllStarUtil.presentSpellCard(boss, SPELLCARD_NAME);
 				
-				Game.getGame().startSpellCard(new KagerouSpell(boss));
+				final KagerouSpell card = new KagerouSpell(boss);
+				
+				Game.getGame().startSpellCard(card);
 				
 				boss.spawnBackground(scheme.getBossAura());
+				
+				BossUtil.spellcardCircle(boss, card, scheme.getBossAura());
 			}
 		}, 1);
 		
@@ -366,16 +371,29 @@ public class Kagerou extends AllStarBoss
 			@Override
 			public void run()
 			{
-				Game.getGame().delete(boss);
-				
-				game.clearSpellcards();
-				game.clear(ClearType.ALL);
-				
-				BossUtil.mapleExplosion(boss.getX(), boss.getY());
+				Game.getGame().clearCircle(800f, boss, ClearType.ALL);
 			}
 		}, 1);
 		
-		scheme.waitTicks(5); // Prevent concurrency issues.
+		scheme.waitTicks(2);
+		
+		boss.playSpecial(false);
+		SchemeUtil.deathAnimation(scheme, boss, boss.getAuraColor());
+		
+		Game.getGame().addTaskGame(new Runnable()
+		{
+			@Override
+			public void run()
+			{
+				ObjectUtil.deathAnimation(boss);
+				
+				Game.getGame().delete(boss);
+				
+				Game.getGame().clear(ClearType.ALL);
+			}
+		}, 5);
+		
+		scheme.waitTicks(10); // Prevent concurrency issues.
 	}
 	
 	public static class KagerouNonSpell extends Spellcard
@@ -383,6 +401,7 @@ public class Kagerou extends AllStarBoss
 		public KagerouNonSpell(StageObject owner)
 		{
 			super(owner);
+			setSpellcardTime(Duration.seconds(34));
 		}
 
 		@Override
@@ -467,8 +486,7 @@ public class Kagerou extends AllStarBoss
 										};
 									};
 									
-									bullet.setShader(ShaderLibrary.GLOW.getProgram());
-									
+									bullet.setGlowing();
 									bullet.getCurrentSprite().setScale(0.3f, 1f);
 									
 									bullet.setDirectionRadsTick(dir, 4f);
@@ -502,7 +520,7 @@ public class Kagerou extends AllStarBoss
 										};
 									};
 									
-									bullet.setShader(ShaderLibrary.GLOW.getProgram());
+									bullet.setGlowing();
 									bullet.setDirectionRadsTick((float) (dir + Math.toRadians(45) + (left ? -1 : 1) * Math.toRadians(i * 2f)), Math.max(i / 2f, 1f) * 1f);
 									
 									game.spawn(bullet);
@@ -522,7 +540,7 @@ public class Kagerou extends AllStarBoss
 				
 				bullet.setZIndex(i);
 				bullet.setDirectionRadsTick((float) Math.toRadians(i), 5f);
-				bullet.setShader(ShaderLibrary.GLOW.getProgram());
+				bullet.setGlowing();
 				
 				game.spawn(bullet);
 			}
@@ -534,7 +552,10 @@ public class Kagerou extends AllStarBoss
 		public KagerouSpell(StageObject owner)
 		{
 			super(owner);
+			setSpellcardTime(Duration.seconds(54));
 		}
+		
+		private ZIndexHelper indexer = new ZIndexHelper();
 
 		@Override
 		public void tick(int tick)
@@ -639,6 +660,10 @@ public class Kagerou extends AllStarBoss
 								wolf.setDirectionRadsTick((float) Math.toRadians(finalI - 135f), 10f);
 								wolf.setRotationFromVelocity(180f);
 								wolf.useSpawnAnimation(false);
+								
+								wolf.setGlowing();
+								wolf.useSpawnAnimation(false);
+								wolf.useDeathAnimation(false);
 
 								game.spawn(wolf);
 							}
@@ -708,6 +733,8 @@ public class Kagerou extends AllStarBoss
 					
 					bullet.setVelocityXTick(addX);
 					bullet.setVelocityYTick(addY);
+					
+					indexer.index(bullet);
 					
 					game.spawn(bullet);
 				}
@@ -783,8 +810,12 @@ public class Kagerou extends AllStarBoss
 									// Vanity bullet, no collision.
 								}
 							};
+							
 							wolf.setDirectionRadsTick((float) Math.toRadians(finalI - 135f), 10f);
 							wolf.setRotationFromVelocity(180f);
+							wolf.setGlowing();
+							wolf.useSpawnAnimation(false);
+							wolf.useDeathAnimation(false);
 
 							game.spawn(wolf);
 						}
@@ -846,7 +877,7 @@ public class Kagerou extends AllStarBoss
 								}
 							};
 							
-							bullet.setShader(ShaderLibrary.GLOW.getProgram());
+							bullet.setGlowing();
 
 							float maxX = 100f;
 							float addX = (float) (Math.random() * (maxX * 2) - maxX);

@@ -34,8 +34,6 @@ import java2hu.util.ImageSplitter;
 import java2hu.util.MathUtil;
 import java2hu.util.Scheduler;
 
-import shaders.ShaderLibrary;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.Color;
@@ -611,7 +609,7 @@ public class Sekibanki extends AllStarBoss
 		public SekibankiBulletWormBullet(float x, float y)
 		{
 			super(new ThBullet(ThBulletType.RAIN, ThBulletColor.RED), x, y);
-			setShader(ShaderLibrary.GLOW.getProgram());
+			setGlowing();
 		}
 		
 		@Override
@@ -727,6 +725,7 @@ public class Sekibanki extends AllStarBoss
 
 						bullet.getSpawnAnimationSettings().setAlpha(0.1f);
 						bullet.getSpawnAnimationSettings().setTime(10f);
+						bullet.setGlowing();
 
 						float dirRads = 0;
 						

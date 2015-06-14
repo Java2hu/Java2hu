@@ -5,6 +5,7 @@ import java2hu.HitboxSprite;
 import java2hu.J2hGame;
 import java2hu.J2hGame.ClearType;
 import java2hu.Loader;
+import java2hu.MovementAnimation;
 import java2hu.allstar.AllStarStageScheme;
 import java2hu.allstar.enemies.AllStarBoss;
 import java2hu.allstar.util.AllStarUtil;
@@ -19,6 +20,7 @@ import java2hu.object.bullet.Bullet;
 import java2hu.object.enemy.greater.Boss;
 import java2hu.object.player.Player;
 import java2hu.object.ui.CircleHealthBar;
+import java2hu.pathing.SimpleTouhouBossPath;
 import java2hu.plugin.sprites.FadeInSprite;
 import java2hu.spellcard.Spellcard;
 import java2hu.system.SaveableObject;
@@ -29,11 +31,14 @@ import java2hu.touhou.sounds.TouhouSounds;
 import java2hu.util.AnimationUtil;
 import java2hu.util.BossUtil;
 import java2hu.util.BossUtil.BackgroundAura;
+import java2hu.util.Duration;
 import java2hu.util.Getter;
 import java2hu.util.ImageSplitter;
 import java2hu.util.ImageUtil;
 import java2hu.util.MathUtil;
+import java2hu.util.ObjectUtil;
 import java2hu.util.Scheduler;
+import java2hu.util.SchemeUtil;
 import java2hu.util.Setter;
 
 import com.badlogic.gdx.Gdx;
@@ -53,13 +58,25 @@ import com.badlogic.gdx.math.Rectangle;
  */
 public class Sukuna extends AllStarBoss
 {
-	public static Sukuna newInstance(float x, float y)
+	public boolean clone = false;
+	public Sprite bg;
+	public Sprite bge;
+	public Setter<BackgroundBossAura> background;
+	
+	public Sukuna(float maxHealth, float x, float y)
 	{
-		return newInstance(x, y, false);
+		this(false, maxHealth, x, y);
 	}
 	
-	public static Sukuna newInstance(float x, float y, boolean clone)
+	public Sukuna(boolean clone, float maxHealth, float x, float y)
 	{
+		super(maxHealth, x, y);
+		
+		this.setAuraColor(new Color(226F/255F, 104F/255F, 74/255F, 1));
+		this.setBgmPosition(15f);
+		
+		this.clone = clone;
+		
 		String basedir = "enemy/sukuna/";
 		
 		int chunkHeight = 192;
@@ -71,12 +88,10 @@ public class Sukuna extends AllStarBoss
 		Sprite fbs = new Sprite(Loader.texture(Gdx.files.internal(basedir + "fbs.png")));
 		Sprite nameTag = new Sprite(Loader.texture(Gdx.files.internal(basedir + "nametag.png")));
 
-		Animation right = ImageSplitter.getAnimationFromSprite(sprite, 0, 2 * chunkHeight, chunkHeight, chunkWidth, 6F, 1,2,3,4,5,6,7,8,9,8,9);
-		Animation left = ImageSplitter.getAnimationFromSprite(sprite, 0, 4 * chunkHeight, chunkHeight, chunkWidth, 6F, 1,2,3,4,5,4,5,4,5,4,5,4,5,4,5,4,5,4,5);
+		Animation right = new MovementAnimation(ImageSplitter.getAnimationFromSprite(sprite, 0, 2 * chunkHeight, chunkHeight, chunkWidth, 6F, 1,2,3,4,5,6), ImageSplitter.getAnimationFromSprite(sprite, 0, 2 * chunkHeight, chunkHeight, chunkWidth, 6F, 7,8,9), 4f);
+		Animation left = AnimationUtil.copyAnimation(right);
 
 		Animation special = ImageSplitter.getAnimationFromSprite(sprite, chunkHeight, chunkWidth, 3F, 
-				// Start
-				1,
 				// Move to left
 				12,13,14,15,16,17,18,19,
 				// Move back to center
@@ -84,18 +99,19 @@ public class Sukuna extends AllStarBoss
 				// Move to right
 				21,22,23,24,25,26,27,28,29,
 				// Move back
-				28,27,26,25,24,23,22);
+				28,27,26,25,24,23,22,21);
 		
-		Animation idle = AnimationUtil.copyAnimation(special);
+		Animation idle = AnimationUtil.copyAnimation(special, 4f);
 		idle.setPlayMode(PlayMode.LOOP);
+		special.setPlayMode(PlayMode.LOOP);
 		
-		Sprite bg = new Sprite(Loader.texture(Gdx.files.internal(basedir + "bg.png")));
+		bg = new Sprite(Loader.texture(Gdx.files.internal(basedir + "bg.png")));
 		
 		bg.setSize(Game.getGame().getWidth(), Game.getGame().getHeight());
 		
-		Sprite bge2 = new Sprite(Loader.texture(Gdx.files.internal(basedir + "bge2.png")));
+		bge = new Sprite(Loader.texture(Gdx.files.internal(basedir + "bge2.png")));
 		
-		bge2.setSize(Game.getGame().getWidth(), Game.getGame().getHeight());
+		bge.setSize(Game.getGame().getWidth(), Game.getGame().getHeight());
 		
 		Music bgm = null;
 		
@@ -103,139 +119,118 @@ public class Sukuna extends AllStarBoss
 		{
 			bgm = Gdx.audio.newMusic(Gdx.files.internal("enemy/sukuna/bgm.mp3"));
 			bgm.setVolume(1f * Game.getGame().getMusicModifier());
-			bgm.setPosition(7.5f);
+			
 			bgm.setLooping(true);
 		}
 		
-		final Sukuna boss = new Sukuna(clone, nameTag, fbs, bg, bge2, idle, left, right, special, bgm, x, y);
-		
-		return boss;
-	}
-	
-	private boolean clone = false;
-	public Sprite bg;
-	public Sprite bge;
-	public Setter<BackgroundBossAura> background;
-	
-	public Sukuna(boolean clone, Sprite nametag, Sprite fullBodySprite, final Sprite bg, final Sprite bge2, Animation idle, Animation left, Animation right, Animation special, Music bgm, float x, float y)
-	{
-		super(100, nametag, fullBodySprite, idle, left, right, special, bgm, x, y);
-		
-		this.setAuraColor(new Color(226F/255F, 104F/255F, 74/255F, 1));
-		
-		this.bg = bg;
-		this.bge = bge2;
-		
-		this.clone = clone;
-		
-		if(clone)
-			return;
+		set(fbs, idle, left, right, special);
+		set(nameTag, bgm);
 		
 		background = new Setter<BackgroundBossAura>()
-		{
-			@Override
-			public void set(final BackgroundBossAura t)
-			{
-				Game.getGame().spawn(new HorizontalScrollingBackground(bg, 0.2F, false)
 				{
-					{
-						addEffect(new FadeInSprite(new Getter<Sprite>()
-						{
-							@Override
-							public Sprite get()
-							{
-								return bg;
-							}
-						}
-						, 0, 0.5f, 0.01F));
-						
-						setZIndex(-6);
-						
-						setFrameBuffer(t.getBackgroundBuffer());
-					}
-					
 					@Override
-					public boolean isPersistant()
+					public void set(final BackgroundBossAura t)
 					{
-						return Sukuna.this.isOnStage();
-					}
-				});
-				
-				Game.getGame().spawn(new ScrollingBackground(bge, 0.4f, -0.4f)
-				{
-					{
-						addEffect(new FadeInSprite(new Getter<Sprite>()
+						Game.getGame().spawn(new HorizontalScrollingBackground(bg, 0.2F, false)
 						{
-							@Override
-							public Sprite get()
 							{
-								return bge;
-							}
-						}
-						, 0, 0.2f, 0.002F));
-						
-						setFrameBuffer(t.getBackgroundBuffer());
-						
-						setZIndex(-4);
-					}
-					
-					@Override
-					public boolean isPersistant()
-					{
-						return Sukuna.this.isOnStage();
-					}
-				});
-				
-				{
-					final Texture texture = Loader.texture(Gdx.files.internal("enemy/sukuna/bge1.png"));
-
-					Sukuna.this.addDisposable(texture);
-					
-					final Color color = Color.WHITE.cpy();
-					color.a = 0;
-
-					SwirlingBackground bge = new SwirlingBackground(texture, true, color)
-					{
-						float timer = 0;
-
-						{
-							setFrameBuffer(t.getBackgroundBuffer());
-							
-							setZIndex(-5);
-						}
-
-						@Override
-						public float getTimer()
-						{
-							return timer;
-						}
-
-						@Override
-						public void updateTimer()
-						{
-							if(color.a < 1f)
-							{
-								color.a += 0.01f;
-								color.a = Math.min(1, color.a);
+								addEffect(new FadeInSprite(new Getter<Sprite>()
+								{
+									@Override
+									public Sprite get()
+									{
+										return bg;
+									}
+								}
+								, 0, 0.5f, 0.01F));
+								
+								setZIndex(-6);
+								
+								setFrameBuffer(t.getBackgroundBuffer());
 							}
 							
-							timer += 0.002f;
-
-							timer %= 1;
-						}
-
-						@Override
-						public boolean isPersistant()
+							@Override
+							public boolean isPersistant()
+							{
+								return Sukuna.this.isOnStage();
+							}
+						});
+						
+						Game.getGame().spawn(new ScrollingBackground(bge, 0.4f, -0.4f)
 						{
-							return Sukuna.this.isOnStage();
-						}
-					};
+							{
+								addEffect(new FadeInSprite(new Getter<Sprite>()
+								{
+									@Override
+									public Sprite get()
+									{
+										return bge;
+									}
+								}
+								, 0, 0.2f, 0.002F));
+								
+								setFrameBuffer(t.getBackgroundBuffer());
+								
+								setZIndex(-4);
+							}
+							
+							@Override
+							public boolean isPersistant()
+							{
+								return Sukuna.this.isOnStage();
+							}
+						});
+						
+						{
+							final Texture texture = Loader.texture(Gdx.files.internal("enemy/sukuna/bge1.png"));
 
-					Game.getGame().spawn(bge);
-				}
-				
-			}
-		};
+							Sukuna.this.addDisposable(texture);
+							
+							final Color color = Color.WHITE.cpy();
+							color.a = 0;
+
+							SwirlingBackground bge = new SwirlingBackground(texture, true, color)
+							{
+								float timer = 0;
+
+								{
+									setFrameBuffer(t.getBackgroundBuffer());
+									
+									setZIndex(-5);
+								}
+
+								@Override
+								public float getTimer()
+								{
+									return timer;
+								}
+
+								@Override
+								public void updateTimer()
+								{
+									if(color.a < 1f)
+									{
+										color.a += 0.01f;
+										color.a = Math.min(1, color.a);
+									}
+									
+									timer += 0.002f;
+
+									timer %= 1;
+								}
+
+								@Override
+								public boolean isPersistant()
+								{
+									return Sukuna.this.isOnStage();
+								}
+							};
+
+							Game.getGame().spawn(bge);
+						}
+						
+					}
+				};
 	}
 	
 	@Override
@@ -356,7 +351,7 @@ public class Sukuna extends AllStarBoss
 		final SaveableObject<BackgroundAura> aura = new SaveableObject<BackgroundAura>();
 		
 		{
-			final Sukuna sukuna = this;
+			final Sukuna boss = this;
 			final J2hGame g = Game.getGame();
 
 			Game.getGame().addTaskGame(new Runnable()
@@ -364,32 +359,32 @@ public class Sukuna extends AllStarBoss
 				@Override
 				public void run()
 				{
-					BossUtil.cloudEntrance(sukuna, 60);
+					BossUtil.cloudEntrance(boss, 60);
 
 					Game.getGame().addTaskGame(new Runnable()
 					{
 						@Override
 						public void run()
 						{
-							Game.getGame().spawn(sukuna);
+							Game.getGame().spawn(boss);
 							
-							bar.setObject(new CircleHealthBar(sukuna));
+							bar.setObject(new CircleHealthBar(boss));
 							g.spawn(bar.getObject());
 							
 							bar.getObject().addSplit(0.4f);
 							
-							AllStarUtil.introduce(sukuna);
+							AllStarUtil.introduce(boss);
 
-							sukuna.setHealth(0.1f);
-							sukuna.healUp();
-							aura.setObject(BossUtil.backgroundAura(sukuna, sukuna.getBgAuraColor()));
+							boss.setHealth(0.1f);
+							boss.healUp();
+							aura.setObject(BossUtil.backgroundAura(boss, boss.getBgAuraColor()));
 							
 							Game.getGame().addTaskGame(new Runnable()
 							{
 								@Override
 								public void run()
 								{
-									Game.getGame().startSpellCard(new SukunaNonSpell(sukuna));
+									Game.getGame().startSpellCard(new SukunaNonSpell(boss));
 								}
 							}, 60);
 						}
@@ -402,7 +397,7 @@ public class Sukuna extends AllStarBoss
 				@Override
 				public boolean returnTrueToWait()
 				{
-					return !Game.getGame().getStageObjects().contains(sukuna);
+					return !Game.getGame().getStageObjects().contains(boss);
 				}
 			});
 			
@@ -413,13 +408,13 @@ public class Sukuna extends AllStarBoss
 				@Override
 				public boolean returnTrueToWait()
 				{
-					return !sukuna.isDead();
+					return !boss.isDead();
 				}
 			});
 			
 			scheme.doWait();
 			
-			sukuna.setHealth(sukuna.getMaxHealth());
+			boss.setHealth(boss.getMaxHealth());
 			bar.getObject().split();
 			
 			aura.getObject().setMagicSquareEnabled(false);
@@ -433,42 +428,48 @@ public class Sukuna extends AllStarBoss
 				{
 					Game.getGame().clear(ClearType.SPELLS, ClearType.TASKS, ClearType.ALL_OBJECTS);
 					
-					AllStarUtil.presentSpellCard(sukuna, "Mallet \"Size doesn't mean anything\"");
+					AllStarUtil.presentSpellCard(boss, "Mallet \"Size doesn't mean anything\"");
 					
-					sukuna.background.set(scheme.getBossAura());
-					spell.setObject(new SukunaSpell(sukuna));
+					boss.background.set(scheme.getBossAura());
+					spell.setObject(new SukunaSpell(boss));
 					Game.getGame().startSpellCard(spell.getObject());
-					sukuna.spell = spell.getObject();
+					
+					BossUtil.spellcardCircle(boss, spell.getObject(), scheme.getBossAura());
+					
+					boss.spell = spell.getObject();
 				}
 			}, 1);
 			
-			
-			scheme.setWait(new WaitConditioner()
-			{
-				@Override
-				public boolean returnTrueToWait()
-				{
-					return !sukuna.isDead();
-				}
-			});
-			
-			scheme.doWait();
+			SchemeUtil.waitForDeath(scheme, boss);
 			
 			Game.getGame().addTaskGame(new Runnable()
 			{
 				@Override
 				public void run()
 				{
-					Game.getGame().delete(sukuna);
-					
-					Game.getGame().clearSpellcards();
-					Game.getGame().clear(ClearType.ALL_OBJECTS);
-					
-					BossUtil.mapleExplosion(sukuna.getX(), sukuna.getY(), 30, 10F, 5F, 2F);
+					Game.getGame().clearCircle(800f, boss, ClearType.ALL);
 				}
 			}, 1);
 			
-			scheme.waitTicks(5); // Prevent concurrency issues.
+			scheme.waitTicks(2);
+			
+			boss.playSpecial(false);
+			SchemeUtil.deathAnimation(scheme, boss, boss.getAuraColor());
+			
+			Game.getGame().addTaskGame(new Runnable()
+			{
+				@Override
+				public void run()
+				{
+					ObjectUtil.deathAnimation(boss);
+					
+					Game.getGame().delete(boss);
+					
+					Game.getGame().clear(ClearType.ALL);
+				}
+			}, 5);
+			
+			scheme.waitTicks(10); // Prevent concurrency issues.
 		}
 	}
 	
@@ -477,6 +478,7 @@ public class Sukuna extends AllStarBoss
 		public SukunaNonSpell(StageObject owner)
 		{
 			super(owner);
+			setSpellcardTime(Duration.seconds(41));
 		}
 	
 		public int offset = 0;
@@ -494,24 +496,29 @@ public class Sukuna extends AllStarBoss
 				((AllStarBoss)getOwner()).playSpecial(true);
 			}
 			
-			if(tick % 150 == 0 && tick > 60)
-				BossUtil.moveAroundRandomly((Boss)getOwner(), (int) (getGame().getMaxX() / 2) - 200, (int)(getGame().getMaxX() / 2) + 200, Game.getGame().getHeight() - 300, Game.getGame().getHeight() - 400, 800);
+			if(tick % 250 == 0 && tick > 60)
+			{
+				boss.getPathing().setCurrentPath(new SimpleTouhouBossPath(boss));
+			}
 			
 			if(tick % 180 == 0)
 				boss.playSpecial(true);
 			
-			if(tick == 3000 || tick == 4000)
+			final int timeOutOne = (int) Duration.seconds(21).toTicks();
+			final int timeOutTwo = (int) Duration.seconds(33).toTicks();
+			
+			if(tick == timeOutOne || tick == timeOutTwo)
 				TouhouSounds.Enemy.ACTIVATE_1.play(1F);
 			
-			if(tick == 3000)
-				AllStarUtil.presentSpellCard(boss, "Thousand Needles - Horrible Death");
+			if(tick == timeOutOne)
+				AllStarUtil.presentSpellCard(boss, "Thousand Needles \"Horrible Death\"");
 			
 			int speed = 400;
 			
-			if(tick > 3100)
+			if(tick > timeOutOne + 100)
 				speed = 250;
 			
-			if(tick > 4100)
+			if(tick > timeOutTwo + 100)
 				speed = 180;
 			
 			if(tick % speed == speed - 50)
@@ -542,7 +549,7 @@ public class Sukuna extends AllStarBoss
 			
 			int times = Math.min(2 + tick / 200, 14);
 			
-			boss.setDamageModifier(times/10F);
+			boss.setDamageModifier(times/6F);
 			
 			for(int i = 0; i < times; i++)
 			{
@@ -603,6 +610,7 @@ public class Sukuna extends AllStarBoss
 			super(new ThBullet(ThBulletType.RICE_LARGE, color), x, y);
 			
 			useSpawnAnimation(false);
+			setGlowing();
 			
 			for(TextureRegion r : getAnimation().getKeyFrames())
 			{
@@ -622,6 +630,10 @@ public class Sukuna extends AllStarBoss
 			
 			Bullet bullet = new Bullet(new ThBullet(ThBulletType.ORB_LARGE, color), x, y)
 			{
+				{
+					useDeathAnimation(false);
+				}
+				
 				@Override
 				public void onUpdate(long tick)
 				{
@@ -856,6 +868,10 @@ public class Sukuna extends AllStarBoss
 				
 				Bullet orb = new Bullet(new ThBullet(ThBulletType.ORB_LARGE, color), (float)(hitRight ?  Game.getGame().getWidth() : hitLeft ? 0 : minX), (float)(hitTop ?  Game.getGame().getHeight() : minY))
 				{
+					{
+						useDeathAnimation(false);
+					}
+					
 					@Override
 					public void onUpdate(long tick)
 					{
@@ -900,9 +916,11 @@ public class Sukuna extends AllStarBoss
 			final Sukuna sukuna = (Sukuna)owner;
 			final J2hGame game = Game.getGame();
 			
+			setSpellcardTime(Duration.seconds(45));
+			
 			BossUtil.backgroundAura(sukuna, sukuna.getBgAuraColor());
 			
-			sukuna.setDamageModifier(0.1F);
+			sukuna.setDamageModifier(0.5F);
 			
 			Texture texture = Loader.texture(Gdx.files.internal("enemy/sukuna/anm.png")); // Just get her animations texture from another.
 			
@@ -1107,7 +1125,7 @@ public class Sukuna extends AllStarBoss
 			{
 				TouhouSounds.Enemy.ACTIVATE_3.play(1f);
 				
-				clone1 = Sukuna.newInstance(boss.getX() - 400, boss.getY() - 100, true);
+				clone1 = new Sukuna(true, 0f, boss.getX() - 400, boss.getY() - 100);
 				
 				for(TextureRegion r : clone1.idle.getKeyFrames())
 					((HitboxSprite)r).setAlpha(0.5F);
@@ -1119,7 +1137,7 @@ public class Sukuna extends AllStarBoss
 			{
 				TouhouSounds.Enemy.ACTIVATE_3.play(1f);
 				
-				clone2 = Sukuna.newInstance(boss.getX() + 400, boss.getY() - 100, true);
+				clone2 = new Sukuna(true, 0f, boss.getX() + 400, boss.getY() - 100);
 				
 				for(TextureRegion r : clone2.idle.getKeyFrames())
 					((HitboxSprite)r).setAlpha(0.5F);
@@ -1142,6 +1160,8 @@ public class Sukuna extends AllStarBoss
 						bullet.getSpawnAnimationSettings().setTime(30f);
 						bullet.setDirectionRadsTick((float) Math.toRadians(rotation), 2f);
 						bullet.setRotationFromVelocity(-90f);
+						
+						bullet.setGlowing();
 						game.spawn(bullet);
 					}
 				
@@ -1183,16 +1203,18 @@ public class Sukuna extends AllStarBoss
 					Boss target = (Boss) settings[i];
 					
 					int offset = (int) MathUtil.getAngle(target, game.getPlayer());
-
+					
 					for(int rotation = offset; rotation < 360 + offset; rotation += 20)
 					{
 						Bullet bullet = new Bullet(new ThBullet(ThBulletType.ORB_LARGE, (ThBulletColor) settings[i + 1]), target.getX(), target.getY());
+						
+						bullet.setZIndex(bullet.getZIndex() + rotation);
 						bullet.setDirectionRadsTick((float) Math.toRadians(rotation), 4f);
 						bullet.setScale(bulletScale);
 						bullet.getSpawnAnimationSettings().setAlpha(-1f);
 						bullet.getSpawnAnimationSettings().setAddedScale(3f);
 						bullet.getSpawnAnimationSettings().setTime(30f);
-						bullet.setZIndex(bullet.getZIndex() + rotation);
+						
 						game.spawn(bullet);
 					}
 				}
@@ -1203,7 +1225,7 @@ public class Sukuna extends AllStarBoss
 				
 				setScale(player, scale);
 				setHitboxScale(player, scale * scale, scale * scale);
-				boss.setDamageModifier(Math.max(1 - bulletScale, 0));
+				boss.setDamageModifier(Math.max((1f - bulletScale) * 1.5f, 0));
 				
 				if(bulletScale > 0.5)
 					bulletScale -= 0.1f;

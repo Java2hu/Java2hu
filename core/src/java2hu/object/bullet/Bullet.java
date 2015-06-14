@@ -560,6 +560,9 @@ public class Bullet extends StageObject
 			@Override
 			public void onDraw()
 			{
+				if(!bullet.isOnStageRaw())
+					return;
+				
 				J2hGame g = Game.getGame();
 				
 				HitboxSprite current = new HitboxSprite(getCurrentSprite());
@@ -588,30 +591,27 @@ public class Bullet extends StageObject
 				
 				alpha += alphaIncrease;
 				
-				if(getTicksAlive() > time || !bullet.isOnStage())
+				if(bullet.getTicksAlive() > time || !bullet.isOnStageRaw())
 				{
-					Game.getGame().delete(this);
+					removeOwnedObject(this);
+					animationPlaying = false;
 				}
 			}
 			
 			@Override
 			public void onDelete()
 			{
-				animationPlaying = false;
 				// Don't destroy assets.
 			}
 			
 			@Override
 			public boolean isPersistant()
 			{
-				return false;
+				return true;
 			}
 		};
 		
-		obj.setZIndex(getZIndex());
-		obj.setShader(getShader());
-		
-		Game.getGame().spawn(obj);
+		addOwnedObject(obj);
 	}
 	
 	public void onHit()
@@ -663,15 +663,27 @@ public class Bullet extends StageObject
 			}
 			
 			@Override
+			public void draw()
+			{
+				bullet.setOwnedBy(this);
+				bullet.draw();
+				
+				onDraw();
+			}
+			
+			final float width = bullet.getWidth();
+			final float height = bullet.getHeight();
+			
+			@Override
 			public void onDraw()
 			{
 				J2hGame g = Game.getGame();
 				
-				HitboxSprite current = (HitboxSprite) BREAK_ANI.getKeyFrame(ticks / 2f);
+				HitboxSprite current = (HitboxSprite) BREAK_ANI.getKeyFrame(ticks/2f);
 				
 				current.setOrigin(0, 0);
 				
-				float longest = Math.max(bullet.getWidth(), bullet.getHeight()) + 100;
+				float longest = Math.max(width, height) + 100;
 				
 				current.setSize(longest, longest);
 				
@@ -683,12 +695,23 @@ public class Bullet extends StageObject
 				current.draw(g.batch);
 			}
 			
+			float scale = 1f;
+			
 			@Override
 			public void onUpdate(long tick)
 			{
 				ticks++;
 				
-				if(BREAK_ANI.isAnimationFinished(ticks / 2f))
+				HitboxSprite cur = bullet.getCurrentSprite();
+				
+				if(cur != null)
+				{
+					final float multiplier = 0.8f;
+					
+					cur.setScale(Math.max(0, cur.getScaleX() * multiplier), Math.max(0, cur.getScaleY() * multiplier));
+				}
+				
+				if(BREAK_ANI.isAnimationFinished(ticks / 2f) || !isOnStageRaw())
 				{
 					Game.getGame().delete(this);
 				}

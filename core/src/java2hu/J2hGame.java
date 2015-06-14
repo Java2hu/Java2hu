@@ -354,6 +354,21 @@ public class J2hGame extends ApplicationAdapter implements InputProcessor
 		}
 	}
 	
+	/**
+	 * Spawns an object in after a certain amount of ticks, this makes use of internal tasks.
+	 */
+	public void spawnIn(final StageObject obj, int ticks)
+	{
+		addTask(new Runnable()
+		{
+			@Override
+			public void run()
+			{
+				spawn(obj);
+			}
+		}, ticks);
+	}
+	
 	public static enum ClearType
 	{
 		ALL,
@@ -769,7 +784,7 @@ public class J2hGame extends ApplicationAdapter implements InputProcessor
 	
 	private void onDelete(StageObject obj)
 	{
-		obj.onDelete();
+		obj.delete();
 	}
 	
 	private boolean canSpawn(StageObject obj)
@@ -872,7 +887,7 @@ public class J2hGame extends ApplicationAdapter implements InputProcessor
 
 				try
 				{
-					Thread.sleep(10);
+					Thread.sleep(1);
 				}
 				catch (InterruptedException e)
 				{
@@ -969,7 +984,8 @@ public class J2hGame extends ApplicationAdapter implements InputProcessor
 	}
 	
 	/**
-	 * Run a task delayed
+	 * Run a task delayed on the internal task list.
+	 * The internal task list won't be cleared, so everything in here will run for sure.
 	 * @param run
 	 * @param ticks
 	 */
@@ -1185,6 +1201,19 @@ public class J2hGame extends ApplicationAdapter implements InputProcessor
 		System.out.println("Profiling " + (profiling ? "ENABLED" : "DISABLED"));
 	}
 	
+	private boolean zIndexing = false;
+	
+	public boolean isZIndexing()
+	{
+		return zIndexing;
+	}
+	
+	public void setZIndexing(boolean zIndexing)
+	{
+		this.zIndexing = zIndexing;
+		System.out.println("Z-Indexing " + (profiling ? "ENABLED" : "DISABLED"));
+	}
+	
 	private boolean created = false;
 
 	@Override
@@ -1230,6 +1259,43 @@ public class J2hGame extends ApplicationAdapter implements InputProcessor
 	public Matrix4 standardProjectionMatrix = null;
 
 	private ArrayList<String> profilingOutput;
+	
+	/**
+	 * Draw items such as hitboxes.
+	 */
+	public void drawZIndexes()
+	{
+		batch.begin();
+		
+		ArrayList<StageObject> objects = new ArrayList<StageObject>();
+		
+		objects.addAll(getStageObjects());
+		
+		objects.addAll(getBullets());
+		
+		for(StageObject obj : objects)
+		{
+			String index = "" + obj.getZIndex();
+			TextBounds b = font.getBounds(index);
+			
+			final float x = obj.getX() - (b.width / 2f);
+			final float y = obj.getY() + (b.height / 2f);
+			
+			font.setColor(Color.BLACK);
+			
+			final float dev = 1f;
+			font.draw(batch, index, x - dev, y - dev);
+			font.draw(batch, index, x - dev, y + dev);
+			font.draw(batch, index, x + dev, y + dev);
+			font.draw(batch, index, x + dev, y - dev);
+			
+			font.setColor(Color.WHITE);
+			
+			font.draw(batch, index, x, y);
+		}
+		
+		batch.end();
+	}
 	
 	/**
 	 * Draw items such as hitboxes.
@@ -1962,6 +2028,11 @@ public class J2hGame extends ApplicationAdapter implements InputProcessor
 				drawDebugData();
 			}
 			
+			if(zIndexing)
+			{
+				drawZIndexes();
+			}
+			
 			float secondsPerTick = 1f/LOGIC_TPS;
 			boolean updateLogic = false;
 			
@@ -2077,6 +2148,10 @@ public class J2hGame extends ApplicationAdapter implements InputProcessor
 			else if(keycode == Input.Keys.F)
 			{
 				setProfiling(!isProfiling());
+			}
+			else if(keycode == Input.Keys.G)
+			{
+				setZIndexing(!isZIndexing());
 			}
 			else if(alt && Gdx.input.isKeyJustPressed(Keys.ENTER))
 			{

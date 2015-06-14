@@ -1,6 +1,7 @@
 package java2hu.allstar;
 
 import java.util.ArrayList;
+
 import java2hu.Game;
 import java2hu.IPosition;
 import java2hu.J2hGame;
@@ -8,6 +9,7 @@ import java2hu.J2hGame.ClearType;
 import java2hu.allstar.Days.CharacterData;
 import java2hu.allstar.Days.EnvironmentType;
 import java2hu.allstar.enemies.AllStarBoss;
+import java2hu.allstar.enemies.day7.Sukuna;
 import java2hu.allstar.players.Marisa;
 import java2hu.background.BackgroundBossAura;
 import java2hu.background.bg3d.Background3D;
@@ -53,6 +55,9 @@ public class AllStarStageScheme extends GameFlowScheme
 						if(event.getObject() instanceof AllStarBoss)
 						{
 							final AllStarBoss b = (AllStarBoss) event.getObject();
+							
+							if(b instanceof Sukuna && ((Sukuna)b).clone)
+								return;
 							
 							int id = bossAura.getNextEmptyAura();
 							

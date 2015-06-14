@@ -29,6 +29,14 @@ public class AllStarUtil extends J2hObject
 {
 	public static Sprite bg;
 	
+	/**
+	 * Translates an RGB from x/255f to x
+	 */
+	public static Color from255RGB(float r, float g, float b)
+	{
+		return new Color(r / 255f, g / 255f, b / 255f, 1f);
+	}
+	
 	public static void introduce(final AllStarBoss boss)
 	{
 		introduce(boss, 0, Game.getGame().getHeight());

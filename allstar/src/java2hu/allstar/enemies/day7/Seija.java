@@ -584,7 +584,12 @@ public class Seija extends AllStarBoss
 						{
 							return rotation + finalI;
 						}
-					}, getOwner().getX(), getOwner().getY(), 0.4F, 0.1F, 3F + (float)rotationAmount / (float)100));
+					}, getOwner().getX(), getOwner().getY(), 0.4F, 0.1F, 3F + (float)rotationAmount / (float)100)
+					{
+						{
+							this.setGlowing();
+						}
+					});
 					
 					if(tick == 200)
 						Game.getGame().spawn(new SeijaGravityBullet(new ThBullet(ThBulletType.BALL_1, ThBulletColor.RED).getAnimation(), new Getter<Float>()
@@ -594,7 +599,12 @@ public class Seija extends AllStarBoss
 							{
 								return rotation + finalI;
 							}
-						}, getOwner().getX(), getOwner().getY(), 0.4F, 0.1F, 2F + (float)rotationAmount / (float)100));
+						}, getOwner().getX(), getOwner().getY(), 0.4F, 0.1F, 2F + (float)rotationAmount / (float)100)
+						{
+							{
+								this.setGlowing();
+							}
+						});
 				}
 				catch (Exception e)
 				{
