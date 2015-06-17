@@ -118,9 +118,6 @@ public class ButtonManager implements EventListener
 	@EventHandler
 	public void keyDown(KeyDownEvent event)
 	{
-		System.out.println(this);
-		System.out.println("Contains: " + Game.getGame().getEventListenersMap().containsKey(this));
-		
 		int keyCode = event.getKey();
 		
 		if(ticksInactive > 0)

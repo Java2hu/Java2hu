@@ -55,6 +55,8 @@ public class ShouCurvingNonSpell extends Spellcard
 		ThLaserType type = lightning ? ThLaserType.LIGHTNING : ThLaserType.NORMAL;
 		ThLaserColor sub = lightning ? ThLaserColor.LIGHTNING : ThLaserColor.values()[new Random().nextInt(ThLaserColor.values().length)];
 		
+		final boolean glowing = Math.random() > 0.5f;
+		
 		float total = 200;
 		
 		if(tick % total == 160)
@@ -75,6 +77,9 @@ public class ShouCurvingNonSpell extends Spellcard
 					int slowTicks = 0;
 
 					{
+						if(glowing)
+							setGlowing();
+						
 						setLengthOnScreen(-1);
 						setMaxPoints(30);
 						setUnitsPerPoint(5);
@@ -125,6 +130,9 @@ public class ShouCurvingNonSpell extends Spellcard
 					int slowTicks = 0;
 
 					{
+						if(glowing)
+							setGlowing();
+						
 						setLengthOnScreen(-1);
 						setMaxPoints(30);
 						setUnitsPerPoint(5);
@@ -176,6 +184,9 @@ public class ShouCurvingNonSpell extends Spellcard
 					boolean done = false;
 
 					{
+						if(glowing)
+							setGlowing();
+						
 						setLengthOnScreen(-1);
 						setMaxPoints(20);
 						setUnitsPerPoint(-1);
@@ -227,6 +238,9 @@ public class ShouCurvingNonSpell extends Spellcard
 					boolean done = false;
 
 					{
+						if(glowing)
+							setGlowing();
+						
 						setLengthOnScreen(-1);
 						setMaxPoints(20);
 						setUnitsPerPoint(-1);

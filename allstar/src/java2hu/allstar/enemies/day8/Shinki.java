@@ -20,6 +20,7 @@ import java2hu.object.bullet.StationaryLaser;
 import java2hu.object.enemy.greater.Boss;
 import java2hu.object.player.Player;
 import java2hu.object.ui.CircleHealthBar;
+import java2hu.overwrite.J2hMusic;
 import java2hu.plugin.sprites.FadeInSprite;
 import java2hu.spellcard.Spellcard;
 import java2hu.system.SaveableObject;
@@ -100,7 +101,7 @@ public class Shinki extends AllStarBoss
 		Sprite wingsNormal = new Sprite(sprite, 0, 128, 512, 192);
 		Sprite wingsDemon = new Sprite(sprite, 0, 128 + 192, 512, 192);
 		
-		Music bgm = Gdx.audio.newMusic(Gdx.files.internal(folder + "bgm.mp3"));
+		Music bgm = new J2hMusic(Gdx.audio.newMusic(Gdx.files.internal(folder + "bgm.mp3")));
 		bgm.setVolume(1f * Game.getGame().getMusicModifier());
 		bgm.setPosition(24.5f);
 		bgm.setLooping(true);

@@ -608,6 +608,7 @@ public class Wakasagihime extends AllStarBoss
 				
 				fish.setDirectionRadsTick((float) Math.toRadians(180 * Math.random()), 2f);
 				fish.useSpawnAnimation(false);
+				fish.useDeathAnimation(false);
 				fish.setRotationFromVelocity(-90f);
 				
 				game.spawn(fish);

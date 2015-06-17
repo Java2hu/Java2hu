@@ -2,11 +2,11 @@ package java2hu.object.bullet;
 import java2hu.Game;
 import java2hu.HitboxSprite;
 import java2hu.J2hGame;
-import java2hu.Loader;
 import java2hu.ZIndex;
 import java2hu.object.DrawObject;
 import java2hu.object.StageObject;
 import java2hu.overwrite.J2hObject;
+import java2hu.util.AnimationUtil;
 import java2hu.util.ImageSplitter;
 import java2hu.util.MathUtil;
 
@@ -638,64 +638,87 @@ public class Bullet extends StageObject
 	private static Texture BREAK = null;
 	private static Animation BREAK_ANI = null;
 	
+	/**
+	 * Keep updating a bullets delta update method in it's deletion animation.
+	 * This will make the bullets die out while still moving.
+	 * This might give some side effects though, turn off if it causes any trouble.
+	 */
+	public static boolean UPDATE_MOVEMENT_ON_DELETION = true;
+	
 	public void deleteAnimation()
 	{
 		if(BREAK_ANI == null)
 		{
-			BREAK = Loader.texture(Gdx.files.internal("sprites/bullet_break.png"));
+			BREAK = new Texture(Gdx.files.internal("sprites/bullet_break.png"))
+			{
+				@Override
+				public void dispose()
+				{
+					new Exception().printStackTrace();
+					
+				
+					
+					super.dispose();
+				}
+			};
 			BREAK_ANI = ImageSplitter.getAnimationFromSprite(BREAK, 64, 64, 3f, 1,2,3,4,5,6,7,8);
 		}
 		
 		final Bullet bullet = this;
 		
+		final float width = bullet.getWidth();
+		final float height = bullet.getHeight();
+		
+		final Animation ani = AnimationUtil.copyAnimation(BREAK_ANI);
+		
+		Color effect = getType().getEffectColor();
+		
+		if(effect == null)
+			effect = Color.WHITE;
+		
+		effect = effect.cpy();
+		
+		for(TextureRegion r : ani.getKeyFrames())
+		{
+			HitboxSprite sprite = (HitboxSprite)r;
+			
+			sprite.setOrigin(0, 0);
+			
+			float longest = Math.max(width, height) + 100;
+			
+			sprite.setSize(longest, longest);
+			
+			sprite.setPosition(bullet.getX() - (sprite.getWidth() / 2f), bullet.getY() - (sprite.getHeight() / 2f));
+			
+			sprite.setColor(effect);
+			sprite.setAlpha(0.3f);	
+		}
+		
 		DrawObject obj = new DrawObject()
 		{
 			int ticks = 0;
-			Color effect;
-			
+
 			{
-				effect = getType().getEffectColor();
+				setName("Death animation " + bullet.getName());
 				
-				if(effect == null)
-					effect = Color.WHITE;
-				
-				effect = effect.cpy();
+				bullet.setOwnedBy(this);
 			}
 			
 			@Override
 			public void draw()
 			{
-				bullet.setOwnedBy(this);
-				bullet.draw();
-				
 				onDraw();
 			}
-			
-			final float width = bullet.getWidth();
-			final float height = bullet.getHeight();
 			
 			@Override
 			public void onDraw()
 			{
 				J2hGame g = Game.getGame();
 				
-				HitboxSprite current = (HitboxSprite) BREAK_ANI.getKeyFrame(ticks/2f);
-				
-				current.setOrigin(0, 0);
-				
-				float longest = Math.max(width, height) + 100;
-				
-				current.setSize(longest, longest);
-				
-				current.setPosition(bullet.getX() - (current.getWidth() / 2f), bullet.getY() - (current.getHeight() / 2f));
-				
-				current.setColor(effect);
-				current.setAlpha(0.3f);
-				
+				HitboxSprite current = (HitboxSprite) ani.getKeyFrame(ticks/2f);
+
 				current.draw(g.batch);
 			}
-			
-			float scale = 1f;
 			
 			@Override
 			public void onUpdate(long tick)
@@ -711,10 +734,17 @@ public class Bullet extends StageObject
 					cur.setScale(Math.max(0, cur.getScaleX() * multiplier), Math.max(0, cur.getScaleY() * multiplier));
 				}
 				
-				if(BREAK_ANI.isAnimationFinished(ticks / 2f) || !isOnStageRaw())
+				if(ani.isAnimationFinished(ticks / 2f) || !isOnStageRaw())
 				{
 					Game.getGame().delete(this);
 				}
+			}
+			
+			@Override
+			public void update(float second)
+			{
+				if(UPDATE_MOVEMENT_ON_DELETION)
+					bullet.update(second);
 			}
 			
 			@Override

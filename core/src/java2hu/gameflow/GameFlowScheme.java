@@ -168,7 +168,8 @@ public abstract class GameFlowScheme extends Thread
 			@Override
 			public boolean returnTrueToWait()
 			{
-				System.out.println(task.isCompleted());
+				if(!task.isCompleted())
+					System.out.println("run and return sync task isn't completed yet...");
 				
 				return !task.isCompleted();
 			}
@@ -197,7 +198,33 @@ public abstract class GameFlowScheme extends Thread
 	
 	public static abstract class ReturnSyncTask<T> extends SyncTask
 	{
-		public abstract T getResult();
+		private T result;
+		
+		public T getResult()
+		{
+			return result;
+		}
+		
+		public void setResult(T result)
+		{
+			this.result = result;
+		}
+		
+		@Override
+		public boolean isCompleted()
+		{
+			return result != null;
+		}
+		
+		/**
+		 * Doesn't do anything in this context, this task is completed once the result is set.
+		 */
+		@Override
+		@Deprecated
+		public void setCompleted(boolean completed)
+		{
+			
+		}
 	}
 	
 	public static abstract class WaitConditioner extends J2hObject

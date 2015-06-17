@@ -9,7 +9,6 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java2hu.events.Event;
@@ -1265,8 +1264,6 @@ public class J2hGame extends ApplicationAdapter implements InputProcessor
 	 */
 	public void drawZIndexes()
 	{
-		batch.begin();
-		
 		ArrayList<StageObject> objects = new ArrayList<StageObject>();
 		
 		objects.addAll(getStageObjects());
@@ -1293,8 +1290,6 @@ public class J2hGame extends ApplicationAdapter implements InputProcessor
 			
 			font.draw(batch, index, x, y);
 		}
-		
-		batch.end();
 	}
 	
 	/**
@@ -2015,6 +2010,11 @@ public class J2hGame extends ApplicationAdapter implements InputProcessor
 
 			drawStage();
 			
+			if(zIndexing)
+			{
+				drawZIndexes();
+			}
+			
 			batch.setProjectionMatrix(standardProjectionMatrix);
 			
 			batch.flush();
@@ -2026,11 +2026,6 @@ public class J2hGame extends ApplicationAdapter implements InputProcessor
 			if(debugMode)
 			{
 				drawDebugData();
-			}
-			
-			if(zIndexing)
-			{
-				drawZIndexes();
 			}
 			
 			float secondsPerTick = 1f/LOGIC_TPS;
@@ -2206,12 +2201,13 @@ public class J2hGame extends ApplicationAdapter implements InputProcessor
 	
 	private class ListenerData
 	{
+		public EventListener listener;
 		public HashMap<Class, ArrayList<Method>> methodMap = new HashMap<Class, ArrayList<Method>>();
 	}
 	
-	private HashMap<EventListener, ListenerData> eventListeners = new HashMap<EventListener, ListenerData>();
+	private RenderSet<ListenerData> eventListeners = new RenderSet<ListenerData>();
 	
-	public HashMap<EventListener, ListenerData> getEventListenersMap()
+	public RenderSet<ListenerData> getEventListenersMap()
 	{
 		return eventListeners;
 	}
@@ -2236,10 +2232,15 @@ public class J2hGame extends ApplicationAdapter implements InputProcessor
 	{
 		Array<CallMethod> methodsToCall = new Array<CallMethod>();
 		
-		for(Entry<EventListener, ListenerData> set : eventListeners.entrySet())
+		eventListeners.startReading();
+		
+		Iterator<ListenerData> it = eventListeners.iterator();
+		
+		while(it.hasNext())
 		{
-			ListenerData data = set.getValue();
-			EventListener l = set.getKey();
+			ListenerData data = it.next();
+
+			EventListener l = data.listener;
 			
 			for (Class<?> clazz = event.getClass(); Event.class.isAssignableFrom(clazz); clazz = clazz.getSuperclass())
 			{
@@ -2264,6 +2265,8 @@ public class J2hGame extends ApplicationAdapter implements InputProcessor
 				}
 			}
 		}
+		
+		eventListeners.endReading();
 		
 		methodsToCall.sort(priorityComperator);
 		
@@ -2329,11 +2332,23 @@ public class J2hGame extends ApplicationAdapter implements InputProcessor
 			}
 		}
 		
-		eventListeners.put(listener, data);
+		data.listener = listener;
+		
+		eventListeners.add(data);
 	}
 	
 	public void unregisterEvents(EventListener listener)
 	{
-		eventListeners.remove(listener);
+		ArrayList<ListenerData> toDelete = new ArrayList<J2hGame.ListenerData>();
+		
+		for(ListenerData d : eventListeners)
+		{
+			if(d.listener.equals(listener))
+			{
+				toDelete.add(d);
+			}
+		}
+		
+		eventListeners.removeAll(toDelete);
 	}
 }

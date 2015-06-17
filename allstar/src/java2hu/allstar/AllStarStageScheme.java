@@ -1,7 +1,6 @@
 package java2hu.allstar;
 
 import java.util.ArrayList;
-
 import java2hu.Game;
 import java2hu.IPosition;
 import java2hu.J2hGame;
@@ -138,20 +137,12 @@ public class AllStarStageScheme extends GameFlowScheme
 	
 	public static abstract class SpawnBossTask<T> extends ReturnSyncTask<T>
 	{
-		private T result;
-		
-		@Override
-		public T getResult()
-		{
-			return result;
-		}
-
 		@Override
 		public void run()
 		{
-			result = get();
+			T result = get();
 			
-			setCompleted(true);
+			setResult(result);
 		}
 		
 		public abstract T get();

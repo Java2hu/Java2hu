@@ -5,6 +5,7 @@ import java2hu.HitboxSprite;
 import java2hu.Loader;
 import java2hu.allstar.AllStarStageScheme;
 import java2hu.allstar.enemies.AllStarBoss;
+import java2hu.overwrite.J2hMusic;
 import java2hu.util.HitboxUtil;
 import java2hu.util.ImageSplitter;
 
@@ -60,7 +61,7 @@ public class Gengetsu extends AllStarBoss
 
 		Sprite bg = new Sprite(Loader.texture(Gdx.files.internal(folder + "bg.png")));
 
-		Music bgm = Gdx.audio.newMusic(Gdx.files.internal(folder + "bgm.mp3"));
+		Music bgm = new J2hMusic(Gdx.audio.newMusic(Gdx.files.internal(folder + "bgm.mp3")));
 		bgm.setVolume(1f * Game.getGame().getMusicModifier());
 		bgm.setPosition(95f);
 		bgm.setLooping(true);

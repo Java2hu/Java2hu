@@ -118,6 +118,11 @@ public abstract class Spellcard extends J2hObject
 	
 	private boolean timedOut = false;
 	
+	public boolean isTimedOut()
+	{
+		return timedOut;
+	}
+	
 	public void onTimeOut()
 	{
 		TouhouSounds.Stage.TIMEOUT.play();

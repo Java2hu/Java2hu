@@ -6,11 +6,14 @@ import java2hu.J2hGame.ClearType;
 import java2hu.Loader;
 import java2hu.MovementAnimation;
 import java2hu.allstar.AllStarStageScheme;
+import java2hu.allstar.AllStarStageScheme.SpawnBossTask;
 import java2hu.allstar.enemies.AllStarBoss;
 import java2hu.allstar.util.AllStarUtil;
 import java2hu.background.BackgroundBossAura;
 import java2hu.background.VerticalScrollingBackground;
+import java2hu.gameflow.GameFlowScheme.ReturnSyncTask;
 import java2hu.gameflow.GameFlowScheme.WaitConditioner;
+import java2hu.object.PositionObject;
 import java2hu.object.bullet.Bullet;
 import java2hu.object.player.Player;
 import java2hu.object.ui.CircleHealthBar;
@@ -18,6 +21,7 @@ import java2hu.overwrite.J2hMusic;
 import java2hu.pathing.SimpleTouhouBossPath;
 import java2hu.plugin.Plugin;
 import java2hu.spellcard.PhaseSpellcard;
+import java2hu.spellcard.Spellcard;
 import java2hu.system.SaveableObject;
 import java2hu.touhou.bullet.ThBullet;
 import java2hu.touhou.bullet.ThBulletColor;
@@ -166,7 +170,7 @@ public class Cirno extends AllStarBoss
 		bar.getObject().split();
 		boss.setHealth(boss.getMaxHealth());
 
-		Game.getGame().addTaskGame(new Runnable()
+		Spell card = scheme.runAndReturnSync(new ReturnSyncTask<Spell>()
 		{
 			@Override
 			public void run()
@@ -182,8 +186,10 @@ public class Cirno extends AllStarBoss
 				Game.getGame().startSpellCard(card);
 
 				BossUtil.spellcardCircle(boss, card, scheme.getBossAura());
+				
+				setResult(card);
 			}
-		}, 1);
+		});
 		
 		SchemeUtil.waitForDeath(scheme, boss);
 		
@@ -214,6 +220,48 @@ public class Cirno extends AllStarBoss
 		}, 5);
 		
 		scheme.waitTicks(10); // Prevent concurrency issues.
+		
+		if(card.isTimedOut())
+		{
+			scheme.waitTicks(60);
+			
+			ObjectUtil.deathAnimation(new PositionObject(game.getMinX(), game.getMinY()));
+			ObjectUtil.deathAnimation(new PositionObject(game.getMinX(), game.getMaxY()));
+			ObjectUtil.deathAnimation(new PositionObject(game.getMaxX(), game.getMaxY()));
+			ObjectUtil.deathAnimation(new PositionObject(game.getMaxX(), game.getMinY()));
+			
+			scheme.waitTicks(80);
+			
+			scheme.getBossAura().clearAuras();
+			
+			final Cirno newBoss = scheme.runAndReturnSync(new SpawnBossTask<Cirno>()
+			{
+				@Override
+				public Cirno get()
+				{
+					return new Cirno(100, game.getCenterX(), game.getCenterY());
+				}
+			});
+			
+			game.spawn(newBoss);
+			
+			scheme.runSync(new Runnable()
+			{
+				@Override
+				public void run()
+				{
+					AllStarUtil.presentSpellCard(newBoss, "Nobody ignores me, I'm the strongest after all!");
+					
+					final Spellcard cardTwo = null; // Commence very strong timeout spell
+
+					BossUtil.spellcardCircle(newBoss, cardTwo, scheme.getBossAura());
+					
+					BossUtil.chargeExplosion(newBoss, Color.BLUE);
+				}
+			});
+			
+			SchemeUtil.waitForDeath(scheme, newBoss);
+		}
 	}
 	
 	public static class NonSpell extends PhaseSpellcard<Cirno>
@@ -407,6 +455,7 @@ public class Cirno extends AllStarBoss
 		{
 			super(owner);
 			setSpellcardTime(Duration.seconds(50));
+//			setSpellcardTime(Duration.seconds(1));
 			
 			addPhase(new Phase<Cirno>(30)
 			{
