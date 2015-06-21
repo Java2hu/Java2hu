@@ -20,6 +20,7 @@ import java2hu.allstar.enemies.day2.Mokou;
 import java2hu.allstar.enemies.day5.Seiran;
 import java2hu.allstar.enemies.day6.Sekibanki;
 import java2hu.allstar.enemies.day7.Raiko;
+import java2hu.allstar.enemies.day7.Ringo;
 import java2hu.allstar.enemies.day7.Seija;
 import java2hu.allstar.enemies.day7.Sukuna;
 import java2hu.allstar.enemies.day7.tsukumo.TsukumoGeneral;
@@ -260,16 +261,27 @@ public class Days extends J2hObject
 				@Override
 				public AllStarBoss get()
 				{
-					final Raiko raiko = Raiko.newInstance(startX, startY);
+					final Raiko boss = Raiko.newInstance(startX, startY);
 
-					return raiko;
+					return boss;
 				}
 			});
 			
 			type = EnvironmentType.MOON;
 			
 			// The Moon:
-			// Ringo
+			
+			addCharacter(day, type, "Ringo", new Getter<AllStarBoss>()
+			{
+				@Override
+				public AllStarBoss get()
+				{
+					final Ringo boss = new Ringo(startHP, startX, startY);
+
+					return boss;
+				}
+			});
+			
 			// Rei'sen (Reisen 2)
 			// Reisen
 			// Watatsuki's

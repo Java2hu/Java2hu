@@ -53,3 +53,4 @@ core/assets/*
 /*.iws
 *.jar
 hs_err_pid*
+allstarlauncher/settings.json

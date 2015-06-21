@@ -1362,7 +1362,7 @@ public class BossUtil extends J2hObject
 				}
 				else
 				{
-					final double cardMultiplier = card.getTimeLeft() == null ? 2f : card.getTimeLeft().getValue() / card.getSpellcardTime().getValue();
+					final double cardMultiplier = (card == null || card.getTimeLeft() == null) ? 1f : card.getTimeLeft().getValue() / card.getSpellcardTime().getValue();
 
 					size = 50f + (float) (350 * cardMultiplier);
 				}

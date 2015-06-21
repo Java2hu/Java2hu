@@ -498,6 +498,8 @@ public class TsukumoGeneral implements SpecialFlowScheme<AllStarStageScheme>
 							}
 						}
 					};
+					
+					b.setGlowing();
 					b.setZIndex((int) (b.getZIndex() + i));
 					b.setDirectionDegTick(i, 1f);
 					b.setRotationFromVelocity(-90);
