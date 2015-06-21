@@ -167,6 +167,16 @@ public class PauseMenu extends Menu
 				Game.getGame().setProfiling(!Game.getGame().isProfiling());
 			}
 		}));
+		
+		manager.addButton(new TextButton(450, 200, "(G) Toggle Z-Indexing Mode (Shows draw order)", new Runnable()
+		{
+			@Override
+			public void run()
+			{
+				TouhouSounds.Hud.OK.play();
+				Game.getGame().setZIndexing(!Game.getGame().isZIndexing());
+			}
+		}));
 	}
 	
 	@Override

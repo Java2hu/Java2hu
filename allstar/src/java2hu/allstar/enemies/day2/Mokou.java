@@ -5,9 +5,12 @@ import java2hu.HitboxSprite;
 import java2hu.J2hGame;
 import java2hu.J2hGame.ClearType;
 import java2hu.Loader;
+import java2hu.MovementAnimation;
 import java2hu.allstar.AllStarStageScheme;
 import java2hu.allstar.enemies.AllStarBoss;
 import java2hu.allstar.util.AllStarUtil;
+import java2hu.background.Background;
+import java2hu.background.BackgroundBossAura;
 import java2hu.gameflow.GameFlowScheme.WaitConditioner;
 import java2hu.object.DrawObject;
 import java2hu.object.StageObject;
@@ -15,8 +18,8 @@ import java2hu.object.bullet.Bullet;
 import java2hu.object.bullet.GravityBullet;
 import java2hu.object.enemy.greater.Boss;
 import java2hu.object.ui.CircleHealthBar;
-import java2hu.plugin.sprites.FadeInSprite;
-import java2hu.plugin.sprites.ScalingSprite;
+import java2hu.overwrite.J2hMusic;
+import java2hu.pathing.SimpleTouhouBossPath;
 import java2hu.spellcard.Spellcard;
 import java2hu.system.SaveableObject;
 import java2hu.touhou.bullet.ThBullet;
@@ -26,10 +29,15 @@ import java2hu.touhou.sounds.TouhouSounds;
 import java2hu.util.AnimationUtil;
 import java2hu.util.BossUtil;
 import java2hu.util.BossUtil.BackgroundAura;
+import java2hu.util.BossUtil.BossEffectsResult;
+import java2hu.util.Duration;
 import java2hu.util.Getter;
 import java2hu.util.HitboxUtil;
 import java2hu.util.ImageSplitter;
 import java2hu.util.MathUtil;
+import java2hu.util.ObjectUtil;
+import java2hu.util.SchemeUtil;
+import java2hu.util.Setter;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Music;
@@ -42,14 +50,12 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
 
-/**
- * Fujiwara No Mokou (IN)
- * Spell: "Honest Man's Death - "I just wanted the powerup...""
- */
 public class Mokou extends AllStarBoss
 {
-	public static Mokou newInstance(float x, float y)
+	public Mokou(float maxHealth, float x, float y)
 	{
+		super(maxHealth, x, y);
+		
 		int chunkHeight = 160;
 		int chunkWidth = 128;
 
@@ -61,10 +67,10 @@ public class Mokou extends AllStarBoss
 
 		TextureRegion nameTag = new TextureRegion(Loader.texture(Gdx.files.internal("enemy/mokou/nametag.png")));
 
-		Animation idle = ImageSplitter.getAnimationFromSprite(sprite, chunkHeight, chunkWidth, 12F, 1,2,3,4);
+		Animation idle = ImageSplitter.getAnimationFromSprite(sprite, chunkHeight, chunkWidth, 8F, 1,2,3,4);
 		idle.setPlayMode(PlayMode.LOOP);
 		
-		Animation left = ImageSplitter.getAnimationFromSprite(sprite, chunkHeight, chunkWidth, 12F, 5,6,7,8);
+		Animation left = new MovementAnimation(ImageSplitter.getAnimationFromSprite(sprite, chunkHeight, chunkWidth, 8F, 5,6), ImageSplitter.getAnimationFromSprite(sprite, chunkHeight, chunkWidth, 8F, 7,8), 8f);
 		Animation right = AnimationUtil.copyAnimation(left);
 
 		for(TextureRegion reg : right.getKeyFrames())
@@ -73,47 +79,124 @@ public class Mokou extends AllStarBoss
 		Animation special = ImageSplitter.getAnimationFromSprite(sprite, chunkHeight, chunkWidth, 20F, 9,10,11,12,12,12,12,12);
 		special.setPlayMode(PlayMode.NORMAL);
 
-		Sprite bg = new Sprite(Loader.texture(Gdx.files.internal("enemy/mokou/bg.png")));
-		Sprite bge = new Sprite(Loader.texture(Gdx.files.internal("enemy/mokou/bge.png")));
-
-		Music bgm = Gdx.audio.newMusic(Gdx.files.internal("enemy/mokou/bgm.mp3"));
-		bgm.setVolume(1f * Game.getGame().getMusicModifier());
-		bgm.setPosition(26f);
-		bgm.setLooping(true);
+		final Texture bg = Loader.texture(Gdx.files.internal("enemy/mokou/bg.png"));
+		final Texture bge = Loader.texture(Gdx.files.internal("enemy/mokou/bge.png"));
 		
-		Sprite phoenix = new Sprite(Loader.texture(Gdx.files.internal("enemy/mokou/aura.png")));
-		phoenix.setScale(2F);
-
-		final Mokou mokou = new Mokou(100, nameTag, fbs, idle, left, right, special, bgm, bg, bge, phoenix, x, y);
-		
-		return mokou;
-	}
-	
-	private Sprite phoenix;
-	public Sprite bg;
-	public Sprite bge;
-	
-	public Mokou(float maxHealth, TextureRegion nametag, Sprite fullBodySprite, Animation idle, Animation left, Animation right, Animation special, Music bgm, final Sprite bg, final Sprite bge, final Sprite phoenix, float x, float y)
-	{
-		super(maxHealth, nametag, fullBodySprite, idle, left, right, special, bgm, x, y);
-		
-		addDisposable(nametag);
-		addDisposable(fullBodySprite);
-		addDisposable(idle);
-		addDisposable(left);
-		addDisposable(right);
-		addDisposable(special);
 		addDisposable(bg);
 		addDisposable(bge);
-		addDisposable(phoenix);
 		
-		this.setAuraColor(new Color(140, 0, 0, 1));
+		backgroundSetter = new Setter<BackgroundBossAura>()
+		{
+			@Override
+			public void set(BackgroundBossAura t)
+			{
+				Background back = new Background(bg);
+				back.setFrameBuffer(t.getBackgroundBuffer());
+				
+				game.spawn(back);
+				
+				float size = (float) Math.sqrt((game.getWidth() * game.getWidth()) + (game.getHeight() * game.getHeight()));
+				
+				final Sprite moonSprite = new Sprite(bge);
+
+				moonSprite.setPosition(game.getCenterX() - (size / 2f), game.getCenterY() - (size / 2f));
+				moonSprite.setSize(size, size);
+				
+				moonSprite.setOriginCenter();
+				
+				DrawObject moon = new DrawObject()
+				{
+					@Override
+					public void onDraw()
+					{
+						moonSprite.draw(game.batch);
+					}
+					
+					@Override
+					public void onUpdateDelta(float delta)
+					{
+						moonSprite.rotate(20f * delta);
+					}
+				};
+				
+				moon.setZIndex(back.getZIndex() + 1);
+				
+				moon.setFrameBuffer(t.getBackgroundBuffer());
+				
+				game.spawn(moon);
+			}
+		};
 		
-		this.phoenix = phoenix;
+
+		Music bgm = new J2hMusic(Gdx.audio.newMusic(Gdx.files.internal("enemy/mokou/bgm.mp3")));
+		bgm.setLooping(true);
 		
-		this.bg = bg;
-		this.bge = bge;
+		setBgmPosition(25f);
+		
+		final Sprite phoenix = new Sprite(Loader.texture(Gdx.files.internal("enemy/mokou/aura.png")));
+		phoenix.setOriginCenter();
+		phoenix.setScale(2F);
+		
+		phoenixSpawner = new Getter<StageObject>()
+		{
+			@Override
+			public StageObject get()
+			{
+				final Mokou boss = Mokou.this;
+				
+				StageObject obj = new DrawObject()
+				{
+					@Override
+					public void onDraw()
+					{
+						phoenix.setColor(Color.WHITE);
+						phoenix.setPosition(boss.getX() - (phoenix.getWidth() / 2f), boss.getY() - (phoenix.getHeight() / 2f));
+						phoenix.setScale(2f);
+						phoenix.draw(game.batch);
+						
+						final float pulseTimeSeconds = 0.6f;
+						final float scaler = ((game.getElapsedTime() % pulseTimeSeconds) / pulseTimeSeconds) * 1.5f;
+						float alpha = ((scaler > 1.25f ? (scaler - 1.25f) / 0.25f : 0f) * 1f);
+						
+						phoenix.setColor(2f, 0.5f, 0.5f, 0.5f + (alpha * -0.5f));
+						
+						phoenix.setScale(1f + scaler);
+						
+						phoenix.draw(game.batch);
+					}
+					
+					@Override
+					public float getWidth()
+					{
+						return 0;
+					}
+					
+					@Override
+					public float getHeight()
+					{
+						return 0;
+					}
+				};
+				
+				obj.setZIndex(boss.getZIndex() - 2);
+				
+				game.spawn(obj);
+				
+				boss.addChild(obj);
+				
+				return obj;
+			}
+		};
+		
+		set(nameTag, bgm);
+		set(fbs, idle, left, right, special);
+		
+		setAuraColor(AllStarUtil.from255RGB(255, 0, 0));
+		setBgAuraColor(AllStarUtil.from255RGB(255, 0, 0));
 	}
+	
+	public Setter<BackgroundBossAura> backgroundSetter;
+	public Getter<StageObject> phoenixSpawner;
 	
 	@Override
 	public void onUpdate(long tick)
@@ -128,10 +211,10 @@ public class Mokou extends AllStarBoss
 	}
 
 	@Override
-	public void executeFight(AllStarStageScheme scheme)
+	public void executeFight(final AllStarStageScheme scheme)
 	{
 		final J2hGame g = Game.getGame();
-		final Mokou mokou = this;
+		final Mokou boss = this;
 		
 		final SaveableObject<CircleHealthBar> bar = new SaveableObject<CircleHealthBar>();
 		final SaveableObject<BackgroundAura> aura = new SaveableObject<BackgroundAura>();
@@ -141,31 +224,32 @@ public class Mokou extends AllStarBoss
 			@Override
 			public void run()
 			{
-				BossUtil.cloudEntrance(mokou, 60);
+				BossUtil.cloudEntrance(boss, 60);
 
 				g.addTaskGame(new Runnable()
 				{
 					@Override
 					public void run()
 					{
-						bar.setObject(new CircleHealthBar(mokou));
+						bar.setObject(new CircleHealthBar(boss));
 						
-						g.spawn(mokou);
+						g.spawn(boss);
 						g.spawn(bar.getObject());
 						
 						bar.getObject().addSplit(0.7f);
 						
-						AllStarUtil.introduce(mokou);
-						aura.setObject(BossUtil.backgroundAura(mokou, mokou.getBgAuraColor()));
+						AllStarUtil.introduce(boss);
 						
-						mokou.setHealth(0.1f);
-						mokou.healUp();
+						BossEffectsResult r = BossUtil.addBossEffects(boss, boss.getAuraColor(), boss.getBgAuraColor());
 						
-						Game.getGame().startSpellCard(new MokouNonSpell(mokou));
+						aura.setObject(r.bgAura);
+						
+						boss.setHealth(0.1f);
+						boss.healUp();
+						
+						Game.getGame().startSpellCard(new MokouNonSpell(boss));
 					}
 				}, 60);
-				
-//				Game.getGame().spawn(new MusicPositionTimer(mokou.getBackgroundMusic()));
 			}
 		}, 1);
 
@@ -174,7 +258,7 @@ public class Mokou extends AllStarBoss
 			@Override
 			public boolean returnTrueToWait()
 			{
-				return !mokou.isOnStage();
+				return !boss.isOnStage();
 			}
 		});
 		
@@ -187,7 +271,7 @@ public class Mokou extends AllStarBoss
 			{
 				try
 				{
-					return !mokou.isDead();
+					return !boss.isDead();
 				}
 				catch(Exception e)
 				{
@@ -199,7 +283,7 @@ public class Mokou extends AllStarBoss
 		scheme.doWait();
 		
 		bar.getObject().split();
-		mokou.setHealth(mokou.getMaxHealth());
+		boss.setHealth(boss.getMaxHealth());
 		
 		aura.getObject().setMagicSquareEnabled(false);
 
@@ -210,89 +294,53 @@ public class Mokou extends AllStarBoss
 			{
 				Game.getGame().getSpellcards().clear();
 				Game.getGame().clearObjects();
-				AllStarUtil.presentSpellCard(mokou, "Honest Man's Death \"I just wanted the powerup\"");
+				
+				AllStarUtil.presentSpellCard(boss, "Honest Man's Death \"I just wanted the powerup\"");
 				
 				TouhouSounds.Enemy.HUM_2.play();
 				
-				Game.getGame().spawn(new DrawObject()
-				{
-					{
-						setZIndex(-1);
-					}
-					
-					{
-						addEffect(new FadeInSprite(new Getter<Sprite>()
-								{
-							@Override
-							public Sprite get()
-							{
-								return phoenix;
-							}
-						}
-						, 0.01F));
-						
-						addEffect(new ScalingSprite(new Getter<Sprite>()
-								{
-							@Override
-							public Sprite get()
-							{
-								return phoenix;
-							}
-						}
-						, 3F, 2F, 0.02F));
-					}
-					
-					@Override
-					public boolean isPersistant()
-					{
-						return mokou.isOnStage();
-					}
-					
-					@Override
-					public void onDraw()
-					{
-						phoenix.setPosition(mokou.getDrawX() - phoenix.getWidth() / 2, mokou.getDrawY() - phoenix.getHeight() / 2);
-						phoenix.draw(Game.getGame().batch);
-					}
-				});
+				final MokouSpell card = new MokouSpell(boss);
 				
-				Game.getGame().startSpellCard(new MokouSpell(mokou));
+				Game.getGame().startSpellCard(card);
+				
+				BossUtil.spellcardCircle(boss, card);
+				
+				boss.backgroundSetter.set(scheme.getBossAura());
+				boss.phoenixSpawner.get();
 			}
 		}, 1);
 		
-		scheme.setWait(new WaitConditioner()
-		{
-			@Override
-			public boolean returnTrueToWait()
-			{
-				try
-				{
-					return !mokou.isDead();
-				}
-				catch(Exception e)
-				{
-					return true;
-				}
-			}
-		});
 		
-		scheme.doWait();
+		SchemeUtil.waitForDeath(scheme, boss);
 		
 		Game.getGame().addTaskGame(new Runnable()
 		{
 			@Override
 			public void run()
 			{
-				Game.getGame().delete(mokou);
-				
-				game.clearSpellcards();
-				game.clear(ClearType.ALL_OBJECTS);
-				
-				BossUtil.mapleExplosion(mokou.getX(), mokou.getY());
+				Game.getGame().clearCircle(800f, boss, ClearType.ALL);
 			}
 		}, 1);
 		
-		scheme.waitTicks(5); // Prevent concurrency issues.
+		scheme.waitTicks(2);
+		
+		boss.playSpecial(false);
+		SchemeUtil.deathAnimation(scheme, boss, boss.getAuraColor());
+		
+		Game.getGame().addTaskGame(new Runnable()
+		{
+			@Override
+			public void run()
+			{
+				ObjectUtil.deathAnimation(boss);
+				
+				Game.getGame().delete(boss);
+				
+				Game.getGame().clear(ClearType.ALL);
+			}
+		}, 5);
+		
+		scheme.waitTicks(10); // Prevent concurrency issues.
 	}
 	
 	public static class MokouNonSpell extends Spellcard
@@ -300,6 +348,7 @@ public class Mokou extends AllStarBoss
 		public MokouNonSpell(StageObject owner)
 		{
 			super(owner);
+			setSpellcardTime(Duration.seconds(20));
 		}
 
 		float redRotation = 0F;
@@ -312,8 +361,14 @@ public class Mokou extends AllStarBoss
 			if(tick < 60)
 				return;
 			
-			if(tick % 80 == 0)
-				BossUtil.moveAroundRandomly((Boss)getOwner(), (int) (getGame().getMaxX() / 2) - 100, (int)(getGame().getMaxX() / 2) + 100, Game.getGame().getHeight() - 100, Game.getGame().getHeight() - 200, 500);
+			if(tick % 100 == 0)
+			{
+				final SimpleTouhouBossPath path = new SimpleTouhouBossPath(getOwner());
+				
+				path.setTime(Duration.ticks(60));
+				
+				getOwner().getPathing().setCurrentPath(path);
+			}
 			
 			if(tick % 16 == 0)
 				TouhouSounds.Enemy.BULLET_1.play(0.3F, 1F, 0F);
@@ -414,104 +469,7 @@ public class Mokou extends AllStarBoss
 			final Mokou mokou = (Mokou)getOwner();
 			
 			mokou.setDamageModifier(0.7f);
-
-			final Sprite bg = mokou.bg;
-			final Sprite bge = mokou.bge;
-			
-			Game.getGame().spawn(new DrawObject()
-			{
-				{
-					addEffect(new FadeInSprite(new Getter<Sprite>()
-					{
-						@Override
-						public Sprite get()
-						{
-							return bg;
-						}
-					}
-					, 0.01F));
-					setZIndex(-3);
-				}
-				
-				@Override
-				public void onDraw()
-				{
-					bg.setPosition(0, 0);
-					bg.setSize(Game.getGame().getWidth(), Game.getGame().getHeight());
-					bg.draw(Game.getGame().batch);
-				}
-				
-				@Override
-				public boolean isPersistant()
-				{
-					return mokou.isOnStage();
-				}
-			});
-			
-			Game.getGame().spawn(new DrawObject()
-			{
-				{
-					// Set size to contain the whole screen (even when rotated from any point)
-					double maxDistance = Math.sqrt(480*480 + 640*640); // Distance from middle top any corner.
-					
-					bge.setSize((float)(maxDistance*2), (float)(maxDistance*2));
-					bge.setAlpha(0.6F);
-					bge.setOriginCenter();
-					
-					setZIndex(-2);
-				}
-				
-				@Override
-				public void onDraw()
-				{
-					bge.setPosition(640F - bge.getWidth() / 2, 480F - bge.getHeight() / 2);
-					bge.draw(Game.getGame().batch);
-				}
-				
-				@Override
-				public void onUpdate(long tick)
-				{
-					bge.rotate(0.4F);
-				}
-				
-				@Override
-				public boolean isPersistant()
-				{
-					return mokou.isOnStage();
-				}
-			});
-			
-//			Game.getGame().spawn(new DrawObject()
-//			{
-//				{
-//					addEffect(new FadeInImageEffect(new Getter<Image>()
-//							{
-//						@Override
-//						public Image run()
-//						{
-//							return bge;
-//						}
-//					}
-//					,
-//					new Setter<Image>()
-//					{
-//						@Override
-//						public void run(Image t)
-//						{
-//							bge = t;
-//						}
-//					}, 0.01F));
-//					setZIndex(-1);
-//				}
-//				
-//				@Override
-//				public void draw()
-//				{
-//					bge.rotate(0.4F);
-//					
-//					Stage.getGraphics().drawImage(bge, -1300, -1600);
-//				}
-//			});
+			setSpellcardTime(Duration.seconds(60));
 		}
 
 		@Override
@@ -522,8 +480,8 @@ public class Mokou extends AllStarBoss
 				DrawObject obj = new DrawObject()
 				{
 					Texture texture = Loader.texture(Gdx.files.internal("enemy/mokou/bar.png"));
-					Sprite bar = new Sprite(texture, 512, 576, 846 - 512, 14);
-					Sprite text = new Sprite(texture, 546, 526, 860 - 546, 34);
+					Sprite bar = new Sprite(texture, 0, 54, 348, 22);
+					Sprite text = new Sprite(texture, 0, 0, 348, 54);
 					
 					@Override
 					public void onDraw()
@@ -564,17 +522,27 @@ public class Mokou extends AllStarBoss
 			if(tick < 60)
 				return;
 			
+			if(tick % 200 == 0)
+			{
+				final SimpleTouhouBossPath path = new SimpleTouhouBossPath(getOwner());
+				
+				path.setTime(Duration.ticks(100));
+				
+				getOwner().getPathing().setCurrentPath(path);
+			}
+			
 			if(tick % 10 == 0 && tick > 120)
 				TouhouSounds.Enemy.BULLET_3.play(0.2F);
 		
 			{
-				if(chaserBullet == null || !getGame().getBullets().contains(chaserBullet))
+				if(chaserBullet == null || !chaserBullet.isOnStage())
 				{
 					chaserBullet = new Bullet(AnimationUtil.copyAnimation(chaserBulletAnimation), getOwner().getX(), getOwner().getY())
 					{
 						{
 							useSpawnAnimation(false);
 							setZIndex(1001);
+							setDeletionColor(Color.GREEN);
 						}
 						
 						float rotation = 0;
@@ -718,6 +686,7 @@ public class Mokou extends AllStarBoss
 
 			bullet.setVelocityYTick(-6F);
 			bullet.useSpawnAnimation(false);
+			bullet.setDeletionColor(Color.PURPLE);
 			
 //			System.out.println(tick % 2000);
 //			System.out.println(tick % 4000);

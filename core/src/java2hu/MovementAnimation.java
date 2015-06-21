@@ -41,9 +41,11 @@ public class MovementAnimation extends StartupLoopAnimation
 	{
 		Array<TextureRegion> end = new Array<TextureRegion>();
 		
-		for(int i = ani.getKeyFrames().length - 1; i >= 0; i--)
+		TextureRegion[] frames = AnimationUtil.copyFrames(ani.getKeyFrames());
+		
+		for(int i = frames.length - 1; i >= 0; i--)
 		{
-			end.add(ani.getKeyFrames()[i]);
+			end.add(frames[i]);
 		}
 		
 		return end;

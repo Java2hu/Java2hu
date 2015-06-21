@@ -10,8 +10,9 @@ import java2hu.StartupLoopAnimation;
 import java2hu.allstar.AllStarStageScheme;
 import java2hu.allstar.enemies.AllStarBoss;
 import java2hu.allstar.util.AllStarUtil;
+import java2hu.background.Background;
 import java2hu.background.BackgroundBossAura;
-import java2hu.background.HorizontalScrollingBackground;
+import java2hu.background.ClearBackground;
 import java2hu.gameflow.GameFlowScheme.WaitConditioner;
 import java2hu.helpers.ZIndexHelper;
 import java2hu.object.DrawObject;
@@ -40,6 +41,7 @@ import java2hu.util.SchemeUtil;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.g2d.Animation;
@@ -69,8 +71,8 @@ public class Kagerou extends AllStarBoss
 	protected Animation werewolfAniRight;
 	protected Animation werewolfAniLeft;
 	
-	public Sprite bg;
-	public Sprite bge;
+	public Texture bg;
+	public Texture bge;
 	
 	public Kagerou(float maxHealth, float x, float y)
 	{
@@ -104,8 +106,8 @@ public class Kagerou extends AllStarBoss
 		Animation special = ImageSplitter.getAnimationFromSprite(sprite, 0, 2 * chunkHeight, 192, 192, 3F, 1,2,3,4,5,6,7,6,5,4,3,2,1);
 		special.setPlayMode(PlayMode.NORMAL);
 		
-		Sprite bg = new Sprite(Loader.texture(Gdx.files.internal(folder + "bg.png")));
-		Sprite bge = new Sprite(Loader.texture(Gdx.files.internal(folder + "bge.png")));
+		bg = Loader.texture(Gdx.files.internal(folder + "bg.png"));
+		bge = Loader.texture(Gdx.files.internal(folder + "bge.png"));
 
 		Music bgm = new J2hMusic(Gdx.audio.newMusic(Gdx.files.internal(folder + "bgm.mp3")));
 		bgm.setVolume(1f * Game.getGame().getMusicModifier());
@@ -138,6 +140,9 @@ public class Kagerou extends AllStarBoss
 		set(nametag, bgm);
 		set(fbs, idle, left, right, special);
 		
+		setAuraColor(AllStarUtil.from255RGB(175, 107, 175));
+		setBgAuraColor(AllStarUtil.from255RGB(10, 10, 10).mul(6f));
+		
 		addDisposable(nametag);
 		addDisposable(fbs);
 		addDisposable(idle);
@@ -147,9 +152,6 @@ public class Kagerou extends AllStarBoss
 		addDisposable(bg);
 		addDisposable(bge);
 		addDisposable(bot);
-		
-		this.bg = bg;
-		this.bge = bge;
 	}
 	
 	@Override
@@ -209,28 +211,48 @@ public class Kagerou extends AllStarBoss
 	{
 		final Kagerou boss = this;
 		
-		Game.getGame().spawn(new DrawObject()
+		game.spawn(new ClearBackground(-104)
 		{
 			{
 				setFrameBuffer(aura.getBackgroundBuffer());
+				
 				addEffect(new FadeInSprite(new Getter<Sprite>()
 				{
 					@Override
 					public Sprite get()
 					{
-						return boss.bg;
+						return getSprite();
 					}
-				}
-				, 0, 1f, 0.01F));
-				setZIndex(-2);
+				}, 0, 1f, 0.01F));
+			}
+		});
+		
+		final Sprite bg = new Sprite(this.bg);
+		
+		Game.getGame().spawn(new DrawObject()
+		{
+			{
+				setFrameBuffer(aura.getBackgroundBuffer());
+				
+				setBlendFunc(GL20.GL_DST_ALPHA, GL20.GL_SRC_COLOR);
+				
+				addEffect(new FadeInSprite(new Getter<Sprite>()
+				{
+					@Override
+					public Sprite get()
+					{
+						return bg;
+					}
+				}, 0, 1f, 0.01F));
+				setZIndex(-100);
 			}
 			
 			@Override
 			public void onDraw()
 			{
-				boss.bg.setPosition(0, 0);
-				boss.bg.setSize(Game.getGame().getWidth(), Game.getGame().getHeight());
-				boss.bg.draw(Game.getGame().batch);
+				bg.setPosition(0, 0);
+				bg.setSize(Game.getGame().getWidth(), Game.getGame().getHeight());
+				bg.draw(Game.getGame().batch);
 			}
 			
 			@Override
@@ -240,55 +262,49 @@ public class Kagerou extends AllStarBoss
 			}
 		});
 		
-		boss.bge.setAlpha(0.1f);
+		int id = 0;
 		
-		Game.getGame().spawn(new HorizontalScrollingBackground(boss.bge, 0.3f, true)
+		for(int i = -101; i >= -102; i--)
 		{
+			final int finalId = id++;
+			final int finalI = i;
+
+			Game.getGame().spawn(new Background(boss.bge)
 			{
-				setFrameBuffer(aura.getBackgroundBuffer());
-				
-				setZIndex(-1);
-				
-				addEffect(new FadeInSprite(new Getter<Sprite>()
 				{
-					@Override
-					public Sprite get()
+					setFrameBuffer(aura.getBackgroundBuffer());
+					setVelU((finalId == 0 ? -1f : 1f) * 0.01f);
+					
+					getSprite().setScale(0.5f);
+					
+					setBlendFunc(GL20.GL_ONE_MINUS_SRC_COLOR, GL20.GL_ONE_MINUS_SRC_COLOR);
+					getSprite().setColor(0.8f, 0.8f, 0.8f, 1f);
+
+					setZIndex(finalI);
+
+					addEffect(new FadeInSprite(new Getter<Sprite>()
 					{
-						return boss.bge;
-					}
-				}, 0f, 0.2f, 0.01f));
-			}
-			
-			@Override
-			public boolean isPersistant()
-			{
-				return boss.isOnStage();
-			}
-		});
-		
-		Game.getGame().spawn(new HorizontalScrollingBackground(boss.bge, 0.1f, false)
-		{
-			{
-				setFrameBuffer(aura.getBackgroundBuffer());
+						@Override
+						public Sprite get()
+						{
+							return getSprite();
+						}
+					}, 0f, 1f, 0.01f));
+				}
 				
-				setZIndex(-1);
-				
-				addEffect(new FadeInSprite(new Getter<Sprite>()
+				@Override
+				public void onDraw()
 				{
-					@Override
-					public Sprite get()
-					{
-						return boss.bge;
-					}
-				}, 0f, 0.2f, 0.01f));
-			}
-			
-			@Override
-			public boolean isPersistant()
-			{
-				return boss.isOnStage();
-			}
-		});
+					super.onDraw();
+				}
+
+				@Override
+				public boolean isPersistant()
+				{
+					return boss.isOnStage();
+				}
+			});
+		}
 	}
 
 	@Override
@@ -321,7 +337,7 @@ public class Kagerou extends AllStarBoss
 						AllStarUtil.introduce(boss);
 						
 						boss.healUp();
-						BossUtil.backgroundAura(boss, boss.getBgAuraColor());
+						BossUtil.addBossEffects(boss, boss.getAuraColor(), boss.getBgAuraColor());
 						
 						Game.getGame().startSpellCard(new KagerouNonSpell(boss));
 					}

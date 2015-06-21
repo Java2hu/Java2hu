@@ -416,6 +416,20 @@ public class J2hGame extends ApplicationAdapter implements InputProcessor
 		}
 	}
 	
+	private Runnable currentClear; // If a clear is currently running, this runnable can be ran to stop it.
+	
+	/**
+	 * Checks for any currently running clears and cancels them.
+	 */
+	private void checkClear()
+	{
+		if(currentClear != null)
+		{
+			currentClear.run();
+			currentClear = null;
+		}
+	}
+	
 	public void clear(ClearType... types)
 	{
 		for(ClearType type : types)
@@ -433,6 +447,8 @@ public class J2hGame extends ApplicationAdapter implements InputProcessor
 	
 	public void clear(Clear... clearDatas)
 	{
+		checkClear();
+		
 		final HashMap<ClearType, Boolean> types = new HashMap<J2hGame.ClearType, Boolean>();
 		
 		Clear clearSpells = null;
@@ -601,6 +617,8 @@ public class J2hGame extends ApplicationAdapter implements InputProcessor
 	
 	public void clearCircle(float expansionSpeed, final IPosition center, Clear... clearDatas)
 	{
+		checkClear();
+		
 		final HashMap<ClearType, Boolean> types = new HashMap<J2hGame.ClearType, Boolean>();
 		
 		Clear clearSpells = null;
@@ -653,11 +671,10 @@ public class J2hGame extends ApplicationAdapter implements InputProcessor
 		
 		final float maxSize = Math.max(Game.getGame().height, Game.getGame().width) * 2;
 		
-		int tick = 0;
+		final ArrayList<Runnable> clearRunnables = new ArrayList<Runnable>();
 		
 		for(float size = 0; size < maxSize; size += (expansionSpeed / (double)LOGIC_TPS))
 		{
-			tick++;
 			final float finalSize = size;
 			
 			Runnable clear = new Runnable()
@@ -764,8 +781,41 @@ public class J2hGame extends ApplicationAdapter implements InputProcessor
 				}
 			};
 			
-			addTask(clear, tick);
+			clearRunnables.add(clear);
 		}
+		
+		Runnable clearManager = new Runnable()
+		{
+			@Override
+			public void run()
+			{
+				if(isPaused())
+				{
+					addTask(this, 1); // Reschedule until unpaused.
+					return;
+				}
+				
+				if(clearRunnables.size() <= 0)
+					return; // End the manager.
+				
+				Runnable toRun = clearRunnables.remove(0);
+				
+				toRun.run();
+				
+				addTask(this, 1); // Reschedule to run the next clear runnable until empty.
+			}
+		};
+		
+		currentClear = new Runnable()
+		{
+			@Override
+			public void run()
+			{
+				clearRunnables.clear();
+			}
+		};
+		
+		addTask(clearManager, 0);
 	}
 	
 	/**
@@ -1210,7 +1260,7 @@ public class J2hGame extends ApplicationAdapter implements InputProcessor
 	public void setZIndexing(boolean zIndexing)
 	{
 		this.zIndexing = zIndexing;
-		System.out.println("Z-Indexing " + (profiling ? "ENABLED" : "DISABLED"));
+		System.out.println("Z-Indexing " + (zIndexing ? "ENABLED" : "DISABLED"));
 	}
 	
 	private boolean created = false;

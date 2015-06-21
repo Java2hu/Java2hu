@@ -551,10 +551,20 @@ public class BossUtil extends J2hObject
 		}, i + 1);
 	}
 	
-	public static void addBossEffects(Boss boss, Color color, Color bgAura)
+	public static class BossEffectsResult
 	{
-		backgroundAura(boss, bgAura);
-		bossAura(boss, Color.WHITE, color);
+		public BackgroundAura bgAura;
+		public BossAura bossAura;
+	}
+	
+	public static BossEffectsResult addBossEffects(Boss boss, Color color, Color bgAura)
+	{
+		BossEffectsResult r = new BossEffectsResult();
+		
+		r.bgAura = backgroundAura(boss, bgAura);
+		r.bossAura = bossAura(boss, Color.WHITE, color);
+		
+		return r;
 	}
 
 	public static void charge(float x, float y, final Color color, final boolean outwards)
@@ -738,7 +748,7 @@ public class BossUtil extends J2hObject
 						ba.addChild(this);
 						setZIndex(boss.getZIndex() - 1);
 						setName("Boss Aura (Energy Leak)");
-						setShader(ShaderLibrary.GLOW.getProgram());
+						setGlowing();
 					}
 					
 					Sprite leak = new Sprite(energyLeak);
@@ -764,6 +774,12 @@ public class BossUtil extends J2hObject
 					}
 					
 					@Override
+					public boolean isPersistant()
+					{
+						return true;
+					}
+					
+					@Override
 					public void onUpdate(long tick)
 					{
 						if(!ba.isOnStage())
@@ -775,8 +791,21 @@ public class BossUtil extends J2hObject
 						
 						leak.setPosition(boss.getX() + x, boss.getY() + y);
 						
-						if(height > 3.5f)
-							game.delete(this);
+						final float fadeHeight = 2f;
+						final float fade = 2f;
+						
+						
+						if(height > fadeHeight)
+						{
+							float mul = Math.min(1, (height - fadeHeight) / fade);
+							
+							leak.setAlpha(0.4f - (mul * 0.4f));
+							
+							if(mul >= 1)
+							{
+								game.delete(this);
+							}
+						}
 					}
 				});
 			}

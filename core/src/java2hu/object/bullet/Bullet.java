@@ -4,13 +4,12 @@ import java2hu.HitboxSprite;
 import java2hu.J2hGame;
 import java2hu.ZIndex;
 import java2hu.object.DrawObject;
+import java2hu.object.FreeStageObject;
 import java2hu.object.StageObject;
 import java2hu.overwrite.J2hObject;
 import java2hu.util.AnimationUtil;
 import java2hu.util.ImageSplitter;
 import java2hu.util.MathUtil;
-
-import shaders.ShaderLibrary;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
@@ -638,12 +637,25 @@ public class Bullet extends StageObject
 	private static Texture BREAK = null;
 	private static Animation BREAK_ANI = null;
 	
+	private Color deletionColor = null;
+	
 	/**
-	 * Keep updating a bullets delta update method in it's deletion animation.
-	 * This will make the bullets die out while still moving.
-	 * This might give some side effects though, turn off if it causes any trouble.
+	 * If this bullet isn't initiated with a BulletType that contains a color for the bullet, this value is used instead.
+	 * If you set this to null, white will be used.
 	 */
-	public static boolean UPDATE_MOVEMENT_ON_DELETION = true;
+	public void setDeletionColor(Color deletionColor)
+	{
+		this.deletionColor = deletionColor;
+	}
+	
+	/**
+	 * If this bullet isn't initiated with a BulletType that contains a color for the bullet, this value is used instead.
+	 * Can be null, in which case white is used.
+	 */
+	public Color getDeletionColor()
+	{
+		return deletionColor;
+	}
 	
 	public void deleteAnimation()
 	{
@@ -674,6 +686,9 @@ public class Bullet extends StageObject
 		Color effect = getType().getEffectColor();
 		
 		if(effect == null)
+			effect = deletionColor;
+		
+		if(effect == null)
 			effect = Color.WHITE;
 		
 		effect = effect.cpy();
@@ -694,12 +709,13 @@ public class Bullet extends StageObject
 			sprite.setAlpha(0.3f);	
 		}
 		
-		DrawObject obj = new DrawObject()
+		StageObject obj = new FreeStageObject(bullet.getX(), bullet.getY())
 		{
 			int ticks = 0;
 
 			{
 				setName("Death animation " + bullet.getName());
+				setPosition(bullet);
 				
 				bullet.setOwnedBy(this);
 			}
@@ -717,6 +733,7 @@ public class Bullet extends StageObject
 				
 				HitboxSprite current = (HitboxSprite) ani.getKeyFrame(ticks/2f);
 
+				current.setPosition(getX() - (current.getWidth() / 2f), getY() - (current.getHeight() / 2f));
 				current.draw(g.batch);
 			}
 			
@@ -741,10 +758,12 @@ public class Bullet extends StageObject
 			}
 			
 			@Override
-			public void update(float second)
+			public void onUpdateDelta(float delta)
 			{
-				if(UPDATE_MOVEMENT_ON_DELETION)
-					bullet.update(second);
+				super.onUpdateDelta(delta);
+				
+				setX(getX() - (bullet.getVelocityX() * delta));
+				setY(getY() - (bullet.getVelocityY() * delta));
 			}
 			
 			@Override
@@ -758,9 +777,21 @@ public class Bullet extends StageObject
 			{
 				return true; // Deletes itself, no need to get it removed by anything else.
 			}
+
+			@Override
+			public float getWidth()
+			{
+				return 0;
+			}
+
+			@Override
+			public float getHeight()
+			{
+				return 0;
+			}
 		};
 		
-		obj.setShader(ShaderLibrary.GLOW.getProgram());
+		obj.setGlowing();
 		obj.setZIndex(getZIndex());
 		
 		Game.getGame().spawn(obj);

@@ -3,10 +3,10 @@ package java2hu.allstar.enemies.day6;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java2hu.Game;
-import java2hu.HitboxSprite;
 import java2hu.J2hGame;
 import java2hu.J2hGame.ClearType;
 import java2hu.Loader;
+import java2hu.MovementAnimation;
 import java2hu.allstar.AllStarStageScheme;
 import java2hu.allstar.enemies.AllStarBoss;
 import java2hu.allstar.util.AllStarUtil;
@@ -32,7 +32,9 @@ import java2hu.util.Getter;
 import java2hu.util.HitboxUtil;
 import java2hu.util.ImageSplitter;
 import java2hu.util.MathUtil;
+import java2hu.util.ObjectUtil;
 import java2hu.util.Scheduler;
+import java2hu.util.SchemeUtil;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Music;
@@ -61,8 +63,10 @@ public class Sekibanki extends AllStarBoss
 	 */
 	final static String SPELLCARD_NAME = "Flying Head \"You spin my head right round\"";
 	
-	public static Sekibanki newInstance(float x, float y)
+	public Sekibanki(float maxHealth, float x, float y)
 	{
+		super(maxHealth, x, y);
+		
 		String folder = "enemy/" + BOSS_NAME.toLowerCase() + "/";
 		
 		int chunkHeight = 160;
@@ -76,11 +80,11 @@ public class Sekibanki extends AllStarBoss
 
 		TextureRegion nameTag = new TextureRegion(Loader.texture(Gdx.files.internal(folder + "nametag.png")));
 
-		Animation idle = ImageSplitter.getAnimationFromSprite(sprite, chunkHeight, chunkWidth, 12F, 1,2,3,4);
+		Animation idle = ImageSplitter.getAnimationFromSprite(sprite, chunkHeight, chunkWidth, 8F, 1,2,3,4);
 		idle.setPlayMode(PlayMode.LOOP);
 		
-		Animation left = ImageSplitter.getAnimationFromSprite(sprite, chunkHeight, chunkWidth, 12F, 5,6,7,8);
-		Animation right = ImageSplitter.getAnimationFromSprite(sprite, chunkHeight, chunkWidth, 12F, 5,6,7,8);
+		Animation left = new MovementAnimation(ImageSplitter.getAnimationFromSprite(sprite, chunkHeight, chunkWidth, 8F, 5,6,7), ImageSplitter.getAnimationFromSprite(sprite, chunkHeight, chunkWidth, 8F, 8), 8f);
+		Animation right = AnimationUtil.copyAnimation(left);
 
 		for(TextureRegion reg : left.getKeyFrames())
 			reg.flip(true, false);
@@ -89,15 +93,16 @@ public class Sekibanki extends AllStarBoss
 		special.setPlayMode(PlayMode.NORMAL);
 		
 		// Headless variant
-		Animation headlessIdle = ImageSplitter.getAnimationFromSprite(sprite, 0, 3 * chunkHeight, chunkHeight, chunkWidth, 0.2F, 1,2,3,4);
+		Animation headlessIdle = ImageSplitter.getAnimationFromSprite(sprite, 0, 3 * chunkHeight, chunkHeight, chunkWidth, 8F, 1,2,3,4);
+		headlessIdle.setPlayMode(PlayMode.LOOP);
 
-		Animation headlessLeft = ImageSplitter.getAnimationFromSprite(sprite, 0, 3 * chunkHeight, chunkHeight, chunkWidth, 0.2F, 5,6,7,8);
-		Animation headlessRight = ImageSplitter.getAnimationFromSprite(sprite, 0, 3 * chunkHeight, chunkHeight, chunkWidth, 0.2F, 5,6,7,8);
+		Animation headlessLeft = new MovementAnimation(ImageSplitter.getAnimationFromSprite(sprite, 0, 3 * chunkHeight, chunkHeight, chunkWidth, 8F, 5,6,7), ImageSplitter.getAnimationFromSprite(sprite, 0, 3 * chunkHeight, chunkHeight, chunkWidth, 8F, 8), 8f);
+		Animation headlessRight = AnimationUtil.copyAnimation(headlessLeft);
 
 		for(TextureRegion reg : headlessLeft.getKeyFrames())
 			reg.flip(true, false);
 
-		Animation headlessSpecial = ImageSplitter.getAnimationFromSprite(sprite, 0, 3 * chunkHeight, chunkHeight, chunkWidth, 10F, 9,10,11,12,12,12,12,11,10,9);
+		Animation headlessSpecial = ImageSplitter.getAnimationFromSprite(sprite, 0, 3 * chunkHeight, chunkHeight, chunkWidth, 8F, 9,10,11,12,12,12,12,11,10,9);
 		headlessSpecial.setPlayMode(PlayMode.NORMAL);
 
 		Texture bgt = Loader.texture(Gdx.files.internal(folder + "bg.png"));
@@ -112,26 +117,42 @@ public class Sekibanki extends AllStarBoss
 		bgm.setVolume(1f * Game.getGame().getMusicModifier());
 		bgm.setLooping(true);
 		
-		final Sekibanki boss = new Sekibanki(100, nameTag, bg, bge, fbs, idle, left, right, special, bgm, x, y);
+		
+		final Sekibanki boss = this;
+		
+		set(nameTag, bgm);
+		set(fbs, idle, left, right, special);
+		
+		boss.setAuraColor(AllStarUtil.from255RGB(130, 136, 243));
+		boss.setBgAuraColor(AllStarUtil.from255RGB(128, 128, 128));
 		
 		boss.headlessIdle = headlessIdle;
 		boss.headlessLeft = headlessLeft;
 		boss.headlessRight = headlessRight;
 		boss.headlessSpecial = headlessSpecial;
 		
+		normalIdle = idle;
+		normalLeft = left;
+		normalRight = right;
+		normalSpecial = special;
+		
 		boss.addDisposable(headlessIdle);
 		boss.addDisposable(headlessLeft);
 		boss.addDisposable(headlessRight);
 		boss.addDisposable(headlessSpecial);
-		
-		return boss;
 	}
 	
 	public boolean hasHead = true;
+	
 	public Animation headlessIdle;
 	public Animation headlessLeft;
 	public Animation headlessRight;
 	public Animation headlessSpecial;
+	
+	public Animation normalIdle;
+	public Animation normalLeft;
+	public Animation normalRight;
+	public Animation normalSpecial;
 	
 	public Sekibanki(float maxHealth, TextureRegion nametag, final Sprite bg, final Sprite bge, Sprite fullBodySprite, Animation idle, Animation left, Animation right, Animation special, Music bgm, float x, float y)
 	{
@@ -218,53 +239,21 @@ public class Sekibanki extends AllStarBoss
 	public void onDraw()
 	{
 		if(hasHead)
-			super.onDraw();
+		{
+			idle = normalIdle;
+			left = normalLeft;
+			right = normalRight;
+			special = normalSpecial;
+		}
 		else
 		{
-			J2hGame g = Game.getGame();
-			
-			if(headlessSpecial != null && playSpecial)
-			{
-				HitboxSprite current = (HitboxSprite) headlessSpecial.getKeyFrame(getSpecialAnimationTime());
-				current.setPosition(getX() - getWidth() / 2, getY() - getHeight() / 2);
-				current.draw(g.batch);
-				
-				if(!Game.getGame().isPaused())
-					specialTimer++;
-				
-				if(headlessSpecial.getPlayMode() == PlayMode.NORMAL && headlessSpecial.isAnimationFinished(getSpecialAnimationTime()))
-					playSpecial = false;
-			}
-			else if(getLastX() - getX() > 0)
-			{
-				HitboxSprite current = AnimationUtil.getCurrentSprite(headlessLeft, getAnimationTime(), true);
-				current.setPosition(getX() - getWidth() / 2, getY() - getHeight() / 2);
-				current.draw(g.batch);
-			}
-			else if(getLastX() - getX() < 0)
-			{
-				HitboxSprite current = AnimationUtil.getCurrentSprite(headlessRight, getAnimationTime(), true);
-				current.setPosition(getX() - getWidth() / 2, getY() - getHeight() / 2);
-				current.draw(g.batch);
-			}
-			else
-			{
-				HitboxSprite current = AnimationUtil.getCurrentSprite(headlessIdle, getAnimationTime(), true);
-				current.setPosition(getX() - getWidth() / 2, getY() - getHeight() / 2);
-				current.draw(g.batch);
-			}
-			
-			getPlayerHitHitbox().setPosition(getX(), getY());
-			
-			if(System.currentTimeMillis() - getLastMoveTime() > 100)
-			{
-				lastX = getX();
-				lastY = getY();
-			}
-			
-			if(!playSpecial)
-				specialTimer = 0;
+			idle = headlessIdle;
+			left = headlessLeft;
+			right = headlessRight;
+			special = headlessSpecial;
 		}
+		
+		super.onDraw();
 	}
 	
 	private float damageModifier = 0F;
@@ -312,7 +301,7 @@ public class Sekibanki extends AllStarBoss
 						
 						boss.setHealth(0.1f);
 						boss.healUp();
-						BossUtil.backgroundAura(boss, boss.getBgAuraColor());
+						BossUtil.addBossEffects(boss, boss.getAuraColor(), boss.getBgAuraColor());
 						
 						Game.getGame().startSpellCard(new SekibankiNonSpell(boss));
 					}
@@ -362,43 +351,44 @@ public class Sekibanki extends AllStarBoss
 				
 				AllStarUtil.presentSpellCard(boss, SPELLCARD_NAME);
 				
-				Game.getGame().startSpellCard(new SekibankiSpell(boss));
+				final SekibankiSpell card = new SekibankiSpell(boss);
+				
+				Game.getGame().startSpellCard(card);
+				
+				BossUtil.spellcardCircle(boss, card);
 			}
 		}, 1);
 		
-		scheme.setWait(new WaitConditioner()
-		{
-			@Override
-			public boolean returnTrueToWait()
-			{
-				try
-				{
-					return !boss.isDead();
-				}
-				catch(Exception e)
-				{
-					return true;
-				}
-			}
-		});
-		
-		scheme.doWait();
+		SchemeUtil.waitForDeath(scheme, boss);
 		
 		Game.getGame().addTaskGame(new Runnable()
 		{
 			@Override
 			public void run()
 			{
-				Game.getGame().delete(boss);
-				
-				game.clearSpellcards();
-				game.clear(ClearType.ALL_OBJECTS);
-				
-				BossUtil.mapleExplosion(boss.getX(), boss.getY());
+				Game.getGame().clearCircle(800f, boss, ClearType.ALL);
 			}
 		}, 1);
 		
-		scheme.waitTicks(5); // Prevent concurrency issues.
+		scheme.waitTicks(2);
+		
+		boss.playSpecial(false);
+		SchemeUtil.deathAnimation(scheme, boss, boss.getAuraColor());
+		
+		Game.getGame().addTaskGame(new Runnable()
+		{
+			@Override
+			public void run()
+			{
+				ObjectUtil.deathAnimation(boss);
+				
+				Game.getGame().delete(boss);
+				
+				Game.getGame().clear(ClearType.ALL);
+			}
+		}, 5);
+		
+		scheme.waitTicks(10); // Prevent concurrency issues.
 	}
 	
 	public static class SekibankiHead extends Boss
@@ -426,7 +416,13 @@ public class Sekibanki extends AllStarBoss
 			final SekibankiHead boss = new SekibankiHead(1f, null, idle, right, left, special, x, y);
 			
 			if(hitbox == null)
-				hitbox = HitboxUtil.makeHitboxFromSprite(idle.getKeyFrames()[0], HitboxUtil.StandardBulletSpecification.get());
+			{
+				hitbox = HitboxUtil.rectangleHitbox(20f);
+			
+				Rectangle bound = hitbox.getBoundingRectangle();
+				
+				hitbox.setOrigin(bound.getWidth() / 2, bound.getHeight() / 2);
+			}
 			
 			boss.playerHitHitbox = new Polygon(hitbox.getVertices());
 			
@@ -652,8 +648,6 @@ public class Sekibanki extends AllStarBoss
 			if(tick == 0)
 			{
 				BossUtil.moveTo(boss, Game.getGame().getWidth()/2, Game.getGame().getHeight() - 100, 500);
-
-				BossUtil.bossAura(boss, Color.WHITE, new Color(0.0f, 0.2f, 1f, 1f));
 			}
 			
 			if(tick < 30)
@@ -668,7 +662,8 @@ public class Sekibanki extends AllStarBoss
 				{
 					SekibankiHead head = SekibankiHead.newInstance(boss.getX(), boss.getY() + 48);
 					head.setZIndex(boss.getZIndex() + 1);
-					Game.getGame().spawn(head);
+					boss.addChild(head);
+					game.spawn(head);
 					heads.add(head);
 				}
 			}

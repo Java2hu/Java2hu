@@ -8,6 +8,7 @@ import java2hu.allstar.AllStarStageScheme;
 import java2hu.allstar.enemies.AllStarBoss;
 import java2hu.allstar.util.AllStarUtil;
 import java2hu.background.BackgroundBossAura;
+import java2hu.background.ClearBackground;
 import java2hu.background.HorizontalScrollingBackground;
 import java2hu.background.ScrollingBackground;
 import java2hu.gameflow.GameFlowScheme.WaitConditioner;
@@ -148,6 +149,23 @@ public class Wakasagihime extends AllStarBoss
 				final FrameBuffer combineBuffer = new FrameBuffer(Format.RGBA8888, Game.getGame().getWidth(), Game.getGame().getHeight(), false);
 				
 				final float fadeSpeed = 0.01f;
+				
+				
+				game.spawn(new ClearBackground(-15)
+				{
+					{
+						setFrameBuffer(aura.getBackgroundBuffer());
+						
+						addEffect(new FadeInSprite(new Getter<Sprite>()
+						{
+							@Override
+							public Sprite get()
+							{
+								return getSprite();
+							}
+						}, 0, 1f, 0.01F));
+					}
+				});
 				
 				Game.getGame().spawn(new DrawObject()
 				{

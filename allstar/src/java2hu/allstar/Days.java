@@ -127,8 +127,7 @@ public class Days extends J2hObject
 				@Override
 				public AllStarBoss get()
 				{
-					final Mokou boss = Mokou.newInstance(startX, startY);
-					return boss;
+					return new Mokou(startHP, startX, startY);
 				}
 			});
 		}
@@ -203,14 +202,13 @@ public class Days extends J2hObject
 			// Kyouko
 			
 			addCharacter(day, type, "Sekibanki", new Getter<AllStarBoss>()
-					{
-						@Override
-						public AllStarBoss get()
-						{
-							final Sekibanki boss = Sekibanki.newInstance(startX, startY);
-							return boss;
-						}
-					});
+			{
+				@Override
+				public AllStarBoss get()
+				{
+					return new Sekibanki(startHP, startX, startY);
+				}
+			});
 			
 			// Seiga & Zombie
 			// Tojiko
