@@ -10,8 +10,8 @@ import java2hu.MovementAnimation;
 import java2hu.allstar.AllStarStageScheme;
 import java2hu.allstar.enemies.AllStarBoss;
 import java2hu.allstar.util.AllStarUtil;
-import java2hu.background.HorizontalScrollingBackground;
-import java2hu.background.ScrollingBackground;
+import java2hu.background.Background;
+import java2hu.background.BackgroundBossAura;
 import java2hu.gameflow.GameFlowScheme.WaitConditioner;
 import java2hu.object.StageObject;
 import java2hu.object.bullet.Bullet;
@@ -19,7 +19,7 @@ import java2hu.object.enemy.greater.Boss;
 import java2hu.object.player.Player;
 import java2hu.object.ui.CircleHealthBar;
 import java2hu.overwrite.J2hObject;
-import java2hu.plugin.sprites.FadeInSprite;
+import java2hu.pathing.SimpleTouhouBossPath;
 import java2hu.spellcard.Spellcard;
 import java2hu.system.SaveableObject;
 import java2hu.touhou.bullet.ThBullet;
@@ -28,17 +28,18 @@ import java2hu.touhou.bullet.ThBulletType;
 import java2hu.touhou.sounds.TouhouSounds;
 import java2hu.util.AnimationUtil;
 import java2hu.util.BossUtil;
-import java2hu.util.Getter;
+import java2hu.util.Duration;
 import java2hu.util.HitboxUtil;
 import java2hu.util.ImageSplitter;
 import java2hu.util.MathUtil;
 import java2hu.util.ObjectUtil;
 import java2hu.util.Scheduler;
 import java2hu.util.SchemeUtil;
+import java2hu.util.Setter;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Music;
-import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.g2d.Animation;
@@ -47,6 +48,7 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Polygon;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector2;
 
 /**
  * Simple boss, should be used as a template for other bosses instead of constant copying.
@@ -105,11 +107,11 @@ public class Sekibanki extends AllStarBoss
 		Animation headlessSpecial = ImageSplitter.getAnimationFromSprite(sprite, 0, 3 * chunkHeight, chunkHeight, chunkWidth, 8F, 9,10,11,12,12,12,12,11,10,9);
 		headlessSpecial.setPlayMode(PlayMode.NORMAL);
 
-		Texture bgt = Loader.texture(Gdx.files.internal(folder + "bg.png"));
+		final Texture bgt = Loader.texture(Gdx.files.internal(folder + "bg.png"));
 		bgt.setFilter(TextureFilter.MipMapLinearNearest, TextureFilter.Nearest);
 		Sprite bg = new Sprite(bgt);
 		
-		Texture bget = Loader.texture(Gdx.files.internal(folder + "bge.png"));
+		final Texture bget = Loader.texture(Gdx.files.internal(folder + "bge.png"));
 		bget.setFilter(TextureFilter.MipMapLinearNearest, TextureFilter.Nearest);
 		Sprite bge = new Sprite(bget);
 
@@ -140,6 +142,37 @@ public class Sekibanki extends AllStarBoss
 		boss.addDisposable(headlessLeft);
 		boss.addDisposable(headlessRight);
 		boss.addDisposable(headlessSpecial);
+		
+		backgroundSetter = new Setter<BackgroundBossAura>()
+		{
+			@Override
+			public void set(BackgroundBossAura t)
+			{
+				Background bg = new Background(bgt);
+				bg.setFrameBuffer(t.getBackgroundBuffer());
+				bg.setBlendFunc(GL20.GL_SRC_COLOR, GL20.GL_DST_COLOR);
+				bg.setZIndex(bg.getZIndex() - 1);
+				bg.setVelU(0.003f);
+				bg.setVelV(-0.003f);
+				bg.getSprite().setAlpha(1f);
+				game.spawn(bg);
+				
+				Background bgTwo = new Background(bgt);
+				bgTwo.setBlendFunc(GL20.GL_SRC_COLOR, GL20.GL_SRC_COLOR);
+				bgTwo.setFrameBuffer(t.getBackgroundBuffer());
+				bgTwo.setZIndex(bg.getZIndex() - 2);
+				bgTwo.setStartU(0.5f);
+				bgTwo.setEndU(1.5f);
+				bgTwo.setVelU(-0.003f);
+				bgTwo.setVelV(-0.003f);
+				game.spawn(bgTwo);
+				
+				Background bge = new Background(bget);
+				bge.setFrameBuffer(t.getBackgroundBuffer());
+				bge.setVelU(0.003f);
+				game.spawn(bge);
+			}
+		};
 	}
 	
 	public boolean hasHead = true;
@@ -154,80 +187,7 @@ public class Sekibanki extends AllStarBoss
 	public Animation normalRight;
 	public Animation normalSpecial;
 	
-	public Sekibanki(float maxHealth, TextureRegion nametag, final Sprite bg, final Sprite bge, Sprite fullBodySprite, Animation idle, Animation left, Animation right, Animation special, Music bgm, float x, float y)
-	{
-		super(maxHealth, nametag, fullBodySprite, idle, left, right, special, bgm, x, y);
-		
-		addDisposable(nametag);
-		addDisposable(fullBodySprite);
-		addDisposable(idle);
-		addDisposable(left);
-		addDisposable(right);
-		addDisposable(special);
-		addDisposable(bg);
-		addDisposable(bge);
-		
-		setAuraColor(Color.RED);
-		
-		final Sekibanki boss = this;
-		
-		Game.getGame().spawn(new ScrollingBackground(bg, -0.5f, -0.5f)
-		{
-			{
-				addEffect(new FadeInSprite(new Getter<Sprite>()
-				{
-					@Override
-					public Sprite get()
-					{
-						return bg;
-					}
-				}
-				, 0.01F));
-				
-				setZIndex(-2);
-			}
-			
-			@Override
-			public void onDraw()
-			{
-				super.onDraw();
-			}
-			
-			@Override
-			public boolean isPersistant()
-			{
-				return boss.isOnStage();
-			}
-		});
-		
-		Game.getGame().spawn(new HorizontalScrollingBackground(bge, 0.3f, false)
-		{
-			{
-				addEffect(new FadeInSprite(new Getter<Sprite>()
-				{
-					@Override
-					public Sprite get()
-					{
-						return bge;
-					}
-				}
-				, 0f, 0.9f, 0.01F));
-				setZIndex(-1);
-			}
-			
-			@Override
-			public void onDraw() 
-			{
-				super.onDraw();
-			}
-			
-			@Override
-			public boolean isPersistant()
-			{
-				return boss.isOnStage();
-			}
-		});
-	}
+	public Setter<BackgroundBossAura> backgroundSetter;
 	
 	@Override
 	public void onUpdate(long tick)
@@ -271,7 +231,7 @@ public class Sekibanki extends AllStarBoss
 	}
 
 	@Override
-	public void executeFight(AllStarStageScheme scheme)
+	public void executeFight(final AllStarStageScheme scheme)
 	{
 		final J2hGame g = Game.getGame();
 		final Sekibanki boss = this;
@@ -353,6 +313,8 @@ public class Sekibanki extends AllStarBoss
 				
 				final SekibankiSpell card = new SekibankiSpell(boss);
 				
+				backgroundSetter.set(scheme.getBossAura());
+				
 				Game.getGame().startSpellCard(card);
 				
 				BossUtil.spellcardCircle(boss, card);
@@ -395,7 +357,7 @@ public class Sekibanki extends AllStarBoss
 	{
 		public static Polygon hitbox = null;
 		
-		public static SekibankiHead newInstance(float x, float y)
+		public static SekibankiHead newInstance(final Sekibanki lifeline, float x, float y)
 		{
 			int chunkHeight = 64;
 			int chunkWidth = 64;
@@ -413,7 +375,17 @@ public class Sekibanki extends AllStarBoss
 			Animation special = AnimationUtil.copyAnimation(idle, 20f);
 			special.setPlayMode(PlayMode.NORMAL);
 
-			final SekibankiHead boss = new SekibankiHead(1f, null, idle, right, left, special, x, y);
+			final SekibankiHead boss = new SekibankiHead(1f, null, idle, right, left, special, x, y)
+			{
+				@Override
+				public void setHealth(float health)
+				{
+					double healthDiff = health - getHealth();
+					
+					lifeline.increaseHealth((float) healthDiff * lifeline.getDamageModifier());
+				}
+			
+			};
 			
 			if(hitbox == null)
 			{
@@ -484,6 +456,8 @@ public class Sekibanki extends AllStarBoss
 		public SekibankiNonSpell(StageObject owner)
 		{
 			super(owner);
+			
+			setSpellcardTime(Duration.ticks(3000));
 		}
 		
 		ArrayList<SekibankiBulletWorm> worms = new ArrayList<SekibankiBulletWorm>();
@@ -501,8 +475,10 @@ public class Sekibanki extends AllStarBoss
 			if(tick == 0)
 				boss.setDamageModifier(0.7f);
 			
-			if(tick % 200 == 160)
-				BossUtil.moveAroundRandomly((Boss)getOwner(), (int) (getGame().getMaxX() / 2) - 200, (int)(getGame().getMaxX() / 2) + 200, Game.getGame().getHeight()/2 - 100, Game.getGame().getHeight()/2 + 100, 800);
+			if(tick % 160 == 100)
+			{
+				boss.getPathing().setCurrentPath(new SimpleTouhouBossPath(boss));
+			}
 			
 			
 			if(tick % 100 == 0)
@@ -513,7 +489,7 @@ public class Sekibanki extends AllStarBoss
 				
 				for(int i = 0; i < 360; i += 30)
 				{
-					SekibankiBulletWorm worm = new SekibankiBulletWorm(i, (float)(x + Math.sin(Math.toRadians(i)) * 50), (float) (y + Math.cos(Math.toRadians(i)) * 50));
+					SekibankiBulletWorm worm = new SekibankiBulletWorm(i, Math.min(1, 0.5f + (2.5f * tick / 3000f)), (float)(x + Math.sin(Math.toRadians(i)) * 50), (float) (y + Math.cos(Math.toRadians(i)) * 50));
 					
 					int offset = i / 5;
 				
@@ -553,19 +529,22 @@ public class Sekibanki extends AllStarBoss
 		public long spawnTick;
 		public long endTick;
 		
-		public SekibankiBulletWorm(float startRotation, float x, float y)
+		private float mul;
+		
+		public SekibankiBulletWorm(float startRotation, float mul, float x, float y)
 		{
 			this.startRotation = startRotation;
+			this.mul = mul;
 			this.x = x;
 			this.y = y;
 		}
 		
 		public void update()
 		{
-			startRotation += (Math.random() > 0.5f ? -1 : 1) * 10f;
+			startRotation += (Math.random() > 0.5f ? -1 : 1) * 5f;
 			
-			float min = 1f;
-			float max = 30f;
+			float min = 5f;
+			float max = 5f + (25 * mul);
 			
 			float multiplier = (float)Game.getGame().getTick() / 105 % 2;
 			
@@ -595,6 +574,7 @@ public class Sekibanki extends AllStarBoss
 			bullet.setZIndex(bullet.getZIndex() + this.id);
 			this.id++;
 			bullet.setRotationDeg((float) (Math.atan2(velY, velX) * (180 / Math.PI) - 90f));
+			bullet.setScale(multiplier / 5f, 1f);
 			
 			Game.getGame().spawn(bullet);
 		}
@@ -633,7 +613,8 @@ public class Sekibanki extends AllStarBoss
 		{
 			super(owner);
 			
-			((Sekibanki)owner).setDamageModifier(0.7f);
+			((Sekibanki)owner).setDamageModifier(0.4f);
+			setSpellcardTime(Duration.seconds(44));
 		}
 		
 		ArrayList<SekibankiHead> heads = new ArrayList<Sekibanki.SekibankiHead>();
@@ -660,7 +641,7 @@ public class Sekibanki extends AllStarBoss
 				
 				for(int i = 0; i < 360; i += 90)
 				{
-					SekibankiHead head = SekibankiHead.newInstance(boss.getX(), boss.getY() + 48);
+					SekibankiHead head = SekibankiHead.newInstance(boss, boss.getX(), boss.getY() + 48);
 					head.setZIndex(boss.getZIndex() + 1);
 					boss.addChild(head);
 					game.spawn(head);
@@ -670,7 +651,7 @@ public class Sekibanki extends AllStarBoss
 			
 			int i = 0;
 			
-			boolean atBoss = tick % 1400 > 50 && tick % 1400 < 900;
+			final boolean atBoss = tick % 1400 > 50 && tick % 1400 < 900;
 			boolean idle = tick % 1400 > 900 && tick % 1400 < 1000 || atBoss && tick % 800 > 300 && tick % 800 < 500 || tick % 1400 <= 50;
 			
 			if(tick % 1400 == 950)
@@ -689,7 +670,7 @@ public class Sekibanki extends AllStarBoss
 				head.setX(boss.getX() + x);
 				head.setY(boss.getY() + y);
 
-				if(tick % 20 <= 18 && !idle)
+				if(tick % 10 <= 8 && !idle)
 				{
 					float[] modifiers = null;
 					
@@ -701,20 +682,40 @@ public class Sekibanki extends AllStarBoss
 
 					float offset = 0.5f;
 					
-					for(float modifier : modifiers)
+					for(final float modifier : modifiers)
 					{
+						final float speed = atBoss ? tick % 800 > 400 ? 10f : 4f : 10f;
+						
 						Bullet bullet = new Bullet(new ThBullet(ThBulletType.ARROW, ThBulletColor.RED), head.getX(), head.getY())
 						{
+							private float direction = 0;
+							private Vector2 offset = new Vector2();
+							
 							@Override
-							public void onUpdate(long tick)
+							public void onUpdateDelta(float delta)
 							{
-								super.onUpdate(tick);
+								super.onUpdateDelta(delta);
+								
+								if(direction == 0)
+									direction = getVelocityRotationDeg();
+								
+								float newModifier = modifier;
+								
+								if(!atBoss)
+									newModifier = 0.0001f;
+								
+								setDirectionDegTick((float) (direction + Math.sin((((game.getElapsedTime() % 10f) - 5) / 5f) * Math.PI * 2) * newModifier * 20f), speed);
 							}
 							
 							@Override
 							public int getDeleteDistance()
 							{
-								return 1000;
+								if(getTicksAlive() < 100)
+								{
+									return 1000;
+								}
+								
+								return 100;
 							}
 						};
 
@@ -742,7 +743,7 @@ public class Sekibanki extends AllStarBoss
 						bullet.getCurrentSprite().setHitboxOffsetX((float) (Math.cos(dirRads) * -8));
 						bullet.getCurrentSprite().setHitboxOffsetY((float) (Math.sin(dirRads) * -8));
 
-						bullet.setDirectionRadsTick(dirRads, atBoss ? tick % 800 > 400 ? 10f : 4f : 10f);
+						bullet.setDirectionRadsTick(dirRads, speed);
 						bullet.setRotationFromVelocity(270f);
 						Game.getGame().spawn(bullet);
 					}

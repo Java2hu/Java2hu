@@ -3,7 +3,9 @@ package java2hu.touhou.bullet;
 import java.io.File;
 import java.util.HashMap;
 import java2hu.HitboxSprite;
+import java2hu.IPosition;
 import java2hu.Loader;
+import java2hu.object.bullet.Bullet;
 import java2hu.object.bullet.IBulletType;
 import java2hu.util.AnimationUtil;
 import java2hu.util.HitboxUtil;
@@ -30,6 +32,16 @@ public class ThBullet implements IBulletType
 	{
 		this.type = type;
 		this.color = color;
+	}
+	
+	public static ThBullet make(ThBulletType type, ThBulletColor color)
+	{
+		return new ThBullet(type, color);
+	}
+	
+	public static Bullet makeBullet(ThBulletType type, ThBulletColor color, IPosition pos)
+	{
+		return new Bullet(new ThBullet(type, color), pos.getX(), pos.getY());
 	}
 	
 	public ThBulletType getType()

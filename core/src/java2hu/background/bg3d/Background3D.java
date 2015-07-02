@@ -10,13 +10,20 @@ import java2hu.util.ImageUtil;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g3d.Environment;
+import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
+import com.badlogic.gdx.graphics.g3d.model.MeshPart;
+import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
+import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder.VertexInfo;
+import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.utils.Disposable;
 
 public abstract class Background3D extends DrawObject
 {
@@ -118,7 +125,13 @@ public abstract class Background3D extends DrawObject
 	
 	public void setFog(ModelObject fog)
 	{
+		if(this.fog instanceof Disposable)
+			removeDisposable((Disposable)fog);
+		
 		this.fog = fog;
+		
+		if(fog instanceof Disposable)
+			addDisposable((Disposable)fog);
 	}
 	
 	public boolean doDrawFog()
@@ -245,32 +258,96 @@ public abstract class Background3D extends DrawObject
 	}
 	
 	/**
+	 * Makes a plate mesh with the specific material, name and an UV from 0 to UVMul.
+	 * The size for this plate is 10x10 (default)
+	 */
+	public MeshPart makePlateMesh(ModelBuilder b, Material mat, String name, float UVMul)
+	{
+		return makePlateMesh(b, mat, name, 10, UVMul);
+	}
+	
+	/**
+	 * Makes a plate mesh with the specific material, name and an UV from 0 to UVMul
+	 * The size for this plate is the one you specify in both length and width.
+	 */
+	public MeshPart makePlateMesh(ModelBuilder b, Material mat, String name, float size, float UVMul)
+	{
+		return makePlateMesh(b, mat, name, size, size, UVMul, UVMul);
+	}
+	
+	/**
+	 * Makes a plate mesh with the specific material, name and an UV from 0 to UVMul
+	 * The size for this plate is the one you specify in both length and width.
+	 */
+	public MeshPart makePlateMesh(ModelBuilder b, Material mat, String name, float sizeX, float sizeZ, float UMul, float VMul)
+	{
+		MeshPartBuilder mpb = b.part(name, GL20.GL_TRIANGLES, Usage.Position | Usage.TextureCoordinates, mat);
+
+		VertexInfo v1 = new VertexInfo().setPos(-sizeX, 0, -sizeZ).setNor(1, 0, 1).setUV(0, 0);
+		VertexInfo v2 = new VertexInfo().setPos(-sizeX, 0, sizeZ).setNor(1, 0, 1).setUV(0, 1 * VMul);
+		VertexInfo v3 = new VertexInfo().setPos(sizeX, 0, sizeZ).setNor(1, 0, 1).setUV(1 * UMul, 1 * VMul);
+		VertexInfo v4 = new VertexInfo().setPos(sizeX, 0, -sizeZ).setNor(1, 0, 1).setUV(1 * UMul, 0);
+
+		mpb.rect(v1, v4, v3, v2);
+
+		return mpb.getMeshPart();
+	}
+	
+	/**
 	 * Translate a ModelInstance at a certain velocity, looping the object per UV
 	 * The object gets moved back once it's looped over an entire UV, making it look like it's moving forward forever.
 	 */
 	public void translateLooped(ModelInstance instance, float x, float z, float size, float uv)
 	{
+		translateLooped(instance, x, z, size, size, uv, uv);
+	}
+	
+	/**
+	 * Translate a ModelInstance at a certain velocity, looping the object per UV
+	 * The object gets moved back once it's looped over an entire UV, making it look like it's moving forward forever.
+	 * @param offset offset from 0, 0, 0 
+	 */
+	public void translateLooped(ModelInstance instance, Vector3 offset, float x, float z, float size, float uv)
+	{
+		translateLooped(instance, offset, x, z, size, size, uv, uv);
+	}
+	
+	/**
+	 * Translate a ModelInstance at a certain velocity, looping the object per UV
+	 * The object gets moved back once it's looped over an entire UV, making it look like it's moving forward forever.
+	 */
+	public void translateLooped(ModelInstance instance, float x, float z, float sizeX, float sizeZ, float u, float v)
+	{
+		translateLooped(instance, null, x, z, sizeX, sizeZ, u, v);
+	}
+	
+	/**
+	 * Translate a ModelInstance at a certain velocity, looping the object per UV
+	 * The object gets moved back once it's looped over an entire UV, making it look like it's moving forward forever.
+	 * @param offset offset from 0, 0, 0 
+	 */
+	public void translateLooped(ModelInstance instance, Vector3 offset, float x, float z, float sizeX, float sizeZ, float u, float v)
+	{
+		if(offset == null)
+			offset = new Vector3();
+		
 		instance.transform.translate(x, 0, z);
 		
 		Vector3 trans = instance.transform.getTranslation(new Vector3());
 		
-		if(trans.x < -(size / uv))
-		{
-			instance.transform.setToTranslation((size / uv), trans.y, trans.z);
-		}
-		else if(trans.x > (size / uv))
-		{
-			instance.transform.setToTranslation(-(size / uv), trans.y, trans.z);
-		}
+		u /= 2f;
+		v /= 2f;
 		
-		if(trans.z < -(size / uv))
-		{
-			instance.transform.setToTranslation(trans.x, trans.y, (size / uv));
-		}
-		else if(trans.z > (size / uv))
-		{
-			instance.transform.setToTranslation(trans.x, trans.y, -(size / uv));
-		}
+		float uSize = sizeX / u;
+		
+		if((trans.x - offset.x) < -uSize || (trans.x - offset.x) > uSize)
+			instance.transform.translate((((trans.x - offset.x) < -uSize ? 1 : -1) * uSize), 0, 0);
+		
+		float vSize = sizeX / u;
+		trans = instance.transform.getTranslation(new Vector3());
+		
+		if((trans.z - offset.z) < -vSize || (trans.z - offset.z) > vSize)
+			instance.transform.translate(0, 0, ((trans.z - offset.z) < -vSize ? 1 : -1) * vSize);
 	}
 	
 	public abstract void drawBackground(ModelBatch modelBatch, Environment environment, boolean drawFog);

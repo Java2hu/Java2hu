@@ -15,10 +15,8 @@ import java2hu.util.MathUtil;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Camera;
-import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureWrap;
-import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.graphics.g3d.Environment;
 import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.graphics.g3d.Model;
@@ -31,8 +29,6 @@ import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute;
 import com.badlogic.gdx.graphics.g3d.model.MeshPart;
 import com.badlogic.gdx.graphics.g3d.model.Node;
 import com.badlogic.gdx.graphics.g3d.shaders.DefaultShader;
-import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
-import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder.VertexInfo;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.graphics.g3d.utils.RenderableSorter;
 import com.badlogic.gdx.math.Vector3;
@@ -240,25 +236,6 @@ public class CloudsBG extends Background3D
 		
 		clouds.add(cloud);
 		instances.add(cloud.instance);
-	}
-	
-	public MeshPart makePlateMesh(ModelBuilder b, Material mat, String name, float UVMul)
-	{
-		return makePlateMesh(b, mat, name, 10, UVMul);
-	}
-	
-	public MeshPart makePlateMesh(ModelBuilder b, Material mat, String name, float size, float UVMul)
-	{
-		MeshPartBuilder mpb = b.part(name, GL20.GL_TRIANGLES, Usage.Position | Usage.TextureCoordinates, mat);
-
-		VertexInfo v1 = new VertexInfo().setPos(-size, 0, -size).setNor(1, 0, 1).setUV(0, 0);
-		VertexInfo v2 = new VertexInfo().setPos(-size, 0, size).setNor(1, 0, 1).setUV(0, 1 * UVMul);
-		VertexInfo v3 = new VertexInfo().setPos(size, 0, size).setNor(1, 0, 1).setUV(1 * UVMul, 1 * UVMul);
-		VertexInfo v4 = new VertexInfo().setPos(size, 0, -size).setNor(1, 0, 1).setUV(1 * UVMul, 0);
-
-		mpb.rect(v1, v4, v3, v2);
-
-		return mpb.getMeshPart();
 	}
 	
 	@Override

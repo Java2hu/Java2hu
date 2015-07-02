@@ -14,6 +14,18 @@ public abstract class Plugin<T extends StageObject> extends J2hObject
 	{
 		return false;
 	}
+	
+	private boolean delete = false;
+	
+	public void delete()
+	{
+		delete = true;
+	}
+	
+	public boolean doDelete()
+	{
+		return delete;
+	}
 
 	public void onDelete()
 	{

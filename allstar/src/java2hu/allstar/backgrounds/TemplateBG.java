@@ -2,6 +2,7 @@ package java2hu.allstar.backgrounds;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+
 import java2hu.Game;
 import java2hu.J2hGame;
 import java2hu.Loader;
@@ -30,7 +31,12 @@ import com.badlogic.gdx.graphics.g3d.utils.RenderableSorter;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 
-public class DreamWorldBG extends Background3D
+/**
+ * Template background
+ * 
+ * set userData of Renderables to z-index.
+ */
+public class TemplateBG extends Background3D
 {
 	public ModelBatch batch = new ModelBatch(new RenderableSorter()
 	{
@@ -64,13 +70,10 @@ public class DreamWorldBG extends Background3D
 	
 	public ArrayList<ModelInstance> instances = new ArrayList<ModelInstance>();
 	
-	public ModelInstance grid1;
-	public ModelInstance grid2;
-	public ModelInstance grid3;
+	public ModelInstance plane1;
+	public ModelInstance plane2;
 	
-	public ModelInstance stars;
-	
-	public DreamWorldBG()
+	public TemplateBG()
 	{
 		setModelBatch(batch);
 
@@ -87,18 +90,15 @@ public class DreamWorldBG extends Background3D
         
 		J2hGame game = Game.getGame();
 		
-		FileHandle dir = Gdx.files.internal("scenes/dream world/");
+		FileHandle dir = Gdx.files.internal("scenes/");
 		
-		Texture grid1 = Loader.texture(dir.child("grid1.png"));
-		grid1.setWrap(TextureWrap.Repeat, TextureWrap.Repeat);
+		Texture plane1Text = Loader.texture(dir.child("grid1.png"));
+		plane1Text.setWrap(TextureWrap.Repeat, TextureWrap.Repeat);
 		
-		Texture grid2 = Loader.texture(dir.child("grid2.png"));
-		grid2.setWrap(TextureWrap.Repeat, TextureWrap.Repeat);
+		Texture plane2Text = Loader.texture(dir.child("grid2.png"));
+		plane2Text.setWrap(TextureWrap.Repeat, TextureWrap.Repeat);
 		
-		Texture stars = Loader.texture(dir.child("stars.png"));
-		stars.setWrap(TextureWrap.Repeat, TextureWrap.Repeat);
-		
-		// Stars
+		// Sample Plane (plane1)
 		{
 			ModelBuilder b = new ModelBuilder();
 			b.begin();
@@ -106,25 +106,21 @@ public class DreamWorldBG extends Background3D
 			Material mat = new Material();
 			mat.set(ColorAttribute.createDiffuse(1, 1f, 1f, 0.99f));
 			mat.set(new BlendingAttribute(true, 0.3f));
-			mat.set(TextureAttribute.createDiffuse(stars));
-
-			String name = "stars";
+			mat.set(TextureAttribute.createDiffuse(plane1Text));
 
 			Node node = b.node();
 
-			node.id = name;
-			mat.id = name;
 			b.part(makePlateMesh(b, mat, name, 15), mat);
 			
 			Model model = b.end();
 			
-			this.stars = new ModelInstance(model);
-			this.stars.userData = 0d;
+			plane1 = new ModelInstance(model);
+			plane1.userData = 0d; // Lowest z-index.
 
-			instances.add(this.stars);
+			instances.add(plane1);
 		}
 		
-		// Grid 1 and 3
+		// Sample Plane (plane2) above plane1
 		{
 			ModelBuilder b = new ModelBuilder();
 			b.begin();
@@ -132,56 +128,18 @@ public class DreamWorldBG extends Background3D
 			Material mat = new Material();
 			mat.set(ColorAttribute.createDiffuse(1, 1f, 1f, 0.99f));
 			mat.set(new BlendingAttribute(true, 0.3f));
-			mat.set(TextureAttribute.createDiffuse(grid1));
-
-			String name = "grid1";
+			mat.set(TextureAttribute.createDiffuse(plane2Text));
 
 			Node node = b.node();
 
-			node.id = name;
-			mat.id = name;
 			b.part(makePlateMesh(b, mat, name, 15), mat);
 			
 			Model model = b.end();
 			
-			this.grid1 = new ModelInstance(model);
-			this.grid1.userData = 1d;
-			this.grid1.transform.setToTranslation(0, 1f, 0f);
-			
-			instances.add(this.grid1);
-			
-			this.grid3 = new ModelInstance(model);
-			this.grid3.userData = 3d;
-			this.grid3.transform.setToTranslation(0, 2f, 0f);
+			plane2 = new ModelInstance(model);
+			plane2.userData = 1d; // Higher z-index than plane1.
 
-			instances.add(this.grid3);
-		}
-		
-		// Grid 2
-		{
-			ModelBuilder b = new ModelBuilder();
-			b.begin();
-
-			Material mat = new Material();
-			mat.set(ColorAttribute.createDiffuse(1, 1f, 1f, 0.99f));
-			mat.set(new BlendingAttribute(true, 0.3f));
-			mat.set(TextureAttribute.createDiffuse(grid2));
-
-			String name = "grid2";
-
-			Node node = b.node();
-
-			node.id = name;
-			mat.id = name;
-			b.part(makePlateMesh(b, mat, name, 15), mat);
-			
-			Model model = b.end();
-			
-			this.grid2 = new ModelInstance(model);
-			this.grid2.userData = 2d;
-			this.grid2.transform.setToTranslation(0, 1.5f, 0f);
-
-			instances.add(this.grid2);
+			instances.add(plane2);
 		}
 		
 		setCameraPather(new UpdateObject()
@@ -210,14 +168,10 @@ public class DreamWorldBG extends Background3D
 	}
 	
 	@Override
-	public void onUpdate(long tick)
+	public void onUpdateDelta(float delta)
 	{
-		super.onUpdate(tick);
-		
-		translateLooped(grid1, -0.005f, -0.005f, 10f, 15f);
-		translateLooped(grid2, -0.0025f, -0.005f, 10f, 15f);
-		translateLooped(grid3, -0.00125f, -0.005f, 10f, 15f);
-		translateLooped(stars, 0f, -0.01f, 10f, 15f);
+		translateLooped(plane1, -0.0080f * delta, -0.0080f * delta, 10f, 15f);
+		translateLooped(plane2, -0.0040f * delta, -0.0080f * delta, 10f, 15f);
 	}
 
 	@Override

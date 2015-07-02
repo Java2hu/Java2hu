@@ -12,6 +12,7 @@ import java2hu.object.UpdateObject;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Camera;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureWrap;
 import com.badlogic.gdx.graphics.g3d.Environment;
@@ -30,7 +31,7 @@ import com.badlogic.gdx.graphics.g3d.utils.RenderableSorter;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 
-public class DreamWorldBG extends Background3D
+public class MoonBG extends Background3D
 {
 	public ModelBatch batch = new ModelBatch(new RenderableSorter()
 	{
@@ -64,13 +65,14 @@ public class DreamWorldBG extends Background3D
 	
 	public ArrayList<ModelInstance> instances = new ArrayList<ModelInstance>();
 	
-	public ModelInstance grid1;
-	public ModelInstance grid2;
-	public ModelInstance grid3;
+	public ModelInstance moon;
+	public ModelInstance rabbit;
+	
+	public Material rabbitMat;
 	
 	public ModelInstance stars;
 	
-	public DreamWorldBG()
+	public MoonBG()
 	{
 		setModelBatch(batch);
 
@@ -87,13 +89,13 @@ public class DreamWorldBG extends Background3D
         
 		J2hGame game = Game.getGame();
 		
-		FileHandle dir = Gdx.files.internal("scenes/dream world/");
+		FileHandle dir = Gdx.files.internal("scenes/moon/");
 		
-		Texture grid1 = Loader.texture(dir.child("grid1.png"));
-		grid1.setWrap(TextureWrap.Repeat, TextureWrap.Repeat);
+		Texture moon = Loader.texture(dir.child("moon.png"));
+		moon.setWrap(TextureWrap.Repeat, TextureWrap.Repeat);
 		
-		Texture grid2 = Loader.texture(dir.child("grid2.png"));
-		grid2.setWrap(TextureWrap.Repeat, TextureWrap.Repeat);
+		Texture rabbit = Loader.texture(dir.child("rabbit.png"));
+		rabbit.setWrap(TextureWrap.Repeat, TextureWrap.Repeat);
 		
 		Texture stars = Loader.texture(dir.child("stars.png"));
 		stars.setWrap(TextureWrap.Repeat, TextureWrap.Repeat);
@@ -124,64 +126,60 @@ public class DreamWorldBG extends Background3D
 			instances.add(this.stars);
 		}
 		
-		// Grid 1 and 3
+		// Moon
 		{
 			ModelBuilder b = new ModelBuilder();
 			b.begin();
 
 			Material mat = new Material();
-			mat.set(ColorAttribute.createDiffuse(1, 1f, 1f, 0.99f));
-			mat.set(new BlendingAttribute(true, 0.3f));
-			mat.set(TextureAttribute.createDiffuse(grid1));
+			mat.set(ColorAttribute.createDiffuse(1, 1f, 1f, 0.8f));
+			mat.set(new BlendingAttribute(true, 0.6f));
+			mat.set(TextureAttribute.createDiffuse(moon));
 
-			String name = "grid1";
+			String name = "moon";
 
 			Node node = b.node();
 
 			node.id = name;
 			mat.id = name;
-			b.part(makePlateMesh(b, mat, name, 15), mat);
+			b.part(makePlateMesh(b, mat, name, 3, 3, 1, 1), mat);
 			
 			Model model = b.end();
 			
-			this.grid1 = new ModelInstance(model);
-			this.grid1.userData = 1d;
-			this.grid1.transform.setToTranslation(0, 1f, 0f);
+			this.moon = new ModelInstance(model);
+			this.moon.userData = 2d;
+			this.moon.transform.setToTranslation(0, 1f, 0f);
 			
-			instances.add(this.grid1);
-			
-			this.grid3 = new ModelInstance(model);
-			this.grid3.userData = 3d;
-			this.grid3.transform.setToTranslation(0, 2f, 0f);
-
-			instances.add(this.grid3);
+			instances.add(this.moon);
 		}
 		
-		// Grid 2
+		// Rabbit
 		{
 			ModelBuilder b = new ModelBuilder();
 			b.begin();
 
 			Material mat = new Material();
-			mat.set(ColorAttribute.createDiffuse(1, 1f, 1f, 0.99f));
-			mat.set(new BlendingAttribute(true, 0.3f));
-			mat.set(TextureAttribute.createDiffuse(grid2));
+			mat.set(ColorAttribute.createDiffuse(1, 1f, 1f, 0f));
+			mat.set(new BlendingAttribute(true, 0f));
+			mat.set(TextureAttribute.createDiffuse(rabbit));
+			
+			rabbitMat = mat;
 
-			String name = "grid2";
+			String name = "rabbit";
 
 			Node node = b.node();
 
 			node.id = name;
 			mat.id = name;
-			b.part(makePlateMesh(b, mat, name, 15), mat);
+			b.part(makePlateMesh(b, mat, name, 3, 3, 1, 1), mat);
 			
 			Model model = b.end();
 			
-			this.grid2 = new ModelInstance(model);
-			this.grid2.userData = 2d;
-			this.grid2.transform.setToTranslation(0, 1.5f, 0f);
+			this.rabbit = new ModelInstance(model);
+			this.rabbit.userData = 3d;
+			this.rabbit.transform.setToTranslation(0, 1.5f, 0f);
 
-			instances.add(this.grid2);
+			instances.add(this.rabbit);
 		}
 		
 		setCameraPather(new UpdateObject()
@@ -192,11 +190,11 @@ public class DreamWorldBG extends Background3D
 			@Override
 			public void onUpdate(long tick)
 			{
-				Vector3 pos = new Vector3(0, 3f, 0f);
+				Vector3 pos = new Vector3(0, 4f, -0.4f);
 				Vector3 look = new Vector3();
 				
 				yaw = 270f;
-				pitch = 190f;
+				pitch = 180f;
 				
 				look.add((float) Math.cos(Math.toRadians(yaw)), (float) Math.cos(Math.toRadians(pitch)), (float) (Math.sin(Math.toRadians(yaw))));
 
@@ -214,9 +212,28 @@ public class DreamWorldBG extends Background3D
 	{
 		super.onUpdate(tick);
 		
-		translateLooped(grid1, -0.005f, -0.005f, 10f, 15f);
-		translateLooped(grid2, -0.0025f, -0.005f, 10f, 15f);
-		translateLooped(grid3, -0.00125f, -0.005f, 10f, 15f);
+		moon.transform.setToTranslation(0, 0.1f, -4);
+		
+		final float circleTime = 800f;
+		final float mul = (tick % circleTime) / circleTime;
+		
+		moon.transform.rotate(0, 1, 0, mul * 360f);
+		
+		Material mat = rabbit.materials.first();
+		
+		float ticker = (tick % 300) / 300f;
+		
+		ticker *= 2;
+		
+		if(ticker > 1f)
+			ticker = 2f - ticker;
+		
+		mat.set(ColorAttribute.createDiffuse(1f, 1f, 1f, 1f * ticker));
+		mat.set(new BlendingAttribute(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA, 0.4f));
+		
+		rabbit.transform.setToTranslation(0.04f, 0.1001f, -4f + 0.04f);
+		rabbit.transform.rotate(0, 1, 0, mul * 360f);
+		
 		translateLooped(stars, 0f, -0.01f, 10f, 15f);
 	}
 

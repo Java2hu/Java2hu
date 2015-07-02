@@ -160,23 +160,29 @@ public class SpellVault extends AllStarMenu
 			}
 		});
 		
-		addCard("You are the boss", new SpellCardGetter()
+		addCard("You are the boss", new Getter<GameFlowScheme>()
 		{
 			@Override
-			public Spellcard get(Boss boss)
+			public GameFlowScheme get()
 			{
-				return new YouAreTheBoss(boss);
+				return new TestScheme()
+				{
+					@Override
+					public GameFlowScheme getRestartInstance()
+					{
+						return get();
+					}
+					
+					@Override
+					public void startSpellcard(Boss boss)
+					{
+						Spellcard card = new YouAreTheBoss(boss, getBossAura());
+						
+						Game.getGame().startSpellCard(card);
+					}
+				};
 			}
 		});
-		
-//		addCard("4/20 Special", new Getter<GameFlowScheme>()
-//		{
-//			@Override
-//			public GameFlowScheme get()
-//			{
-//				return new BlazeItScheme();
-//			}
-//		});
 			
 		TextBounds bound = botFont.getBounds("Exit");
 		

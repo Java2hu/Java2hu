@@ -668,12 +668,10 @@ public class Bullet extends StageObject
 				{
 					new Exception().printStackTrace();
 					
-				
-					
 					super.dispose();
 				}
 			};
-			BREAK_ANI = ImageSplitter.getAnimationFromSprite(BREAK, 64, 64, 3f, 1,2,3,4,5,6,7,8);
+			BREAK_ANI = ImageSplitter.getAnimationFromSprite(BREAK, 64, 64, 2f, 1,2,3,4,5,6,7,8);
 		}
 		
 		final Bullet bullet = this;
@@ -693,6 +691,8 @@ public class Bullet extends StageObject
 		
 		effect = effect.cpy();
 		
+		boolean flip = getZIndex() % 2 == 0;
+		
 		for(TextureRegion r : ani.getKeyFrames())
 		{
 			HitboxSprite sprite = (HitboxSprite)r;
@@ -706,7 +706,10 @@ public class Bullet extends StageObject
 			sprite.setPosition(bullet.getX() - (sprite.getWidth() / 2f), bullet.getY() - (sprite.getHeight() / 2f));
 			
 			sprite.setColor(effect);
-			sprite.setAlpha(0.3f);	
+			sprite.setAlpha(0.3f);
+			
+			if(flip)
+				sprite.setFlip(true, false);
 		}
 		
 		StageObject obj = new FreeStageObject(bullet.getX(), bullet.getY())
@@ -716,6 +719,7 @@ public class Bullet extends StageObject
 			{
 				setName("Death animation " + bullet.getName());
 				setPosition(bullet);
+				setGlowing();
 				
 				bullet.setOwnedBy(this);
 			}

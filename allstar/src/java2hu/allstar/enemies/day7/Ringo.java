@@ -1,10 +1,13 @@
 package java2hu.allstar.enemies.day7;
 
+import java.util.ArrayList;
 import java2hu.Game;
 import java2hu.J2hGame;
 import java2hu.J2hGame.ClearType;
 import java2hu.Loader;
 import java2hu.MovementAnimation;
+import java2hu.Position;
+import java2hu.RNG;
 import java2hu.StartupLoopAnimation;
 import java2hu.allstar.AllStarStageScheme;
 import java2hu.allstar.enemies.AllStarBoss;
@@ -12,14 +15,23 @@ import java2hu.allstar.util.AllStarUtil;
 import java2hu.background.Background;
 import java2hu.background.BackgroundBossAura;
 import java2hu.gameflow.GameFlowScheme.WaitConditioner;
+import java2hu.helpers.ZIndexHelper;
+import java2hu.object.bullet.Bullet;
 import java2hu.object.player.Player;
 import java2hu.object.ui.CircleHealthBar;
 import java2hu.overwrite.J2hMusic;
+import java2hu.pathing.SimpleTouhouBossPath;
+import java2hu.plugin.Plugin;
 import java2hu.spellcard.BossSpellcard;
 import java2hu.system.SaveableObject;
+import java2hu.touhou.bullet.ThBullet;
+import java2hu.touhou.bullet.ThBulletColor;
+import java2hu.touhou.bullet.ThBulletType;
+import java2hu.touhou.sounds.TouhouSounds;
 import java2hu.util.BossUtil;
 import java2hu.util.Duration;
 import java2hu.util.ImageSplitter;
+import java2hu.util.MathUtil;
 import java2hu.util.ObjectUtil;
 import java2hu.util.SchemeUtil;
 import java2hu.util.Setter;
@@ -44,7 +56,7 @@ public class Ringo extends AllStarBoss
 	/**
 	 * Spell Card Name
 	 */
-	final static String SPELLCARD_NAME = "...";
+	final static String SPELLCARD_NAME = "Rabbit Sign \"All-you-can-eat Dango\"";
 	
 	private Setter<BackgroundBossAura> backgroundSpawner;
 	
@@ -149,7 +161,7 @@ public class Ringo extends AllStarBoss
 			@Override
 			public void run()
 			{
-				BossUtil.cloudEntrance(boss, 60);
+				BossUtil.cloudEntrance(boss, AllStarUtil.from255RGB(255, 183, 0), AllStarUtil.from255RGB(255, 232, 0), 60);
 
 				g.addTaskGame(new Runnable()
 				{
@@ -193,6 +205,8 @@ public class Ringo extends AllStarBoss
 			@Override
 			public void run()
 			{
+				boss.playSpecial(false);
+				
 				game.clear(ClearType.ALL);
 				
 				backgroundSpawner.set(scheme.getBossAura());
@@ -244,14 +258,119 @@ public class Ringo extends AllStarBoss
 		public NonSpell(Ringo owner)
 		{
 			super(owner);
-			setSpellcardTime(Duration.seconds(25));
+			setSpellcardTime(Duration.seconds(22));
 		}
 
 		@Override
 		public void tick(int tick, J2hGame game, Ringo boss)
 		{
 			final Player player = game.getPlayer();
+			
+			if(tick == 100)
+			{
+				boss.playSpecial(true);
+				
+				BossUtil.chargeExplosion(boss, boss.getAuraColor());
+			}
+			
+			if(tick < 130)
+			{
+				return;
+			}
+			
+			final int COLOR_PERIOD = 400;
 
+			tick -= 130;
+			
+			if(tick % 8 == 0)
+			{
+				TouhouSounds.Enemy.BULLET_1.play(0.3f);
+			}
+			
+			if(tick % 6 == 0)
+			{
+				int amount = 30;
+
+				for(int i = 0; i < amount; i++)
+				{
+					float angle = ((float)i / (float)amount) * 360;
+					
+					double mul = RNG.multiplierMirror(1000, tick);
+					
+					angle += (Math.sin(RNG.multiplier(200, tick) * Math.PI) * (50 + (200 * mul)));
+
+					Bullet bullet = new Bullet(new ThBullet(ThBulletType.BALL_2, RNG.booleanMultiplier(COLOR_PERIOD, tick) ? ThBulletColor.BLUE : ThBulletColor.PURPLE), boss.getX(), boss.getY());
+
+					final float speed = 400f;
+					
+					bullet.setDirectionDeg(angle, speed * 2f);
+					bullet.setZIndex(bullet.getZIndex() + i);
+
+					bullet.addEffect(new Plugin<Bullet>()
+					{
+						@Override
+						public void update(Bullet object, long tick)
+						{
+							if(object.getTicksAlive() == 15)
+							{
+								object.setDirectionDeg(object.getVelocityRotationDeg(), speed);
+							}
+							
+							object.getCurrentSprite().rotate(2f);
+							
+							float mul = 1f;//Math.min(1, object.getTicksAlive() / 10f);
+							
+							object.setScale(mul);
+						}
+					});
+					
+					bullet.useSpawnAnimation(false);
+					bullet.setGlowing();
+					
+					game.spawn(bullet);
+				}
+			}
+			
+			if(tick % 10 == 0)
+			{
+				int directions = 6;
+				
+				for(int i = 0; i < directions; i++)
+				{
+					float angle = ((float)i / (float)directions) * 360;
+					
+					ArrayList<Bullet> circle = circle(boss.getX(), boss.getY(), 2, 20);
+					
+					for(Bullet bullet : circle)
+					{
+						bullet.setDirectionDeg((float) (angle + (RNG.multiplier(600, tick)) * 360f), 300f);
+						bullet.setBullet(ThBullet.make(ThBulletType.DOT_SMALL_MOON, RNG.booleanMultiplier(COLOR_PERIOD, tick) ? ThBulletColor.BLUE : ThBulletColor.PURPLE));
+						bullet.setGlowing();
+					}
+				}
+			}
+		}
+		
+		private ArrayList<Bullet> circle(float x, float y, int amount, float size)
+		{
+			ArrayList<Bullet> list = new ArrayList<Bullet>();
+			
+			float angleAdd = 360f / amount;
+			float angle = angleAdd;
+			
+			for(int i = 0; i <= amount; i++)
+			{
+				float rad = (float) Math.toRadians(angle);
+				
+				Bullet bullet = new Bullet(new ThBullet(ThBulletType.DOT_SMALL_MOON, ThBulletColor.BLUE), (float) (x + (Math.cos(rad) * size)), (float) (y + (Math.sin(rad) * size)));
+				
+				game.spawn(bullet);
+				list.add(bullet);
+				
+				angle += angleAdd;
+			}
+			
+			return list;
 		}
 	}
 
@@ -260,7 +379,7 @@ public class Ringo extends AllStarBoss
 		public Spell(Ringo owner)
 		{
 			super(owner);
-			setSpellcardTime(Duration.seconds(50));
+			setSpellcardTime(Duration.seconds(56));
 		}
 
 		@Override
@@ -268,6 +387,82 @@ public class Ringo extends AllStarBoss
 		{
 			final Player player = game.getPlayer();
 			
+			if(tick % 50 == 0)
+			{
+				for(final boolean bool : new boolean[] { true, false })
+				{
+					Bullet bullet = ThBullet.makeBullet(ThBulletType.BALL_BIG, ThBulletColor.PURPLE, boss);
+					bullet.setScale(0.2f, 4f);
+					
+					final float finalAngle = MathUtil.getAngle(bullet, player) + ((bool ? 1f : -1f) * 60f);
+					final float finalRad = (float) Math.toRadians(finalAngle);
+					
+					bullet.setDirectionDeg(finalAngle, 300f);
+					bullet.setRotationFromVelocity();
+					bullet.getSpawnAnimationSettings().setAlpha(-0.5f);
+					bullet.getSpawnAnimationSettings().setTime(60f);
+					bullet.getSpawnAnimationSettings().setAddedScale(0f);
+					bullet.setGlowing();
+					
+					bullet.addEffect(new Plugin<Bullet>()
+					{
+						private ZIndexHelper indexer = new ZIndexHelper();
+						
+						@Override
+						public void update(Bullet object, long tick)
+						{
+							if(object.getTicksAlive() < 10)
+								return;
+							
+							final float mul = - (1f * (Math.min(object.getTicksAlive() - 30, 200f) / 200f));
+							
+							if(tick % 6 == 0 && tick % (10 * 6) <= (4 * 6))
+							{
+								TouhouSounds.Enemy.RELEASE_1.play(0.1f);
+								
+								final Bullet bullet = ThBullet.makeBullet(ThBulletType.BALL_BIG, ThBulletColor.WHITE, new Position(object.getX(), object.getY()));
+								
+								bullet.addEffect(new Plugin<Bullet>()
+								{
+									@Override
+									public void update(Bullet object, long tick)
+									{
+										float speed = 300f + -200f * (mul);
+										
+										if(object.getTicksAlive() < 20)
+										{
+											speed = 0f;
+										}
+
+										bullet.setDirectionDeg(finalAngle + ((bool ? 0.12f : -0.12f) * (object.getTicksAlive())) + (((bool ? -90f : 90f))), speed);
+									}
+								});
+								
+								indexer.index(bullet);
+								
+								game.spawn(bullet);
+							}
+						}
+					});
+					
+					game.spawn(bullet);
+				}
+			}
+			
+			if(tick % 20 == 0)
+			{
+				Bullet bullet = ThBullet.makeBullet(ThBulletType.BALL_BIG, ThBulletColor.BLUE, boss);
+				
+				bullet.setDirectionDeg(MathUtil.getAngle(bullet, player), 400f);
+				bullet.setGlowing();
+				
+				game.spawn(bullet);
+			}
+			
+			if(tick % 200 == 0)
+			{
+				boss.getPathing().setCurrentPath(new SimpleTouhouBossPath(boss));
+			}
 		}
 	}
 }

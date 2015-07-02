@@ -3,7 +3,7 @@ package java2hu.allstar.menu;
 import java2hu.Game;
 import java2hu.J2hGame;
 import java2hu.allstar.AllStarGame;
-import java2hu.allstar.backgrounds.DreamWorldBG;
+import java2hu.allstar.backgrounds.MoonBG;
 import java2hu.allstar.dialogue.MarisaDP;
 import java2hu.allstar.dialogue.MarisaDP.MarisaDPFace;
 import java2hu.allstar.players.Marisa;
@@ -82,7 +82,7 @@ public class DeveloperMenu extends AllStarMenu
 					@Override
 					public void run()
 					{
-						Game.getGame().spawn(new DreamWorldBG());
+						Game.getGame().spawn(new MoonBG());
 					}
 				};
 				

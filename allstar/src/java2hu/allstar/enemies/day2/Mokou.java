@@ -12,6 +12,7 @@ import java2hu.allstar.util.AllStarUtil;
 import java2hu.background.Background;
 import java2hu.background.BackgroundBossAura;
 import java2hu.gameflow.GameFlowScheme.WaitConditioner;
+import java2hu.helpers.ZIndexHelper;
 import java2hu.object.DrawObject;
 import java2hu.object.StageObject;
 import java2hu.object.bullet.Bullet;
@@ -20,6 +21,7 @@ import java2hu.object.enemy.greater.Boss;
 import java2hu.object.ui.CircleHealthBar;
 import java2hu.overwrite.J2hMusic;
 import java2hu.pathing.SimpleTouhouBossPath;
+import java2hu.plugin.Plugin;
 import java2hu.spellcard.Spellcard;
 import java2hu.system.SaveableObject;
 import java2hu.touhou.bullet.ThBullet;
@@ -95,9 +97,14 @@ public class Mokou extends AllStarBoss
 				
 				game.spawn(back);
 				
-				float size = (float) Math.sqrt((game.getWidth() * game.getWidth()) + (game.getHeight() * game.getHeight()));
+				final float width = game.getWidth() / 2f;
+				final float height = game.getHeight() / 2f;
+				
+				float size = (float) Math.sqrt((width * width) + (height * height));
 				
 				final Sprite moonSprite = new Sprite(bge);
+				
+				size *= 2f;
 
 				moonSprite.setPosition(game.getCenterX() - (size / 2f), game.getCenterY() - (size / 2f));
 				moonSprite.setSize(size, size);
@@ -224,7 +231,7 @@ public class Mokou extends AllStarBoss
 			@Override
 			public void run()
 			{
-				BossUtil.cloudEntrance(boss, 60);
+				BossUtil.cloudEntrance(boss, boss.getAuraColor(), boss.getBgAuraColor(), 60);
 
 				g.addTaskGame(new Runnable()
 				{
@@ -350,6 +357,8 @@ public class Mokou extends AllStarBoss
 			super(owner);
 			setSpellcardTime(Duration.seconds(20));
 		}
+		
+		private ZIndexHelper indexer = new ZIndexHelper();
 
 		float redRotation = 0F;
 		float blueRotation = 40F;
@@ -399,6 +408,7 @@ public class Mokou extends AllStarBoss
 				
 				red.setDirectionRadsTick((float) rotation, speed);
 				red.setRotationFromVelocity(90F);
+				indexer.index(red);
 
 				Game.getGame().spawn(red);
 			}
@@ -414,6 +424,7 @@ public class Mokou extends AllStarBoss
 				
 				blue.setDirectionRadsTick((float) rotation, speed + 1F);
 				blue.setRotationFromVelocity(90F);
+				indexer.index(blue);
 
 				Game.getGame().spawn(blue);
 			}
@@ -429,6 +440,7 @@ public class Mokou extends AllStarBoss
 				
 				purple.setDirectionRadsTick((float) rotation, speed - 1F);
 				purple.setRotationFromVelocity(90F);
+				indexer.index(purple);
 
 				Game.getGame().spawn(purple);
 			}
@@ -457,6 +469,7 @@ public class Mokou extends AllStarBoss
 			
 			chaserBulletAnimation = new Animation(1, sprite);
 			sprite.setHitbox(HitboxUtil.loadHitbox(Gdx.files.internal("enemy/mokou/hitbox.vertices")));
+			sprite.setHitboxScaleOffsetModifier(0.75F);
 			sprite.setScale(4F);
 		}
 		
@@ -573,8 +586,10 @@ public class Mokou extends AllStarBoss
 							float x = (getX() - getGame().getPlayer().getX()) / distance * 1.8F;
 							float y = (getY() - getGame().getPlayer().getY()) / distance * 1.8F;
 							
-							x *= 2f;
-							y *= 2f;
+							float speed = 1.8f;
+							
+							x *= speed;
+							y *= speed;
 							
 							if(Game.getGame().getPlayer().getY() > Game.getGame().getMaxY() * 0.4f && getY() > Game.getGame().getMaxY() * 0.4f)
 							{
@@ -622,14 +637,43 @@ public class Mokou extends AllStarBoss
 				
 			}
 		}
+		
+		private ZIndexHelper indexer = new ZIndexHelper();
 
 		public void halfRain(float x, float y, int tick, boolean right)
 		{
+			float waveTime = 30; // How wide the pendulem is
+			float divident = 80 - (y > 0 ? 20 : 0); // How much rotations it makes
+			float max = waveTime / divident;
+			
+			final boolean finalRight = right;
+			
+			if(tick % (waveTime * 4) >= waveTime * 2)
+				right = !right;
+			
 			GravityBullet bullet = new GravityBullet(AnimationUtil.copyAnimation(oneUpAnimation), getOwner().getX() + x, getOwner().getY() + y - 50, 0.002F, 4F)
 			{
-				float scale = 0.2F;
+				float scale = 4F;
 				Animation originalAnimation;
-				boolean randomized = false;
+
+				{
+					getCurrentSprite().setRotation(finalRight ? 270 : -270);
+					
+					addEffect(new Plugin<GravityBullet>()
+					{
+						@Override
+						public void update(GravityBullet object, long tick)
+						{
+							object.getCurrentSprite().rotate(finalRight ? -2f : 2f);
+							
+							if(finalRight ? object.getCurrentSprite().getRotation() <= 0 : object.getCurrentSprite().getRotation() >= 0)
+							{
+								object.getCurrentSprite().setRotation(0);
+								delete();
+							}
+						}
+					});
+				}
 				
 				@Override
 				public void onUpdate(long tick)
@@ -642,16 +686,12 @@ public class Mokou extends AllStarBoss
 					for(TextureRegion r : getAnimation().getKeyFrames())
 						((HitboxSprite)r).setScale(scale);
 					
-					if(scale < 4)
-						scale += 0.05F;
-					
 					if(Game.getGame().getPlayer().getY() > Game.getGame().getMaxY() * 0.4f)
 					{
-
 						float distance = MathUtil.getDistance(getX(), getY(), getGame().getPlayer().getX(), getGame().getPlayer().getY());
 
 						float x = (getX() - getGame().getPlayer().getX()) / distance * 1.8F;
-						float y = (getY() - getGame().getPlayer().getY()) / distance * 1.8F;
+						float y = (getY() - getGame().getPlayer().getY()) / distance * 3F;
 						
 						x *= 2f;
 						y *= 2f;
@@ -663,15 +703,6 @@ public class Mokou extends AllStarBoss
 					{
 						if(getVelocityXTick() == 0)
 							setVelocityXTick((float) (Math.random() * 1F - 0.5F));
-
-						if(getVelocityYTick() < getTerminalVelocity() && !randomized)
-						{
-							float randomizationX = 2F;
-							float randomizationY = 0F;
-							setVelocityYTick((float) (getVelocityYTick() + (Math.random() > 0.5 ? -(randomizationX * Math.random()) : randomizationX * Math.random())));
-							setVelocityXTick((float) (getVelocityXTick() + (Math.random() > 0.5 ? -(randomizationY * Math.random()) : randomizationY * Math.random())));
-							randomized = true;
-						}
 					}
 				}
 				
@@ -687,14 +718,9 @@ public class Mokou extends AllStarBoss
 			bullet.setVelocityYTick(-6F);
 			bullet.useSpawnAnimation(false);
 			bullet.setDeletionColor(Color.PURPLE);
+			indexer.index(bullet);
 			
-//			System.out.println(tick % 2000);
-//			System.out.println(tick % 4000);
-			
-			float waveTime = 30; // How wide the pendulem is
-			float divident = 80 - (y > 0 ? 20 : 0); // How much rotations it makes
-			float max = waveTime / divident;
-//			
+
 			if(tick % (waveTime * 2) == waveTime)
 				bullet.setVelocityXTick(max);
 			else if(tick % (waveTime * 2) <= waveTime)
@@ -704,17 +730,9 @@ public class Mokou extends AllStarBoss
 			
 			bullet.setVelocityXTick(bullet.getVelocityXTick() * 20F);
 			
-//			if(bullet.getVelocityXTick() < 0.001F)
-//				bullet.setVelocityXTick(-0.01F);
-			
-			if(tick % (waveTime * 4) >= waveTime * 2)
-				right = !right;
-			
 			if(right)
 				bullet.setVelocityXTick(-bullet.getVelocityXTick());
 			
-//			System.out.println(bullet.getVelocityXTick());
-
 			getGame().spawn(bullet);
 		}
 	}

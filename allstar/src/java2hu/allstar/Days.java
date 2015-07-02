@@ -5,12 +5,14 @@ import java.util.HashMap;
 import java2hu.Game;
 import java2hu.J2hGame;
 import java2hu.allstar.backgrounds.BambooForestBG;
+import java2hu.allstar.backgrounds.CemetryRoadBG;
 import java2hu.allstar.backgrounds.CloudsBG;
 import java2hu.allstar.backgrounds.DreamWorldBG;
 import java2hu.allstar.backgrounds.HokkaiBG;
 import java2hu.allstar.backgrounds.MagicalStormBG;
 import java2hu.allstar.backgrounds.MakaiBG;
 import java2hu.allstar.backgrounds.MistLakeBG;
+import java2hu.allstar.backgrounds.MoonBG;
 import java2hu.allstar.enemies.AllStarBoss;
 import java2hu.allstar.enemies.day1.Cirno;
 import java2hu.allstar.enemies.day1.Doremy;
@@ -557,7 +559,14 @@ public class Days extends J2hObject
 				return new CloudsBG();
 			};
 		}),
-		CEMETRY_ROAD(null),
+		CEMETRY_ROAD(new Getter<Background3D>()
+		{
+			@Override
+			public Background3D get()
+			{
+				return new CemetryRoadBG();
+			}
+		}),
 		THUNDER_CLOUDS(new Getter<Background3D>()
 		{
 			@Override
@@ -583,7 +592,14 @@ public class Days extends J2hObject
 				return new HokkaiBG();
 			};
 		}),
-		MOON(null),
+		MOON(new Getter<Background3D>()
+		{
+			@Override
+			public Background3D get()
+			{
+				return new MoonBG();
+			};
+		}),
 		FLOWER_FIELD(null),
 		HAKURAI(null),
 		EXTRA(null),

@@ -5,6 +5,7 @@ import java2hu.J2hGame;
 import java2hu.J2hGame.ClearType;
 import java2hu.Loader;
 import java2hu.MovementAnimation;
+import java2hu.RNG;
 import java2hu.allstar.AllStarStageScheme;
 import java2hu.allstar.AllStarStageScheme.SpawnBossTask;
 import java2hu.allstar.enemies.AllStarBoss;
@@ -123,6 +124,8 @@ public class Cirno extends AllStarBoss
 	{
 		final J2hGame g = Game.getGame();
 		final Cirno boss = this;
+		
+		RNG.setSeed(10);
 		
 		final SaveableObject<CircleHealthBar> bar = new SaveableObject<CircleHealthBar>();
 		
@@ -376,7 +379,7 @@ public class Cirno extends AllStarBoss
 					if(tick % 2 != 0)
 						return;
 					
-					for(double i = -(60 + Math.random() * 10); i < 60 + Math.random() * 10; i += Math.random() * 30f)
+					for(double i = -(60 + RNG.random() * 10); i < 60 + RNG.random() * 10; i += RNG.random() * 30f)
 					{
 						Bullet bullet = new Bullet(new ThBullet(ThBulletType.CRYSTAL, ThBulletColor.BLUE), boss.getX(), boss.getY());
 						
@@ -385,7 +388,7 @@ public class Cirno extends AllStarBoss
 						float speed = (float) (200f + 600f * modifier);
 						
 						bullet.setDirectionDeg((float) (MathUtil.getAngle(bullet, player) + i), speed);
-						bullet.setRotationFromVelocity(-90f + (float) ((Math.random() < 0.5f ? -1 : 1) * Math.random() * 10));
+						bullet.setRotationFromVelocity(-90f + (float) ((RNG.random() < 0.5f ? -1 : 1) * RNG.random() * 10));
 						
 						game.spawn(bullet);
 					}
@@ -566,13 +569,13 @@ public class Cirno extends AllStarBoss
 					if(tick == 0)
 					{
 						for(int i = 0; i < 5; i++)
-						for(final boolean bool : i == 0 ? new boolean[]{ true, false } : new boolean[] { Math.random() < 0.5f ? false : true })
+						for(final boolean bool : i == 0 ? new boolean[]{ true, false } : new boolean[] { RNG.random() < 0.5f ? false : true })
 						{
 							int pos = 0;
 							
 							while(pos == 0 || MathUtil.getDistance(pos, 0, game.getPlayer().getX(), 0) < 150)
 							{
-								pos = (int) (game.getWidth() * Math.random());
+								pos = (int) (game.getWidth() * RNG.random());
 							}
 
 							final int maxTime = 60;
@@ -590,13 +593,13 @@ public class Cirno extends AllStarBoss
 										public void run()
 										{
 											Bullet bullet = new Bullet(new ThBullet(ThBulletType.RICE, ThBulletColor.WHITE), x + (side ? -10 : 10), y);
-
+ 
 											bullet.setDirectionDeg(bool ? 90 : 270, 500f);
 											bullet.setGlowing();
 
 											bullet.addEffect(new Plugin<Bullet>()
 											{
-												float offset = (float) (Math.random() * 30f);
+												float offset = (float) (((RNG.random() * 2) - 1) * 30f);
 												
 												@Override
 												public void update(Bullet object, long tick)
@@ -606,7 +609,7 @@ public class Cirno extends AllStarBoss
 													if(object.getTicksAlive() > maxTime - finalTime)
 													{
 														final float degree = bool ? 90 + (side ? -1 : 1) * 30f : 270 + (side ? 1 : -1) * 30f;
-														object.setDirectionDeg(degree + offset, 100f + 300f * modifier);
+														object.setDirectionDeg(degree + offset, 100f + 250f * modifier);
 														object.setRotationFromVelocity();
 													}
 												}

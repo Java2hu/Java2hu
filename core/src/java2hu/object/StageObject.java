@@ -3,6 +3,7 @@ package java2hu.object;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map.Entry;
 import java2hu.Game;
 import java2hu.IPosition;
@@ -33,6 +34,11 @@ public abstract class StageObject extends J2hObject implements IPosition
 	public void addEffect(Plugin effect)
 	{
 		effects.add(effect);
+	}
+	
+	public boolean removeEffect(Plugin effect)
+	{
+		return effects.remove(effect);
 	}
 	
 	protected ArrayList<Disposable> disposables = new ArrayList<Disposable>();
@@ -119,7 +125,7 @@ public abstract class StageObject extends J2hObject implements IPosition
 	 */
 	public String getName()
 	{
-		return name;
+		return name != null ? name : toString();
 	}
 	
 	@Override
@@ -154,9 +160,16 @@ public abstract class StageObject extends J2hObject implements IPosition
 	
 	public void disposeAll()
 	{
-		disposeDisposables();
-		
-		disposeChildren();
+		Game.getGame().addTask(new Runnable()
+		{
+			@Override
+			public void run()
+			{
+				disposeDisposables();
+				
+				disposeChildren();
+			}
+		}, 5 * 20);
 	}
 	
 	/**
@@ -222,28 +235,37 @@ public abstract class StageObject extends J2hObject implements IPosition
 		});
 	}
 	
-	public void addDisposable(TextureRegion disp)
+	public Disposable addDisposable(TextureRegion disp)
 	{
 		if(disp == null)
-			return;
+			return null;
 		
 		addDisposable(disp.getTexture());
+		
+		return disp.getTexture();
 	}
 	
-	public void addDisposable(Animation disp)
+	public List<Disposable> addDisposable(Animation disp)
 	{
 		if(disp == null)
-			return;
+			return null;
+		
+		ArrayList<Disposable> list = new ArrayList<Disposable>();
 		
 		for(TextureRegion r : disp.getKeyFrames())
-			addDisposable(r);
+		{
+			Disposable d = addDisposable(r);
+			list.add(d);
+		}
+		
+		return list;
 	}
 	
 	/**
 	 * Unregisters a listener once this object is deleted.
 	 * @param listener
 	 */
-	public void addDisposable(final EventListener listener)
+	public Disposable addDisposable(final EventListener listener)
 	{
 		Disposable disp = new Disposable()
 		{
@@ -255,14 +277,23 @@ public abstract class StageObject extends J2hObject implements IPosition
 		};
 		
 		addDisposable(disp);
+		
+		return disp;
 	}
 	
-	public void addDisposable(Disposable disp)
+	public Disposable addDisposable(Disposable disp)
 	{
 		if(disp == null)
-			return;
+			return null;
 		
 		disposables.add(disp);
+		
+		return disp;
+	}
+	
+	public boolean removeDisposable(Disposable disp)
+	{
+		return disposables.remove(disp);
 	}
 	
 	public abstract float getWidth();
@@ -632,9 +663,18 @@ public abstract class StageObject extends J2hObject implements IPosition
 	{
 		onUpdate(tick);
 		
-		for(Plugin effect : effects)
+		Iterator<Plugin> it = effects.iterator();
+		
+		while(it.hasNext())
 		{
+			Plugin effect = it.next();
+			
 			effect.update(this, tick);
+			
+			if(effect.doDelete())
+			{
+				it.remove();
+			}
 		}
 		
 		getPathing().tick();
