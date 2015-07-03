@@ -12,7 +12,6 @@ import java2hu.object.UpdateObject;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Camera;
-import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureWrap;
 import com.badlogic.gdx.graphics.g3d.Environment;
@@ -95,7 +94,6 @@ public class MoonBG extends Background3D
 		moon.setWrap(TextureWrap.Repeat, TextureWrap.Repeat);
 		
 		Texture rabbit = Loader.texture(dir.child("rabbit.png"));
-		rabbit.setWrap(TextureWrap.Repeat, TextureWrap.Repeat);
 		
 		Texture stars = Loader.texture(dir.child("stars.png"));
 		stars.setWrap(TextureWrap.Repeat, TextureWrap.Repeat);
@@ -132,8 +130,8 @@ public class MoonBG extends Background3D
 			b.begin();
 
 			Material mat = new Material();
-			mat.set(ColorAttribute.createDiffuse(1, 1f, 1f, 0.8f));
-			mat.set(new BlendingAttribute(true, 0.6f));
+			mat.set(ColorAttribute.createDiffuse(0, 0f, 0f, 0f));
+			mat.set(new BlendingAttribute(true, 1f));
 			mat.set(TextureAttribute.createDiffuse(moon));
 
 			String name = "moon";
@@ -159,7 +157,7 @@ public class MoonBG extends Background3D
 			b.begin();
 
 			Material mat = new Material();
-			mat.set(ColorAttribute.createDiffuse(1, 1f, 1f, 0f));
+			mat.set(ColorAttribute.createDiffuse(1f, 1f, 1f, 0f));
 			mat.set(new BlendingAttribute(true, 0f));
 			mat.set(TextureAttribute.createDiffuse(rabbit));
 			
@@ -221,17 +219,22 @@ public class MoonBG extends Background3D
 		
 		Material mat = rabbit.materials.first();
 		
-		float ticker = (tick % 300) / 300f;
+		float ticker = (tick % 500) / 500f;
 		
 		ticker *= 2;
 		
 		if(ticker > 1f)
 			ticker = 2f - ticker;
 		
-		mat.set(ColorAttribute.createDiffuse(1f, 1f, 1f, 1f * ticker));
-		mat.set(new BlendingAttribute(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA, 0.4f));
+		mat.set(ColorAttribute.createDiffuse(1f, 1f - (0.7f * ticker), 1f - (0.7f * ticker), 1f * ticker));
+		mat.set(new BlendingAttribute(true, 1f * ticker));
 		
-		rabbit.transform.setToTranslation(0.04f, 0.1001f, -4f + 0.04f);
+		mat = moon.materials.first();
+		
+		mat.set(ColorAttribute.createDiffuse(1f, 1f - (0.7f * ticker), 1f - (0.7f * ticker), 1f));
+		mat.set(new BlendingAttribute(1f));
+		
+		rabbit.transform.setToTranslation(0f, 0.11f, -4f);
 		rabbit.transform.rotate(0, 1, 0, mul * 360f);
 		
 		translateLooped(stars, 0f, -0.01f, 10f, 15f);

@@ -88,7 +88,7 @@ public class Cirno extends AllStarBoss
 		for(TextureRegion reg : left.getKeyFrames())
 			reg.flip(true, false);
 
-		Animation special = ImageSplitter.getAnimationFromSprite(sprite, chunkHeight, chunkWidth, 10F, 9,10,11);
+		Animation special = ImageSplitter.getAnimationFromSprite(sprite, chunkHeight, chunkWidth, 10F, 9,10,11,10,9);
 		special.setPlayMode(PlayMode.NORMAL);
 	
 		Music bgm = new J2hMusic(Gdx.audio.newMusic(FOLDER.child("bgm.mp3")));

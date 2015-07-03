@@ -19,6 +19,7 @@ import java2hu.object.bullet.GravityBullet;
 import java2hu.object.player.Player;
 import java2hu.object.ui.CircleHealthBar;
 import java2hu.overwrite.J2hMusic;
+import java2hu.pathing.SimpleTouhouBossPath;
 import java2hu.plugin.sprites.FadeInSprite;
 import java2hu.spellcard.Spellcard;
 import java2hu.system.SaveableObject;
@@ -89,13 +90,16 @@ public class Wakasagihime extends AllStarBoss
 		Animation idle = ImageSplitter.getAnimationFromSprite(sprite, chunkHeight, chunkWidth, 10F, 1,2,3,4,5,6);
 		idle.setPlayMode(PlayMode.LOOP);
 		
-		Animation left = ImageSplitter.getAnimationFromSprite(sprite, chunkHeight, chunkWidth, 24F, 7,8,9,10,11,12);
+		Animation left = ImageSplitter.getAnimationFromSprite(sprite, chunkHeight, chunkWidth, 10F, 7,8,9,10,11,12);
 		Animation right = AnimationUtil.copyAnimation(left);
 
 		for(TextureRegion reg : right.getKeyFrames())
 			reg.flip(true, false);
+		
+		left.setPlayMode(PlayMode.LOOP);
+		right.setPlayMode(PlayMode.LOOP);
 
-		Animation special = ImageSplitter.getAnimationFromSprite(sprite, chunkHeight, chunkWidth, 20F, 13,14,15,16,17,18,19,20);
+		Animation special = ImageSplitter.getAnimationFromSprite(sprite, chunkHeight, chunkWidth, 10F, 13,14,15,16,17,18,19,20);
 		special.setPlayMode(PlayMode.NORMAL);
 
 		final Sprite bg = new Sprite(Loader.texture(folder.child("bg.png")));
@@ -647,6 +651,11 @@ public class Wakasagihime extends AllStarBoss
 				y = player.getY() - 50;
 				
 				rotation = MathUtil.getAngle(x, y, player.getX(), player.getY());
+			}
+			
+			if(tick > 120 && tick % 300 == 0)
+			{
+				boss.getPathing().setCurrentPath(new SimpleTouhouBossPath(boss));
 			}
 			
 			if(tick > 120 && tick % 150 == 0)

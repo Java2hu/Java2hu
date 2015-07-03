@@ -387,6 +387,24 @@ public class Ringo extends AllStarBoss
 		{
 			final Player player = game.getPlayer();
 			
+			if(tick == 60)
+			{
+				boss.playSpecial(true);
+				BossUtil.charge(boss, boss.getAuraColor(), false);
+				
+				TouhouSounds.Enemy.ACTIVATE_3.play();
+			}
+			
+			if(tick == 100)
+				boss.playSpecial(false);
+			
+			if(tick < 100)
+			{
+				return;
+			}
+			
+			tick -= 100;
+			
 			if(tick % 50 == 0)
 			{
 				for(final boolean bool : new boolean[] { true, false })
@@ -411,8 +429,10 @@ public class Ringo extends AllStarBoss
 						@Override
 						public void update(Bullet object, long tick)
 						{
-							if(object.getTicksAlive() < 10)
+							if(object.getTicksAlive() < 12)
 								return;
+							
+							tick = object.getTicksAlive() - 12;
 							
 							final float mul = - (1f * (Math.min(object.getTicksAlive() - 30, 200f) / 200f));
 							
@@ -420,7 +440,7 @@ public class Ringo extends AllStarBoss
 							{
 								TouhouSounds.Enemy.RELEASE_1.play(0.1f);
 								
-								final Bullet bullet = ThBullet.makeBullet(ThBulletType.BALL_BIG, ThBulletColor.WHITE, new Position(object.getX(), object.getY()));
+								final Bullet bullet = ThBullet.makeBullet(ThBulletType.BALL_BIG, ThBulletColor.WHITE, new Position(object.getX() - (Math.cos(finalRad) * 140), object.getY() - (Math.sin(finalRad) * 140)));
 								
 								bullet.addEffect(new Plugin<Bullet>()
 								{
@@ -429,7 +449,7 @@ public class Ringo extends AllStarBoss
 									{
 										float speed = 300f + -200f * (mul);
 										
-										if(object.getTicksAlive() < 20)
+										if(object.getTicksAlive() < 40)
 										{
 											speed = 0f;
 										}
