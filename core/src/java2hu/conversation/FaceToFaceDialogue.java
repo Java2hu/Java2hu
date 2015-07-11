@@ -32,8 +32,6 @@ public class FaceToFaceDialogue extends UpdateObject implements EventListener
 	
 	public FaceToFaceDialogue(DialogueTextBalloon textBalloon, DialogueParticipant left, DialogueParticipant right)
 	{
-		Game.getGame().registerEvents(this);
-		
 		leftHolder = left;
 		rightHolder = right;
 		this.textBalloon = textBalloon;
@@ -54,6 +52,8 @@ public class FaceToFaceDialogue extends UpdateObject implements EventListener
 	public void onSpawn()
 	{
 		super.onSpawn();
+		
+		Game.getGame().registerEvents(this);
 	}
 	
 	@Override
@@ -174,6 +174,9 @@ public class FaceToFaceDialogue extends UpdateObject implements EventListener
 		rightHolder.onUpdate(tick);
 		textBalloon.onUpdate(tick);
 		
+		if(cooldown > 0)
+			cooldown--;
+		
 		if(isDone())
 		{
 			Game.getGame().delete(this);
@@ -284,8 +287,6 @@ public class FaceToFaceDialogue extends UpdateObject implements EventListener
 	
 	public void enterRight()
 	{
-		System.out.println("WTR: " + waitTimeRight);
-		
 		if(waitTimeRight == -1)
 			waitTimeRight = getWaitTime(MathUtil.getDistance(rightHolder, rightInactive));
 		
@@ -300,29 +301,36 @@ public class FaceToFaceDialogue extends UpdateObject implements EventListener
 			}
 		});
 	}
+	
+	private int cooldown = 0;
 
 	@EventHandler(priority = EventPriority.LOW)
 	public void keyDown(KeyDownEvent event)
 	{
 		int keyCode = event.getKey();
 		
-		if(keyCode == Keys.Z && !isDone())
+		if(keyCode == Keys.Z && !game.isPaused())
 		{
 			event.setCancelled(true);
 			
-			Dialogue old = dialogue.get(index);
-			
-			if(old.doAfter != null)
-				old.doAfter.run();
-			
-			index++;
-			TouhouSounds.Hud.OK.play();
-			
-			if(!isDone())
+			if(!isDone() && cooldown <= 0)
 			{
-				Dialogue current = dialogue.get(index);
+				cooldown = 40;
 				
-				runDialogue(current);
+				Dialogue old = dialogue.get(index);
+
+				if(old.doAfter != null)
+					old.doAfter.run();
+
+				index++;
+				TouhouSounds.Hud.OK.play();
+
+				if(!isDone())
+				{
+					Dialogue current = dialogue.get(index);
+
+					runDialogue(current);
+				}
 			}
 		}
 	}

@@ -1,18 +1,15 @@
 package java2hu.allstar.players;
 
 import java.util.ArrayList;
-import java.util.HashSet;
-
 import java2hu.Game;
 import java2hu.HitboxSprite;
 import java2hu.Loader;
 import java2hu.StartupLoopAnimation;
 import java2hu.allstar.AllStarGame;
 import java2hu.object.FreeStageObject;
-import java2hu.object.LivingObject;
 import java2hu.object.StageObject;
-import java2hu.object.bullet.Bullet;
 import java2hu.object.player.Player;
+import java2hu.object.player.PlayerBullet;
 import java2hu.touhou.sounds.TouhouSounds;
 import java2hu.util.AnimationUtil;
 import java2hu.util.HitboxUtil;
@@ -27,7 +24,6 @@ import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Animation.PlayMode;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.math.Intersector;
 
 public class Marisa extends Player
 {
@@ -52,14 +48,12 @@ public class Marisa extends Player
 		HitboxSprite hitbox = new HitboxSprite(new TextureRegion(texture, 0, 3 * 96, 64, 31));
 		hitbox.setHitbox(HitboxUtil.rectangleToPolygon(hitbox.getBoundingRectangle()));
 		hitbox.setOriginCenter();
-		hitbox.rotate(90f);
 		
 		Animation bullet1 = new Animation(1, hitbox);
 		
 		hitbox = new HitboxSprite(new TextureRegion(texture, 256, 4 * 96, 64, 31));
 		hitbox.setHitbox(HitboxUtil.rectangleToPolygon(hitbox.getBoundingRectangle()));
 		hitbox.setOriginCenter();
-		hitbox.rotate(90f);
 
 		Animation bullet2 = new Animation(1, hitbox);
 	
@@ -268,37 +262,11 @@ public class Marisa extends Player
 		{
 			for(FreeStageObject obj : hakkeros)
 			{
-				Bullet shot = new Bullet(AnimationUtil.copyAnimation(bullet1), obj.getX(), obj.getY() - 5)
-				{
-					@Override
-					public void update(long tick)
-					{
-						super.update(tick);
-					}
-
-					@Override
-					public void checkCollision()
-					{
-						HashSet<StageObject> stageObjects = new HashSet<StageObject>(Game.getGame().getStageObjects());
-
-						for(StageObject obj : stageObjects)
-						{
-							if(obj instanceof LivingObject)
-							{
-								LivingObject lo = (LivingObject) obj;
-
-								if(Intersector.overlapConvexPolygons(lo.getHitbox(), getCurrentSprite().getHitbox()))
-								{
-									lo.decreaseHealth(0.3F);
-									lo.onHit();
-									Game.getGame().delete(this);
-								}
-							}
-						}
-					}
-				};
+				PlayerBullet shot = new PlayerBullet(AnimationUtil.copyAnimation(bullet1), obj.getX(), obj.getY() - 5);
 
 				shot.getCurrentSprite().setAlpha(0.5f);
+				shot.setRotationDeg(90);
+				shot.setDamage(0.3f);
 				
 				shot.setVelocityYTick(-20f);
 				shot.useSpawnAnimation(false);
@@ -318,39 +286,10 @@ public class Marisa extends Player
 			
 			for(int i = isFocused() ? 0 : -10; isFocused() ? i == 0 : i <= 10; i += 10)
 			{
-				Bullet shot = new Bullet(AnimationUtil.copyAnimation(bullet2), getX() + i, getY() + 10)
-				{
-					@Override
-					public void update(long tick)
-					{
-						super.update(tick);
-						
-						lessDamage = !isFocused();
-					}
-					
-					boolean lessDamage = false;
-
-					@Override
-					public void checkCollision()
-					{
-						HashSet<StageObject> stageObjects = new HashSet<StageObject>(Game.getGame().getStageObjects());
-
-						for(StageObject obj : stageObjects)
-						{
-							if(obj instanceof LivingObject)
-							{
-								LivingObject lo = (LivingObject) obj;
-
-								if(Intersector.overlapConvexPolygons(lo.getHitbox(), getCurrentSprite().getHitbox()))
-								{
-									lo.decreaseHealth(lessDamage ? 1.8f/3f : 1.4f);
-									lo.onHit();
-									Game.getGame().delete(this);
-								}
-							}
-						}
-					}
-				};
+				PlayerBullet shot = new PlayerBullet(AnimationUtil.copyAnimation(bullet2), getX() + i, getY() + 10);
+				
+				shot.setDamage(!isFocused() ? 1.8f/3f : 1.4f);
+				shot.setRotationDeg(90);
 				
 				if(!isFocused())
 					shot.getCurrentSprite().setScale(idle == pc98Idle ? 0.2f : 1f, idle == pc98Idle ? 1f : 0.4f);

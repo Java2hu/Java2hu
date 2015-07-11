@@ -1,7 +1,6 @@
 package java2hu.allstar.menu;
 
 import java.util.HashMap;
-
 import java2hu.Game;
 import java2hu.Loader;
 import java2hu.menu.ButtonManager;

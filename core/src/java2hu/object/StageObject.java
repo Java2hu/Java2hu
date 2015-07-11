@@ -558,6 +558,11 @@ public abstract class StageObject extends J2hObject implements IPosition
 		 * Draw the owned object after it's owner.
 		 */
 		public boolean drawAfter = true;
+		
+		/**
+		 * Set to true to delete.
+		 */
+		public boolean delete = false;
 	}
 	
 	/**
@@ -582,8 +587,14 @@ public abstract class StageObject extends J2hObject implements IPosition
 	
 	public void removeOwnedObject(StageObject obj)
 	{
-		ownedObjects.remove(obj);
-		obj.setOwnedBy(null);
+		OwnedObjectData data = ownedObjects.get(obj);
+		
+		if(data != null)
+		{
+			data.delete = true;
+			
+			obj.setOwnedBy(null);
+		}
 	}
 	
 	private int SRC = GL20.GL_SRC_ALPHA;
@@ -663,29 +674,40 @@ public abstract class StageObject extends J2hObject implements IPosition
 	{
 		onUpdate(tick);
 		
-		Iterator<Plugin> it = effects.iterator();
-		
-		while(it.hasNext())
 		{
-			Plugin effect = it.next();
-			
-			effect.update(this, tick);
-			
-			if(effect.doDelete())
+			Iterator<Plugin> it = effects.iterator();
+
+			while(it.hasNext())
 			{
-				it.remove();
+				Plugin effect = it.next();
+
+				effect.update(this, tick);
+
+				if(effect.doDelete())
+				{
+					it.remove();
+				}
 			}
 		}
 		
 		getPathing().tick();
 		
-		for(Entry<StageObject, OwnedObjectData> owned : ownedObjects.entrySet())
+		Iterator<Entry<StageObject, OwnedObjectData>> it = ownedObjects.entrySet().iterator();
+		
+		while(it.hasNext())
 		{
+			Entry<StageObject, OwnedObjectData> owned = it.next();
+			
 			owned.getKey().update(tick);
 			
 			if(owned.getKey().isOnStageRaw())
 			{
 				game.delete(owned.getKey()); // Shouldn't be drawn on it's own.
+			}
+			
+			if(owned.getValue().delete)
+			{
+				it.remove();
 			}
 		}
 	}

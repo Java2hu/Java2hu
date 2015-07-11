@@ -9,6 +9,7 @@ import java2hu.MovementAnimation;
 import java2hu.allstar.AllStarStageScheme;
 import java2hu.allstar.enemies.AllStarBoss;
 import java2hu.allstar.util.AllStarUtil;
+import java2hu.background.BackgroundBossAura;
 import java2hu.background.SwirlingBackground;
 import java2hu.gameflow.GameFlowScheme.WaitConditioner;
 import java2hu.object.DrawObject;
@@ -17,6 +18,7 @@ import java2hu.object.bullet.Bullet;
 import java2hu.object.enemy.greater.Boss;
 import java2hu.object.player.Player;
 import java2hu.object.ui.CircleHealthBar;
+import java2hu.overwrite.J2hMusic;
 import java2hu.plugin.sprites.FadeInSprite;
 import java2hu.plugin.sprites.ScalingSprite;
 import java2hu.spellcard.Spellcard;
@@ -31,7 +33,9 @@ import java2hu.util.HitboxUtil;
 import java2hu.util.ImageSplitter;
 import java2hu.util.MathUtil;
 import java2hu.util.MeshUtil;
+import java2hu.util.ObjectUtil;
 import java2hu.util.Scheduler;
+import java2hu.util.SchemeUtil;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Music;
@@ -73,12 +77,12 @@ public class Raiko extends AllStarBoss
 		Sprite bg = new Sprite(Loader.texture(Gdx.files.internal("enemy/raiko/bg.png")));
 		bg.setSize(Game.getGame().getWidth(), Game.getGame().getHeight());
 
-		Music bgm = Gdx.audio.newMusic(Gdx.files.internal("enemy/raiko/bgm.mp3"));
-		bgm.setVolume(1f * Game.getGame().getMusicModifier());
-		bgm.setPosition(23.96f);
+		Music bgm = new J2hMusic(Gdx.audio.newMusic(Gdx.files.internal("enemy/raiko/bgm.mp3")));
 		bgm.setLooping(true);
 		
 		final Raiko raiko = new Raiko(nameTag, fbs, bg, idle, left, right, special, bgm, x, y);
+		
+		raiko.setBgmPosition(23.96f);
 		
 		return raiko;
 	}
@@ -89,7 +93,8 @@ public class Raiko extends AllStarBoss
 	{
 		super(100, nametag, fullBodySprite, idle, left, right, special, bgm, x, y);
 		
-		this.setAuraColor(new Color(196F/255F, 71F/255F, 71F/255F, 1));
+		this.setAuraColor(new Color(226F/255F, 194f/255F, 74/255F, 1));
+		this.setBgAuraColor(AllStarUtil.from255RGB(58, 66, 224).mul(0.5f));
 		
 		this.bg = bg;
 	}
@@ -121,14 +126,14 @@ public class Raiko extends AllStarBoss
 	}
 	
 	@Override
-	public void executeFight(AllStarStageScheme scheme)
+	public void executeFight(final AllStarStageScheme scheme)
 	{
 		final J2hGame stage = Game.getGame();
 		
 		final SaveableObject<CircleHealthBar> bar = new SaveableObject<CircleHealthBar>();
 		
 		{
-			final Raiko raiko = this;
+			final Raiko boss = this;
 			final J2hGame g = Game.getGame();
 
 			Game.getGame().addTaskGame(new Runnable()
@@ -136,32 +141,33 @@ public class Raiko extends AllStarBoss
 				@Override
 				public void run()
 				{
-					BossUtil.cloudEntrance(raiko, Color.WHITE, Color.RED, 60);
+					BossUtil.cloudEntrance(boss, Color.WHITE, Color.RED, 60);
 
 					Game.getGame().addTaskGame(new Runnable()
 					{
 						@Override
 						public void run()
 						{
-							bar.setObject(new CircleHealthBar(raiko));
+							bar.setObject(new CircleHealthBar(boss));
 							g.spawn(bar.getObject());
 							
 							bar.getObject().addSplit(0.7f);
 							
-							Game.getGame().spawn(raiko);
+							Game.getGame().spawn(boss);
 							
-							AllStarUtil.introduce(raiko);
+							AllStarUtil.introduce(boss);
 							
-							raiko.setHealth(0.1f);
-							raiko.healUp();
-							BossUtil.backgroundAura(raiko, raiko.getBgAuraColor());
+							boss.setHealth(0.1f);
+							boss.healUp();
+							
+							BossUtil.addBossEffects(boss, boss.getAuraColor(), boss.getBgAuraColor());
 
 							Game.getGame().addTaskGame(new Runnable()
 							{
 								@Override
 								public void run()
 								{
-									Game.getGame().startSpellCard(new RaikoNonSpell(raiko));
+									Game.getGame().startSpellCard(new RaikoNonSpell(boss));
 								}
 							}, 60);
 						}
@@ -174,7 +180,7 @@ public class Raiko extends AllStarBoss
 				@Override
 				public boolean returnTrueToWait()
 				{
-					return !Game.getGame().getStageObjects().contains(raiko);
+					return !Game.getGame().getStageObjects().contains(boss);
 				}
 			});
 			
@@ -185,13 +191,13 @@ public class Raiko extends AllStarBoss
 				@Override
 				public boolean returnTrueToWait()
 				{
-					return !raiko.isDead();
+					return !boss.isDead();
 				}
 			});
 			
 			scheme.doWait();
 
-			raiko.setHealth(raiko.getMaxHealth());
+			boss.setHealth(boss.getMaxHealth());
 			bar.getObject().split();
 			
 			Game.getGame().addTaskGame(new Runnable()
@@ -201,37 +207,46 @@ public class Raiko extends AllStarBoss
 				{
 					game.clear(ClearType.ALL);
 					
-					AllStarUtil.presentSpellCard(raiko, "Shockwave - \"Percussion Orchestra\"");
-					Game.getGame().startSpellCard(new RaikoSpell(raiko));
+					AllStarUtil.presentSpellCard(boss, "Shockwave - \"Percussion Orchestra\"");
+					
+					final RaikoSpell card = new RaikoSpell(boss, scheme.getBossAura());
+					
+					Game.getGame().startSpellCard(card);
+					
+					BossUtil.spellcardCircle(boss, card);
 				}
 			}, 1);
 			
-			
-			scheme.setWait(new WaitConditioner()
-			{
-				@Override
-				public boolean returnTrueToWait()
-				{
-					return !raiko.isDead();
-				}
-			});
-			
-			scheme.doWait();
+			SchemeUtil.waitForDeath(scheme, boss);
 			
 			Game.getGame().addTaskGame(new Runnable()
 			{
 				@Override
 				public void run()
 				{
-					Game.getGame().delete(raiko);
-					
-					BossUtil.mapleExplosion(raiko.getX(), raiko.getY());
-					
-					Game.getGame().clear(ClearType.ALL);
+					Game.getGame().clearCircle(800f, boss, ClearType.ALL);
 				}
 			}, 1);
 			
-			scheme.waitTicks(5); // Prevent concurrency issues.
+			scheme.waitTicks(2);
+			
+			boss.playSpecial(false);
+			SchemeUtil.deathAnimation(scheme, boss, boss.getAuraColor());
+			
+			Game.getGame().addTaskGame(new Runnable()
+			{
+				@Override
+				public void run()
+				{
+					ObjectUtil.deathAnimation(boss);
+					
+					Game.getGame().delete(boss);
+					
+					Game.getGame().clear(ClearType.ALL);
+				}
+			}, 5);
+			
+			scheme.waitTicks(10); // Prevent concurrency issues.
 		}
 	}
 	
@@ -455,7 +470,7 @@ public class Raiko extends AllStarBoss
 		private HitboxSprite drumSkull;
 		private HitboxSprite drumSkullRed;
 		
-		public RaikoSpell(final StageObject owner)
+		public RaikoSpell(final StageObject owner, final BackgroundBossAura aura)
 		{
 			super(owner);
 			
@@ -488,6 +503,7 @@ public class Raiko extends AllStarBoss
 						}
 					}
 					, 0, 1f, 0.01F));
+					setFrameBuffer(aura.getBackgroundBuffer());
 					setZIndex(-2);
 				}
 				
@@ -517,6 +533,7 @@ public class Raiko extends AllStarBoss
 				float timer = 0;
 				
 				{
+					setFrameBuffer(aura.getBackgroundBuffer());
 					setZIndex(-1);
 				}
 				

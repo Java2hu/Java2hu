@@ -310,7 +310,7 @@ public class Mokou extends AllStarBoss
 				
 				Game.getGame().startSpellCard(card);
 				
-				BossUtil.spellcardCircle(boss, card);
+				BossUtil.spellcardCircle(boss, card, scheme.getBossAura());
 				
 				boss.backgroundSetter.set(scheme.getBossAura());
 				boss.phoenixSpawner.get();

@@ -43,7 +43,7 @@ public class AllStarGame extends J2hGame
 	{
 		screen = new LoadScreen(null);
 		spawn(screen);
-		Game.getGame().setPaused(true);
+		Game.getGame().setPaused(false);
 		
 		super.onLoadStart();
 	}
@@ -72,12 +72,25 @@ public class AllStarGame extends J2hGame
 		
 		setPC98(false, true);
 		
-		setScheme(new AllStarStageScheme(1));
+		setScheme(new AllStarStageScheme(day));
 		getScheme().start();
 	}
 	
+	/**
+	 * How much times the player has died since start.
+	 */
 	public int deaths = 0;
+	
+	/**
+	 * Players score, currently unused.
+	 */
 	public int score = 0;
+	
+	/**
+	 * Day to start on
+	 */
+	public int day = 1;
+	
 	private boolean isPC98 = false;
 	
 	public void setPC98(final boolean bool)
@@ -214,7 +227,6 @@ public class AllStarGame extends J2hGame
 		MainMenu menu = new MainMenu(null);
 		spawn(menu);
 
-		onDePause();
-		Game.getGame().setPaused(true);
+		Game.getGame().setPaused(false);
 	}
 }

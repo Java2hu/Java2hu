@@ -31,6 +31,7 @@ import java2hu.touhou.sounds.TouhouSounds;
 import java2hu.util.AnimationUtil;
 import java2hu.util.BossUtil;
 import java2hu.util.BossUtil.BackgroundAura;
+import java2hu.util.BossUtil.BossEffectsResult;
 import java2hu.util.Duration;
 import java2hu.util.Getter;
 import java2hu.util.ImageSplitter;
@@ -72,7 +73,8 @@ public class Sukuna extends AllStarBoss
 	{
 		super(maxHealth, x, y);
 		
-		this.setAuraColor(new Color(226F/255F, 104F/255F, 74/255F, 1));
+		this.setAuraColor(new Color(226F/255F, 194f/255F, 74/255F, 1));
+		this.setBgAuraColor(AllStarUtil.from255RGB(58, 66, 224).mul(0.5f));
 		this.setBgmPosition(15f);
 		
 		this.clone = clone;
@@ -377,7 +379,10 @@ public class Sukuna extends AllStarBoss
 
 							boss.setHealth(0.1f);
 							boss.healUp();
-							aura.setObject(BossUtil.backgroundAura(boss, boss.getBgAuraColor()));
+							
+							BossEffectsResult r = BossUtil.addBossEffects(boss, boss.getAuraColor(), boss.getBgAuraColor());
+							
+							aura.setObject(r.bgAura);
 							
 							Game.getGame().addTaskGame(new Runnable()
 							{
@@ -917,8 +922,6 @@ public class Sukuna extends AllStarBoss
 			final J2hGame game = Game.getGame();
 			
 			setSpellcardTime(Duration.seconds(45));
-			
-			BossUtil.backgroundAura(sukuna, sukuna.getBgAuraColor());
 			
 			sukuna.setDamageModifier(0.5F);
 			

@@ -317,7 +317,7 @@ public class Sekibanki extends AllStarBoss
 				
 				Game.getGame().startSpellCard(card);
 				
-				BossUtil.spellcardCircle(boss, card);
+				BossUtil.spellcardCircle(boss, card, scheme.getBossAura());
 			}
 		}, 1);
 		

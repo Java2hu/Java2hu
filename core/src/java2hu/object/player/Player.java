@@ -4,13 +4,15 @@ import java2hu.Game;
 import java2hu.HitboxSprite;
 import java2hu.J2hGame;
 import java2hu.Loader;
+import java2hu.events.EventListener;
+import java2hu.events.input.KeyDownEvent;
 import java2hu.object.StageObject;
 import java2hu.util.HitboxUtil;
 import java2hu.util.InputUtil;
 import java2hu.util.Scheduler;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
+import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Animation.PlayMode;
@@ -19,7 +21,7 @@ import com.badlogic.gdx.math.Polygon;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Array;
 
-public abstract class Player extends StageObject
+public abstract class Player extends StageObject implements EventListener
 {
 	private Polygon hitbox;
 	public Animation idle;
@@ -173,10 +175,31 @@ public abstract class Player extends StageObject
 		
 		InputUtil.handleMovementArrowKeys(this, 9F, 4.0F);
 		
-		if(Gdx.input.isKeyPressed(Input.Keys.Z))
+		if(Gdx.input.isKeyPressed(Keys.Z))
 		{
-			shoot();
+			KeyDownEvent event = new KeyDownEvent(Keys.Z);
+
+			game.callEvent(event);
+			
+			if(!event.isCancelled())
+				shoot();
 		}
+	}
+	
+	@Override
+	public void onSpawn()
+	{
+		super.onSpawn();
+		
+		game.registerEvents(this);
+	}
+	
+	@Override
+	public void onDelete()
+	{
+		super.onDelete();
+		
+		game.unregisterEvents(this);
 	}
 	
 	public void onHit(StageObject hit)

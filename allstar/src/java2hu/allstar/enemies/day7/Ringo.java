@@ -469,7 +469,7 @@ public class Ringo extends AllStarBoss
 				}
 			}
 			
-			if(tick % 20 == 0)
+			if(tick % 14 == 0)
 			{
 				Bullet bullet = ThBullet.makeBullet(ThBulletType.BALL_BIG, ThBulletColor.BLUE, boss);
 				

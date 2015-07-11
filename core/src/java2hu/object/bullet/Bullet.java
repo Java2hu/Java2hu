@@ -539,6 +539,8 @@ public class Bullet extends StageObject
 		
 		final Bullet bullet = this;
 		
+		final long requestTime = bullet.getTicksAlive();
+		
 		DrawObject obj = new DrawObject()
 		{
 			{
@@ -590,9 +592,9 @@ public class Bullet extends StageObject
 				
 				alpha += alphaIncrease;
 				
-				if(bullet.getTicksAlive() > time || !bullet.isOnStageRaw())
+				if(bullet.getTicksAlive() - requestTime > time || !bullet.isOnStageRaw())
 				{
-					removeOwnedObject(this);
+					bullet.removeOwnedObject(this);
 					animationPlaying = false;
 				}
 			}

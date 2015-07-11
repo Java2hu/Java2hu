@@ -192,10 +192,10 @@ public class HitboxSprite extends Sprite
 	@Override
 	public void rotate(float degrees)
 	{
-		super.rotate(degrees);
-		
 		if(hitbox != null)
-			hitbox.setRotation(getRotation());
+			hitbox.rotate(degrees);
+		
+		super.rotate(degrees);
 	}
 	
 	@Override

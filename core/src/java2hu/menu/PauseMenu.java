@@ -89,6 +89,7 @@ public class PauseMenu extends Menu
 					@Override
 					public void run()
 					{
+						Game.getGame().setPaused(false);
 						Game.getGame().onDePause();
 					}
 				}, 1);
@@ -125,6 +126,7 @@ public class PauseMenu extends Menu
 					@Override
 					public void run()
 					{
+						Game.getGame().setPaused(false);
 						Game.getGame().onDePause();
 						Game.getGame().onRetry();
 					}

@@ -17,7 +17,10 @@ import java2hu.events.EventListener;
 import java2hu.events.ICancellable;
 import java2hu.events.game.ObjectRemoveEvent;
 import java2hu.events.game.ObjectSpawnEvent;
+import java2hu.events.game.PauseGameEvent;
+import java2hu.events.game.UnPauseGameEvent;
 import java2hu.events.input.KeyDownEvent;
+import java2hu.events.input.KeyUpEvent;
 import java2hu.events.sound.MusicModifierChangeEvent;
 import java2hu.events.sound.SoundModifierChangeEvent;
 import java2hu.gameflow.GameFlowScheme;
@@ -39,6 +42,8 @@ import java2hu.util.HitboxUtil;
 import java2hu.util.MathUtil;
 import java2hu.util.Scheduler;
 import java2hu.util.Setter;
+
+import javax.swing.JOptionPane;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
@@ -133,7 +138,8 @@ public class J2hGame extends ApplicationAdapter implements InputProcessor
 	 */
 	public void onPause()
 	{
-		setPaused(true);
+		if(isOutOfGame())
+			return;
 		
 		TouhouSounds.Hud.PAUSE.play();
 		pauseMenu = new PauseMenu(null);
@@ -146,7 +152,8 @@ public class J2hGame extends ApplicationAdapter implements InputProcessor
 	 */
 	public void onDePause()
 	{
-		setPaused(false);
+		if(isOutOfGame())
+			return;
 		
 		if(pauseMenu == null)
 			return;
@@ -1220,6 +1227,18 @@ public class J2hGame extends ApplicationAdapter implements InputProcessor
 		{
 			pauseTick = 0;
 			pauseElapsedTime = 0;
+			
+			UnPauseGameEvent event = new UnPauseGameEvent();
+			callEvent(event);
+			
+			onDePause();
+		}
+		else
+		{
+			PauseGameEvent event = new PauseGameEvent();
+			callEvent(event);
+			
+			onPause();
 		}
 		
 		System.out.println(paused ? "Game Paused" : "Game (Re)started");
@@ -2153,6 +2172,26 @@ public class J2hGame extends ApplicationAdapter implements InputProcessor
 	@Override
 	public boolean keyDown(int keycode)
 	{
+		{
+			boolean alt = Gdx.input.isKeyPressed(Keys.ALT_LEFT) || Gdx.input.isKeyPressed(Keys.ALT_RIGHT);
+			
+			if(alt && keycode == (Keys.ENTER))
+			{
+				boolean before = Gdx.graphics.isFullscreen();
+				
+				Gdx.graphics.setDisplayMode(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), !Gdx.graphics.isFullscreen());
+				
+				boolean after = Gdx.graphics.isFullscreen();
+				
+				if(before == after)
+				{
+					JOptionPane.showMessageDialog(null, "Fullscreen did not trigger, you'll have to restart the game.");
+				}
+				
+				return true;
+			}
+		}
+		
 		KeyDownEvent event = new KeyDownEvent(keycode);
 		
 		callEvent(event);
@@ -2166,10 +2205,7 @@ public class J2hGame extends ApplicationAdapter implements InputProcessor
 			
 			if(keycode == Keys.ESCAPE)
 			{
-				if(!isPaused())
-					onPause();
-				else
-					onDePause();
+				setPaused(!isPaused());
 			}
 			else if(keycode == Input.Keys.S)
 			{
@@ -2210,6 +2246,10 @@ public class J2hGame extends ApplicationAdapter implements InputProcessor
 	@Override
 	public boolean keyUp(int keycode)
 	{
+		KeyUpEvent event = new KeyUpEvent(keycode);
+		
+		callEvent(event);
+		
 		return true;
 	}
 
@@ -2355,7 +2395,18 @@ public class J2hGame extends ApplicationAdapter implements InputProcessor
 	{
 		ListenerData data = new ListenerData();
 	
+		ArrayList<Method> methods = new ArrayList<Method>();
+		
 		for(Method m : listener.getClass().getDeclaredMethods())
+			methods.add(m);
+		
+		for(Method m : listener.getClass().getMethods())
+		{
+			if(!methods.contains(m))
+				methods.add(m);
+		}
+		
+		for(Method m : methods)
 		{
 			EventHandler handler = m.getAnnotation(EventHandler.class);
 
@@ -2369,6 +2420,8 @@ public class J2hGame extends ApplicationAdapter implements InputProcessor
 
 			if(Event.class.isAssignableFrom(clazz))
 			{
+				System.out.println(clazz);
+				
 				m.setAccessible(true);
 
 				if(!data.methodMap.containsKey(clazz))

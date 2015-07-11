@@ -2,7 +2,7 @@ package java2hu.allstar.enemies.day7.tsukumo;
 
 import java2hu.Game;
 import java2hu.Loader;
-import java2hu.StartupLoopAnimation;
+import java2hu.MovementAnimation;
 import java2hu.allstar.AllStarStageScheme;
 import java2hu.allstar.enemies.AllStarBoss;
 import java2hu.background.ScrollingBackground;
@@ -38,7 +38,7 @@ public class Benben extends AllStarBoss
 		
 		setAuraColor(new Color(97f/255f, 66f/255f, 50f/255f, 1f));
 		
-		int chunkHeight = 168;
+		int chunkHeight = 164;
 		int chunkWidth = 128;
 
 		Texture sprite = Loader.texture(FOLDER.child("anm.png"));
@@ -58,8 +58,8 @@ public class Benben extends AllStarBoss
 		Animation rightStartup = ImageSplitter.getAnimationFromSprite(sprite, chunkHeight, chunkWidth, 5F, 9,10,11);
 		Animation rightLoop = ImageSplitter.getAnimationFromSprite(sprite, chunkHeight, chunkWidth, 5F, 12,13);
 
-		StartupLoopAnimation left = new StartupLoopAnimation(leftStartup, leftLoop, 5f);
-		StartupLoopAnimation right = new StartupLoopAnimation(rightStartup, rightLoop, 5f);
+		MovementAnimation left = new MovementAnimation(leftStartup, leftLoop, 5f);
+		MovementAnimation right = new MovementAnimation(rightStartup, rightLoop, 5f);
 
 		Animation special = ImageSplitter.getAnimationFromSprite(sprite, chunkHeight, chunkWidth, 10F, 5,6,7,8);
 		special.setPlayMode(PlayMode.NORMAL);

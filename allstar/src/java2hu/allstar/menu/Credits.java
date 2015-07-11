@@ -909,7 +909,7 @@ public class Credits extends Menu
 					@Override
 					public void onDraw()
 					{
-						String str = "Touhou 3.14 - All Star";
+						String str = "Touhou - All Star Danmaku";
 						
 						black.a = alpha;
 						white.a = alpha;
@@ -922,7 +922,7 @@ public class Credits extends Menu
 						screen.topFont.setColor(white);
 						screen.topFont.draw(Game.getGame().batch, str, getX() - b.width / 2f, getY());
 						
-						str = "A fan game based on the Touhou Project series.";
+						str = "A parody/fan game based on the Touhou Project series.";
 						
 						black.a = alpha;
 						white.a = alpha;

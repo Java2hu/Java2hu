@@ -2,9 +2,10 @@ package java2hu.allstar.enemies.day7.tsukumo;
 
 import java2hu.Game;
 import java2hu.Loader;
-import java2hu.StartupLoopAnimation;
+import java2hu.MovementAnimation;
 import java2hu.allstar.AllStarStageScheme;
 import java2hu.allstar.enemies.AllStarBoss;
+import java2hu.background.BackgroundBossAura;
 import java2hu.background.ScrollingBackground;
 import java2hu.object.DrawObject;
 import java2hu.plugin.sprites.FadeInSprite;
@@ -38,7 +39,7 @@ public class Yatsuhashi extends AllStarBoss
 		
 		setAuraColor(new Color(170f/255f, 160f/255f, 201f/255f, 1f));
 		
-		int chunkHeight = 200;
+		int chunkHeight = 194;
 		int chunkWidth = 128;
 
 		Texture sprite = Loader.texture(FOLDER.child("anm.png"));
@@ -58,8 +59,8 @@ public class Yatsuhashi extends AllStarBoss
 		Animation rightStartup = ImageSplitter.getAnimationFromSprite(sprite, chunkHeight, chunkWidth, 5F, 9,10,11);
 		Animation rightLoop = ImageSplitter.getAnimationFromSprite(sprite, chunkHeight, chunkWidth, 5F, 12,13,14,15);
 
-		StartupLoopAnimation left = new StartupLoopAnimation(leftStartup, leftLoop, 5f);
-		StartupLoopAnimation right = new StartupLoopAnimation(rightStartup, rightLoop, 5f);
+		MovementAnimation left = new MovementAnimation(leftStartup, leftLoop, 5f);
+		MovementAnimation right = new MovementAnimation(rightStartup, rightLoop, 5f);
 
 		Animation special = ImageSplitter.getAnimationFromSprite(sprite, chunkHeight, chunkWidth, 10F, 1,2,3,4,5,6,7,8);
 		special.setPlayMode(PlayMode.NORMAL);
@@ -70,7 +71,13 @@ public class Yatsuhashi extends AllStarBoss
 		set(fbs, idle, left, right, special);
 	}
 	
-	public void spawnBackground()
+	@Override
+	public float getDrawX()
+	{
+		return getX() + 20;
+	}
+	
+	public void spawnBackground(final BackgroundBossAura aura)
 	{
 		final Sprite bg = new Sprite(Loader.texture(FOLDER.child("bg.png")));
 		final Sprite bge = new Sprite(Loader.texture(FOLDER.child("bge.png")));
@@ -94,7 +101,9 @@ public class Yatsuhashi extends AllStarBoss
 				, 0, 1f, 0.01F));
 				
 				bg.setBounds(0, 0, Game.getGame().getWidth(), Game.getGame().getHeight());
-				setZIndex(-3);
+				setFrameBuffer(aura.getBackgroundBuffer());
+				
+				setZIndex(-7);
 			}
 			
 			@Override
@@ -122,8 +131,9 @@ public class Yatsuhashi extends AllStarBoss
 					}
 				}
 				, 0, 1f, 0.01F));
+				setFrameBuffer(aura.getBackgroundBuffer());
 				
-				setZIndex(-2);
+				setZIndex(-6);
 			}
 			
 			
@@ -166,7 +176,9 @@ public class Yatsuhashi extends AllStarBoss
 					}
 				}
 				, 0, 1f, 0.01F));
-				setZIndex(-1);
+				setFrameBuffer(aura.getBackgroundBuffer());
+				
+				setZIndex(-5);
 			}
 			
 			@Override

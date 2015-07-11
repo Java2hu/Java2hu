@@ -4,11 +4,17 @@ import java2hu.Game;
 import java2hu.J2hGame.ClearType;
 import java2hu.allstar.AllStarGame;
 import java2hu.allstar.ExtraStageScheme;
+import java2hu.events.EventHandler;
+import java2hu.events.EventListener;
+import java2hu.events.game.ObjectRemoveEvent;
+import java2hu.events.input.KeyDownEvent;
 import java2hu.menu.Menu;
 import java2hu.overwrite.J2hMusic;
+import java2hu.system.SaveableObject;
 import java2hu.touhou.sounds.TouhouSounds;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -38,7 +44,11 @@ public class MainMenu extends AllStarMenu
 		
 		BitmapFont botFont = getFont(FontType.SMALL);
 		
-		addButton(width / 2f, 650, botFont, "Play", new Runnable()
+		final SaveableObject<Integer> dayObject = new SaveableObject<Integer>(1);
+		
+		float y = 650; 
+		
+		final ShadowedTextButton play = addButton(width / 2f, y, botFont, "Play Day 1", new Runnable()
 		{
 			@Override
 			public void run()
@@ -47,6 +57,7 @@ public class MainMenu extends AllStarMenu
 				
 				((AllStarGame)Game.getGame()).score = 0;
 				((AllStarGame)Game.getGame()).deaths = 0;
+				((AllStarGame)Game.getGame()).day = dayObject.getObject();
 				
 				Game.getGame().onStartGame();
 				
@@ -57,7 +68,48 @@ public class MainMenu extends AllStarMenu
 			}
 		});
 		
-		ShadowedTextButton button = addButton(width / 2f, 600, botFont, "Extra Start", new Runnable()
+		game.registerEvents(new EventListener()
+		{
+			private int day = 1;
+			
+			@EventHandler
+			public void onDelete(ObjectRemoveEvent event)
+			{
+				if(event.getObject() == MainMenu.this)
+				{
+					game.unregisterEvents(this);
+					System.out.println("Delete");
+				}
+			}
+			
+			@EventHandler
+			public void onKeyDown(KeyDownEvent event)
+			{
+				if(event.getKey() == (Keys.RIGHT))
+				{
+					day = (day + 1) > 10 ? 1 : (day + 1);
+				}
+				else if(event.getKey() == (Keys.LEFT))
+				{
+					day = (day - 1) < 1 ? 10 : (day - 1);
+				}
+				else
+					return;
+				
+				dayObject.setObject(day);
+				
+				final String text = "Play Day " + day;
+				
+				TextBounds b = play.getFont().getBounds(text);
+				
+				play.setText(text);
+				play.setX(game.getWidth() / 2f - (b.width / 2f));
+			}
+		});
+		
+		y -= 50;
+		
+		ShadowedTextButton button = addButton(width / 2f, y, botFont, "Extra Start", new Runnable()
 		{
 			@Override
 			public void run()
@@ -84,7 +136,9 @@ public class MainMenu extends AllStarMenu
 		
 		button.setInactiveColor(Color.DARK_GRAY);
 		
-		addButton(width / 2f, 550, botFont, "Spell Practice", new Runnable()
+		y -= 50;
+		
+		addButton(width / 2f, y, botFont, "Spell Practice", new Runnable()
 		{
 			@Override
 			public void run()
@@ -95,7 +149,9 @@ public class MainMenu extends AllStarMenu
 			}
 		});
 		
-		addButton(width / 2f, 500, botFont, "Spellcard Vault", new Runnable()
+		y -= 50;
+		
+		addButton(width / 2f, y, botFont, "Spellcard Vault", new Runnable()
 		{
 			@Override
 			public void run()
@@ -106,7 +162,22 @@ public class MainMenu extends AllStarMenu
 			}
 		});
 		
-		addButton(width / 2f, 450, botFont, "Credits", new Runnable()
+		y -= 50;
+		
+		addButton(width / 2f, y, botFont, "Story / Dev Notes", new Runnable()
+		{
+			@Override
+			public void run()
+			{
+				TouhouSounds.Hud.OK.play();
+				
+				Game.getGame().spawn(new Story(menu));
+			}
+		});
+		
+		y -= 50;
+		
+		addButton(width / 2f, y, botFont, "Credits", new Runnable()
 		{
 			@Override
 			public void run()
@@ -119,7 +190,9 @@ public class MainMenu extends AllStarMenu
 			}
 		});
 		
-		addButton(width / 2f, 400, botFont, "Pre-start Options", new Runnable()
+		y -= 50;
+		
+		addButton(width / 2f, y, botFont, "Pre-start Options", new Runnable()
 		{
 			@Override
 			public void run()
@@ -128,7 +201,9 @@ public class MainMenu extends AllStarMenu
 			}
 		});
 		
-		addButton(width / 2f, 350, botFont, "Developer Menu", new Runnable()
+		y -= 50;
+		
+		addButton(width / 2f, y, botFont, "Developer Menu", new Runnable()
 		{
 			@Override
 			public void run()
@@ -139,7 +214,9 @@ public class MainMenu extends AllStarMenu
 			}
 		});
 		
-		button = addButton(width / 2f, 300, botFont, "Options", new Runnable()
+		y -= 50;
+		
+		button = addButton(width / 2f, y, botFont, "Options", new Runnable()
 		{
 			@Override
 			public void run()
@@ -152,7 +229,9 @@ public class MainMenu extends AllStarMenu
 		
 		button.setInactiveColor(Color.DARK_GRAY);
 		
-		addButton(width / 2f, 250, botFont, "Exit", new Runnable()
+		y -= 50;
+		
+		addButton(width / 2f, y, botFont, "Exit", new Runnable()
 		{
 			@Override
 			public void run()
@@ -179,7 +258,7 @@ public class MainMenu extends AllStarMenu
 		
 		drawLogoDefault();
 		
-		String version = "0.02 (Demo #2)";
+		String version = "0.03 (Demo #3)";
 		
 		botFont.setScale(0.6f);
 		

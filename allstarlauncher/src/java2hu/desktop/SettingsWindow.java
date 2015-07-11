@@ -585,7 +585,7 @@ public class SettingsWindow extends JFrame
 		saveSettings();
 		
 		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
-		config.title = "Touhou 3.14  -  All Star";
+		config.title = "Touhou -  All Star Danmaku";
 		
 		config.width = Integer.parseInt(widthField.getText());
 		config.height = Integer.parseInt(heightField.getText());

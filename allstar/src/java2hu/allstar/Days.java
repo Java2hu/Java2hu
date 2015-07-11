@@ -304,8 +304,6 @@ public class Days extends J2hObject
 				}
 			});
 			
-			addSpecial(day, type, "Dialogue", new Day7Dialogue());
-			
 			addSpecial(day, type, "Mai & Yuki", new Getter<SpecialFlowScheme>()
 			{
 				@Override
@@ -358,6 +356,8 @@ public class Days extends J2hObject
 					return byakuren;
 				}
 			});
+			
+			addSpecial(day, type, "Dialogue", new Day7Dialogue());
 			
 			addCharacter(day, type, "Shinki", new Getter<AllStarBoss>()
 			{

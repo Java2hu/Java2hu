@@ -145,7 +145,13 @@ public class Background extends ABackground
 	
 	private double uOffset = 0d;
 	private double vOffset = 0d;
+	
 	private double rotation = 0d;
+	
+	public void setRotation(double rotation)
+	{
+		this.rotation = rotation;
+	}
 	
 	@Override
 	public void onDraw()

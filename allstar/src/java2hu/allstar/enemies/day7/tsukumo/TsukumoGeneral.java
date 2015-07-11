@@ -5,9 +5,13 @@ import java2hu.HitboxSprite;
 import java2hu.J2hGame;
 import java2hu.J2hGame.ClearType;
 import java2hu.allstar.AllStarStageScheme;
+import java2hu.allstar.enemies.AllStarBoss;
 import java2hu.allstar.util.AllStarUtil;
+import java2hu.gameflow.GameFlowScheme.ReturnSyncTask;
 import java2hu.gameflow.GameFlowScheme.WaitConditioner;
 import java2hu.gameflow.SpecialFlowScheme;
+import java2hu.object.BGMPlayer;
+import java2hu.object.DrawObject;
 import java2hu.object.StageObject;
 import java2hu.object.bullet.Bullet;
 import java2hu.object.bullet.Laser;
@@ -25,8 +29,11 @@ import java2hu.touhou.bullet.ThLaserColor;
 import java2hu.touhou.bullet.ThLaserType;
 import java2hu.touhou.sounds.TouhouSounds;
 import java2hu.util.BossUtil;
+import java2hu.util.Duration;
 import java2hu.util.MathUtil;
+import java2hu.util.ObjectUtil;
 import java2hu.util.Scheduler;
+import java2hu.util.SchemeUtil;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -34,7 +41,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 public class TsukumoGeneral implements SpecialFlowScheme<AllStarStageScheme>
 {
 	@Override
-	public void executeFight(AllStarStageScheme scheme)
+	public void executeFight(final AllStarStageScheme scheme)
 	{
 		final J2hGame g = Game.getGame();
 
@@ -48,6 +55,28 @@ public class TsukumoGeneral implements SpecialFlowScheme<AllStarStageScheme>
 			{
 				boss1SO.setObject(new Benben(100, Game.getGame().getWidth()/2 - 200, 800));
 				boss2SO.setObject(new Yatsuhashi(100, Game.getGame().getWidth()/2 + 200, 800));
+			
+				final BGMPlayer player = new BGMPlayer(boss2SO.getObject().getBackgroundMusic(), true)
+				{
+					@Override
+					public boolean isPersistant()
+					{
+						return boss1SO.getObject().isOnStage() && boss2SO.getObject().isOnStage();
+					}
+				};
+				
+				Game.getGame().addTaskGame(new Runnable()
+				{
+					@Override
+					public void run()
+					{
+						Game.getGame().spawn(player);
+						player.play();
+						player.fadeIn();
+					}
+				}, 30);
+				
+				boss2SO.getObject().setBackgroundMusic(null);
 			}
 		}, 1);
 		
@@ -100,6 +129,8 @@ public class TsukumoGeneral implements SpecialFlowScheme<AllStarStageScheme>
 						
 						AllStarUtil.introduce(boss1, boss2);
 						
+						BossUtil.addBossEffects(boss1, boss1.getAuraColor(), boss1.getBgAuraColor());
+						
 						boss1.healUp();
 					}
 				}, 70);
@@ -118,6 +149,8 @@ public class TsukumoGeneral implements SpecialFlowScheme<AllStarStageScheme>
 						barBoss2.getObject().addSplit(0.8f);
 						
 						boss2.healUp();
+						
+						BossUtil.addBossEffects(boss2, boss2.getAuraColor(), boss2.getBgAuraColor());
 						
 						Game.getGame().startSpellCard(new TsukumoNonSpell(boss1, boss2));
 					}
@@ -159,6 +192,9 @@ public class TsukumoGeneral implements SpecialFlowScheme<AllStarStageScheme>
 		
 		boss1.setHealth(boss1.getMaxHealth());
 		boss2.setHealth(boss2.getMaxHealth());
+		
+		final SaveableObject<DrawObject> circle1 = new SaveableObject<DrawObject>();
+		final SaveableObject<DrawObject> circle2 = new SaveableObject<DrawObject>();
 
 		Game.getGame().addTaskGame(new Runnable()
 		{
@@ -176,82 +212,96 @@ public class TsukumoGeneral implements SpecialFlowScheme<AllStarStageScheme>
 				
 				AllStarUtil.presentSpellCard(boss2, "Stormy Harmony");
 				
-				Game.getGame().startSpellCard(new TsukumoSpell(boss1, boss2));
+				final TsukumoSpell card = new TsukumoSpell(boss1, boss2);
+				
+				boss2.spawnBackground(scheme.getBossAura());
+				
+				Game.getGame().startSpellCard(card);
+				
+				circle1.setObject(BossUtil.spellcardCircle(boss1, card, scheme.getBossAura()));
+				circle2.setObject(BossUtil.spellcardCircle(boss2, card, scheme.getBossAura()));
 			}
 		}, 1);
 		
-		scheme.setWait(new WaitConditioner()
+		final AllStarBoss boss = scheme.runAndReturnSync(new ReturnSyncTask<AllStarBoss>()
 		{
 			@Override
-			public boolean returnTrueToWait()
+			public void run()
 			{
-				if(boss1.isDead() && barBoss1.getObject() != null)
+				if(boss1.isDead())
 				{
-					Game.getGame().addTaskGame(new Runnable()
-					{
-						@Override
-						public void run()
-						{
-							BossUtil.mapleExplosion(boss1.getX(), boss1.getY());
-							
-							if(barBoss1.getObject() != null)
-							{
-								boss1.setPosition(-1000, -1000);
-								Game.getGame().delete(barBoss1.getObject());
-								barBoss1.setObject(null);
-							}
-						}
-					}, 1);
+					setResult(boss1);
 				}
 				
-				if(boss2.isDead() && barBoss2.getObject() != null)
+				if(boss2.isDead())
 				{
-					Game.getGame().addTaskGame(new Runnable()
-					{
-						@Override
-						public void run()
-						{
-							BossUtil.mapleExplosion(boss2.getX(), boss2.getY());
-							
-							if(barBoss2.getObject() != null)
-							{
-								boss2.setPosition(-1000, -1000);
-								Game.getGame().delete(barBoss2.getObject());
-								barBoss2.setObject(null);
-							}
-						}
-					}, 1);
+					setResult(boss2);
 				}
 				
-				if(boss1.isDead() && boss2.isDead())
-					return false;
-				
-				return true;
+				if(!isCompleted())
+					Game.getGame().addTask(this, 1);
 			}
 		});
 		
-		scheme.doWait();
+		final AllStarBoss bossAlive = boss == boss1 ? boss2 : boss1;
+		final SaveableObject<DrawObject> circleDead = boss == boss2 ? circle2 : circle1;
+		final SaveableObject<CircleHealthBar> barDead = boss == boss2 ? barBoss2 : barBoss1;
+		
+		SchemeUtil.deathAnimation(scheme, boss, boss.getAuraColor());
+		
+		Game.getGame().delete(barDead.getObject());
+		Game.getGame().delete(circleDead.getObject());
 		
 		Game.getGame().addTaskGame(new Runnable()
 		{
 			@Override
 			public void run()
 			{
-				Game.getGame().delete(boss1);
-				Game.getGame().delete(boss2);
-				
-				Game.getGame().clearSpellcards();
-				Game.getGame().clear(ClearType.ALL_OBJECTS);
-				
-				if(barBoss1.getObject() != null)
-					BossUtil.mapleExplosion(boss1.getX(), boss1.getY());
-				
-				if(barBoss2.getObject() != null)
-					BossUtil.mapleExplosion(boss2.getX(), boss2.getY());
+				BossUtil.mapleExplosion(boss);
+				boss.setPosition(-1000, -1000);
+				boss.addEffect(new Plugin<StageObject>()
+				{
+					@Override
+					public void update(StageObject object, long tick)
+					{
+						object.setPosition(-1000, -1000);
+					}
+				});
 			}
 		}, 1);
 		
-		scheme.waitTicks(5); // Prevent concurrency issues.
+		SchemeUtil.waitForDeath(scheme, bossAlive);
+
+		Game.getGame().addTaskGame(new Runnable()
+		{
+			@Override
+			public void run()
+			{
+				Game.getGame().clearCircle(800f, bossAlive, ClearType.ALL);
+			}
+		}, 1);
+		
+		scheme.waitTicks(2);
+		
+		SchemeUtil.deathAnimation(scheme, bossAlive, boss.getAuraColor());
+		
+		Game.getGame().addTaskGame(new Runnable()
+		{
+			@Override
+			public void run()
+			{
+				ObjectUtil.deathAnimation(bossAlive);
+				
+				Game.getGame().delete(boss);
+				Game.getGame().delete(bossAlive);
+				
+				Game.getGame().clear(ClearType.ALL);
+			}
+		}, 5);
+		
+		scheme.getBossAura().clearAuras();
+		
+		scheme.waitTicks(10); // Prevent concurrency issues.
 	}
 	
 	public static class TsukumoNonSpell extends Spellcard
@@ -268,6 +318,8 @@ public class TsukumoGeneral implements SpecialFlowScheme<AllStarStageScheme>
 			
 			benben.setDamageModifier(0.8f);
 			yatsuhashi.setDamageModifier(0.8f);
+			
+			setSpellcardTime(Duration.seconds(28));
 		}
 		
 		public float offset = 1f;
@@ -395,8 +447,17 @@ public class TsukumoGeneral implements SpecialFlowScheme<AllStarStageScheme>
 
 			this.benben = boss1;
 			this.yatsuhashi = boss2;
+		
+			setSpellcardTime(Duration.seconds(42));
+		}
+		
+		@Override
+		public void onTimeOut()
+		{
+			benben.setHealth(0f);
+			yatsuhashi.setHealth(0f);
 			
-			yatsuhashi.spawnBackground();
+			super.onTimeOut();
 		}
 		
 		int wait = 0;
@@ -420,21 +481,8 @@ public class TsukumoGeneral implements SpecialFlowScheme<AllStarStageScheme>
 			
 			if(!alone)
 			{
-				if(benben.isDead() || yatsuhashi.isDead())
-				{
-				Plugin stayDead = new Plugin()
-				{
-					@Override
-					public void update(StageObject object, long tick)
-					{
-						object.setPosition(-1000, -1000);
-					}
-				};
-				
 				if(benben.isDead())
 				{
-					benben.addEffect(stayDead);
-					
 					alone = true;
 					
 					BossUtil.cloudSpecial(yatsuhashi, Color.PURPLE, Color.YELLOW, 60);
@@ -445,15 +493,12 @@ public class TsukumoGeneral implements SpecialFlowScheme<AllStarStageScheme>
 				
 				if(yatsuhashi.isDead())
 				{
-					yatsuhashi.addEffect(stayDead);
-					
 					alone = true;
 					
 					BossUtil.cloudSpecial(benben, new Color(97f/255f, 66f/255f, 50f/255f, 1f), Color.WHITE, 60);
 					BossUtil.moveTo(benben, Game.getGame().getWidth()/2f, Game.getGame().getHeight() - 250, 800);
 					
 					wait = 60;
-				}
 				}
 			}
 			
@@ -508,13 +553,13 @@ public class TsukumoGeneral implements SpecialFlowScheme<AllStarStageScheme>
 				}
 			}
 
-			if(!benben.isDead() && tick % (alone ? 300 : 600) >= (alone ? 50 : 200) && tick % (alone ? 300 : 600) <= (alone ? 150 : 260) && tick % (alone ? 11 : 13) == 0)
+			if(!benben.isDead() && tick % (alone ? 300 : 600) >= (alone ? 50 : 206) && tick % (alone ? 300 : 600) <= (alone ? 150 : 260) && tick % (alone ? 12 : 14) == 0)
 			{
 				float offset = (tick % (alone ? 300 : 600) - 200) / (alone ? 5f : 4f);
 				
 				TouhouSounds.Notes.NOTE_1.play();
 				
-				for(float i = alone ? 5 : 0; i < 720; i += alone ? 20 : 15)
+				for(float i = alone ? 5 : 0; i <= 720; i += alone ? 20 : 15)
 				{
 					float angle = i;
 					

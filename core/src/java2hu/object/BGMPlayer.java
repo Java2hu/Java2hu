@@ -12,7 +12,7 @@ import com.badlogic.gdx.utils.Disposable;
 /**
  * Stage object holding a MediaPlayer instance, which will automatically handle pausing/unpausing.
  */
-public abstract class BGMPlayer extends StageObject implements EventListener
+public class BGMPlayer extends StageObject implements EventListener
 {
 	private Music bgm;
 	private boolean pauseOnPause;
@@ -38,7 +38,11 @@ public abstract class BGMPlayer extends StageObject implements EventListener
 		});
 		
 		if(pauseOnPause)
+		{
+			System.out.println("Registering");
 			game.registerEvents(this);
+			System.out.println("Done");
+		}
 	}
 	
 	boolean wasPlaying = false;
@@ -132,6 +136,11 @@ public abstract class BGMPlayer extends StageObject implements EventListener
 	public void setFadeDelay(int fadeDelay)
 	{
 		this.fadeDelay = fadeDelay;
+	}
+	
+	public void play()
+	{
+		getBgm().play();
 	}
 	
 	/**

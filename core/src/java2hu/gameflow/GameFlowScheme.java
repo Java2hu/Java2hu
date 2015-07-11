@@ -168,8 +168,12 @@ public abstract class GameFlowScheme extends Thread
 			@Override
 			public boolean returnTrueToWait()
 			{
-				if(!task.isCompleted())
-					System.out.println("run and return sync task isn't completed yet...");
+				final long l = Game.getGame().getTick() % 200;
+				
+				if(!task.isCompleted() && l == 0)
+				{
+					System.out.println("Something not working? A runAndReturnSync task is still waiting.");
+				}
 				
 				return !task.isCompleted();
 			}
