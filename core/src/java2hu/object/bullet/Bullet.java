@@ -160,7 +160,7 @@ public class Bullet extends StageObject
 	@Deprecated
 	public void setVelocityXTick(float velocityX)
 	{
-		float perSecond = velocityX * game.LOGIC_TPS;
+		float perSecond = velocityX * game.currentTPS;
 		
 		this.velocityX = perSecond;
 	}
@@ -172,7 +172,7 @@ public class Bullet extends StageObject
 	@Deprecated
 	public void setVelocityYTick(float velocityY)
 	{
-		float perSecond = velocityY * game.LOGIC_TPS;
+		float perSecond = velocityY * game.currentTPS;
 		
 		this.velocityY = perSecond;
 	}
@@ -183,7 +183,7 @@ public class Bullet extends StageObject
 	@Deprecated
 	public float getVelocityXTick()
 	{
-		return velocityX / game.LOGIC_TPS;
+		return velocityX / game.currentTPS;
 	}
 	
 	/**
@@ -192,7 +192,7 @@ public class Bullet extends StageObject
 	@Deprecated
 	public float getVelocityYTick()
 	{
-		return velocityY / game.LOGIC_TPS;
+		return velocityY / game.currentTPS;
 	}
 	
 	public void setVelocityX(float velocityX)

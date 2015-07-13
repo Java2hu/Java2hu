@@ -725,7 +725,7 @@ public abstract class StageObject extends J2hObject implements IPosition
 	/**
 	 * The update method should be used to update any logic, positioning, etc.
 	 * This will halt when the game is paused.
-	 * This methods runs on the logic loop, which runs at {@value J2hGame#LOGIC_TPS} tps by default, but can be different. 
+	 * This methods runs on the logic loop, which runs at {@value J2hGame#currentTPS} tps by default, but can be different. 
 	 * @param tick
 	 */
 	public abstract void onUpdate(long tick);

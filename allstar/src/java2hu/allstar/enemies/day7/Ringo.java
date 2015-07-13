@@ -14,6 +14,7 @@ import java2hu.allstar.enemies.AllStarBoss;
 import java2hu.allstar.util.AllStarUtil;
 import java2hu.background.Background;
 import java2hu.background.BackgroundBossAura;
+import java2hu.background.ClearBackground;
 import java2hu.gameflow.GameFlowScheme.WaitConditioner;
 import java2hu.helpers.ZIndexHelper;
 import java2hu.object.bullet.Bullet;
@@ -96,35 +97,63 @@ public class Ringo extends AllStarBoss
 		backgroundSpawner = new Setter<BackgroundBossAura>()
 		{
 			@Override
-			public void set(BackgroundBossAura t)
+			public void set(final BackgroundBossAura t)
 			{
-				final Background bg = new Background(Loader.texture(FOLDER.child("bg.png")));
-				bg.setBlendFunc(GL20.GL_ONE_MINUS_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_COLOR);
-				
+				final Background bg = new Background(Loader.texture(FOLDER.child("bg.png")))
+				{
+					@Override
+					public void onDraw()
+					{
+						setBlendFunc(GL20.GL_ONE_MINUS_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_COLOR);
+						
+						super.onDraw();
+					};
+				};
+
 				bg.setFrameBuffer(t.getBackgroundBuffer());
 				bg.setVelV(0.05d);
 				bg.setVelU(-0.05d);
 				bg.getSprite().setScale(0.75f);
 				bg.getSprite().setAlpha(1f);
-				bg.setZIndex(bg.getZIndex());
+				bg.setZIndex(bg.getZIndex() - 20);
+	
 				game.spawn(bg);
 				
 				float speed = 10;
 				
 				// Layer 1
-				final Background bge = new Background(Loader.texture(FOLDER.child("bge.png")));
+				final Background bge = new Background(Loader.texture(FOLDER.child("bge.png")))
+				{
+					@Override
+					public void onDraw()
+					{
+						setBlendFunc(GL20.GL_DST_ALPHA, GL20.GL_ONE_MINUS_SRC_COLOR);
+						
+						super.onDraw();
+					};
+				};
+				
 				bge.setFrameBuffer(t.getBackgroundBuffer());
 				bge.getSprite().setScale(1.5f);
 				bge.setRotationDegs(speed);
 				bge.getSprite().setAlpha(1f);
 				bge.setZIndex(bg.getZIndex() - 2);
-				bge.setBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_DST_COLOR);
+
 				game.spawn(bge);
 
 				// Layer 2
 				{
-					Background bgeTwo = new Background(Loader.texture(FOLDER.child("bge.png")));
-					bgeTwo.setBlendFunc(GL20.GL_ONE, GL20.GL_ONE_MINUS_DST_ALPHA);
+					Background bgeTwo = new Background(Loader.texture(FOLDER.child("bge.png")))
+					{
+						@Override
+						public void onDraw()
+						{
+							setBlendFunc(GL20.GL_SRC_COLOR, GL20.GL_ZERO);
+							
+							super.onDraw();
+						};
+					};
+
 					bgeTwo.getSprite().setScale(1.5f);
 					bgeTwo.setFrameBuffer(t.getBackgroundBuffer());
 					bgeTwo.setRotationDegs(-speed);
@@ -132,6 +161,13 @@ public class Ringo extends AllStarBoss
 					bgeTwo.setZIndex(bg.getZIndex() - 4);
 					game.spawn(bgeTwo);
 				}
+				
+				Game.getGame().spawn(new ClearBackground(bg.getZIndex() - 10)
+				{
+					{
+						setFrameBuffer(t.getBackgroundBuffer());
+					}
+				});
 			}
 		};
 	}
@@ -383,7 +419,7 @@ public class Ringo extends AllStarBoss
 		}
 
 		@Override
-		public void tick(int tick, J2hGame game, Ringo boss)
+		public void tick(int tick, J2hGame game, final Ringo boss)
 		{
 			final Player player = game.getPlayer();
 			
@@ -440,7 +476,21 @@ public class Ringo extends AllStarBoss
 							{
 								TouhouSounds.Enemy.RELEASE_1.play(0.1f);
 								
-								final Bullet bullet = ThBullet.makeBullet(ThBulletType.BALL_BIG, ThBulletColor.WHITE, new Position(object.getX() - (Math.cos(finalRad) * 140), object.getY() - (Math.sin(finalRad) * 140)));
+								final int returnTime = 200;
+								
+								final Bullet bullet = new Bullet(new ThBullet(ThBulletType.BALL_BIG, ThBulletColor.WHITE), (float)(object.getX() - (Math.cos(finalRad) * 140)), (float) (object.getY() - (Math.sin(finalRad) * 140)))
+								{
+									@Override
+									public void checkCollision()
+									{
+										if(getTicksAlive() > returnTime)
+										{
+											return;
+										}
+										
+										super.checkCollision();
+									};
+								};
 								
 								bullet.addEffect(new Plugin<Bullet>()
 								{
@@ -454,7 +504,28 @@ public class Ringo extends AllStarBoss
 											speed = 0f;
 										}
 
-										bullet.setDirectionDeg(finalAngle + ((bool ? 0.12f : -0.12f) * (object.getTicksAlive())) + (((bool ? -90f : 90f))), speed);
+										if(object.getTicksAlive() > returnTime)
+										{
+											Position mouth = new Position(boss).add(new Position(0, 35f));
+											
+											bullet.setDirectionDeg(MathUtil.getAngle(bullet, mouth), 500f);
+											
+											double dist = MathUtil.getDistance(bullet, mouth);
+											float mul = (float) (dist < 20 ? (dist / 20f) : 1f);
+											
+											bullet.setScale(0.4f * mul);
+											bullet.getCurrentSprite().setAlpha(0.5f);
+											bullet.useDeathAnimation(false);
+											
+											if(dist < 2)
+											{
+												game.delete(object);
+											}
+										}
+										else
+										{
+											bullet.setDirectionDeg(finalAngle + ((bool ? 0.12f : -0.12f) * (object.getTicksAlive())) + (((bool ? -90f : 90f))), speed);
+										}
 									}
 								});
 								

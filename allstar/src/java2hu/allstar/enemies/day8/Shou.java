@@ -8,6 +8,7 @@ import java2hu.J2hGame.ClearType;
 import java2hu.Loader;
 import java2hu.Position;
 import java2hu.StartupLoopAnimation;
+import java2hu.allstar.AllStarGame;
 import java2hu.allstar.AllStarStageScheme;
 import java2hu.allstar.enemies.AllStarBoss;
 import java2hu.allstar.util.AllStarUtil;
@@ -17,9 +18,9 @@ import java2hu.object.DrawObject;
 import java2hu.object.StageObject;
 import java2hu.object.bullet.Bullet;
 import java2hu.object.bullet.Laser;
-import java2hu.object.enemy.greater.Boss;
 import java2hu.object.player.Player;
 import java2hu.object.ui.CircleHealthBar;
+import java2hu.pathing.SimpleTouhouBossPath;
 import java2hu.plugin.sprites.FadeInSprite;
 import java2hu.spellcard.Spellcard;
 import java2hu.system.SaveableObject;
@@ -32,15 +33,19 @@ import java2hu.touhou.bullet.ThLaserType;
 import java2hu.touhou.sounds.TouhouSounds;
 import java2hu.util.AnimationUtil;
 import java2hu.util.BossUtil;
+import java2hu.util.Duration;
 import java2hu.util.Getter;
 import java2hu.util.ImageSplitter;
 import java2hu.util.MathUtil;
+import java2hu.util.ObjectUtil;
 import java2hu.util.Scheduler;
+import java2hu.util.SchemeUtil;
 
 import shaders.ShaderLibrary;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.g2d.Animation;
@@ -151,7 +156,7 @@ public class Shou extends AllStarBoss
 	}
 
 	@Override
-	public void executeFight(AllStarStageScheme scheme)
+	public void executeFight(final AllStarStageScheme scheme)
 	{
 		final J2hGame g = Game.getGame();
 		final Shou boss = this;
@@ -180,7 +185,7 @@ public class Shou extends AllStarBoss
 						AllStarUtil.introduce(boss);
 						
 						boss.healUp();
-						BossUtil.backgroundAura(boss, boss.getBgAuraColor());
+						BossUtil.addBossEffects(boss, Color.RED, boss.getBgAuraColor());
 						
 						Game.getGame().startSpellCard(new ShouNonSpell(boss));
 					}
@@ -229,43 +234,44 @@ public class Shou extends AllStarBoss
 				Game.getGame().clearObjects();
 				AllStarUtil.presentSpellCard(boss, SPELLCARD_NAME);
 				
-				Game.getGame().startSpellCard(new ShouSpell(boss));
+				final ShouSpell card = new ShouSpell(boss);
+				
+				Game.getGame().startSpellCard(card);
+				
+				BossUtil.spellcardCircle(boss, card, scheme.getBossAura());
 			}
 		}, 1);
 		
-		scheme.setWait(new WaitConditioner()
-		{
-			@Override
-			public boolean returnTrueToWait()
-			{
-				try
-				{
-					return !boss.isDead();
-				}
-				catch(Exception e)
-				{
-					return true;
-				}
-			}
-		});
-		
-		scheme.doWait();
+		SchemeUtil.waitForDeath(scheme, boss);
 		
 		Game.getGame().addTaskGame(new Runnable()
 		{
 			@Override
 			public void run()
 			{
-				Game.getGame().delete(boss);
-				
-				Game.getGame().clearSpellcards();
-				Game.getGame().clear(ClearType.ALL_OBJECTS);
-				
-				BossUtil.mapleExplosion(boss.getX(), boss.getY());
+				Game.getGame().clearCircle(800f, boss, ClearType.ALL);
 			}
 		}, 1);
 		
-		scheme.waitTicks(5); // Prevent concurrency issues.
+		scheme.waitTicks(2);
+		
+		boss.playSpecial(false);
+		SchemeUtil.deathAnimation(scheme, boss, boss.getAuraColor());
+		
+		Game.getGame().addTaskGame(new Runnable()
+		{
+			@Override
+			public void run()
+			{
+				ObjectUtil.deathAnimation(boss);
+				
+				Game.getGame().delete(boss);
+				
+				Game.getGame().clear(ClearType.ALL);
+			}
+		}, 5);
+		
+		scheme.waitTicks(10); // Prevent concurrency issues.
 	}
 	
 	public static class ShouNonSpell extends Spellcard
@@ -273,6 +279,8 @@ public class Shou extends AllStarBoss
 		public ShouNonSpell(StageObject owner)
 		{
 			super(owner);
+			
+			setSpellcardTime(Duration.seconds(40));
 		}
 
 		@Override
@@ -289,7 +297,7 @@ public class Shou extends AllStarBoss
 			
 			if(tick % 200 == 170)
 			{
-				BossUtil.moveAroundRandomly((Boss)getOwner(), (int) (getGame().getMaxX() / 2) - 200, (int)(getGame().getMaxX() / 2) + 200, Game.getGame().getHeight() - 100, Game.getGame().getHeight() - 200, 800);
+				boss.getPathing().setCurrentPath(new SimpleTouhouBossPath(boss));
 			}
 			
 			if(tick % 200 == 0)
@@ -402,6 +410,8 @@ public class Shou extends AllStarBoss
 		public ShouSpell(StageObject owner)
 		{
 			super(owner);
+			
+			setSpellcardTime(Duration.seconds(54));
 		}
 
 		@Override
@@ -419,7 +429,7 @@ public class Shou extends AllStarBoss
 				{
 					{
 						boss.bg.setBounds(0, 0, Game.getGame().getWidth(), Game.getGame().getHeight());
-						setZIndex(-2);
+						setZIndex(-10);
 						
 						addEffect(new FadeInSprite(new Getter<Sprite>()
 						{
@@ -429,6 +439,9 @@ public class Shou extends AllStarBoss
 								return boss.bg;
 							}
 						}, 0.1f));
+						
+						if(AllStarGame.CURRENT_AURA != null)
+							setFrameBuffer(AllStarGame.CURRENT_AURA.getBackgroundBuffer());
 					}
 					
 					@Override
@@ -442,7 +455,10 @@ public class Shou extends AllStarBoss
 				game.spawn(new ScrollingBackground(boss.bge, -2f, -2f)
 				{
 					{
-						setZIndex(-1);
+						setZIndex(-9);
+						
+						if(AllStarGame.CURRENT_AURA != null)
+							setFrameBuffer(AllStarGame.CURRENT_AURA.getBackgroundBuffer());
 						
 						addEffect(new FadeInSprite(new Getter<Sprite>()
 						{
@@ -463,7 +479,7 @@ public class Shou extends AllStarBoss
 			
 			if(tick % 200 == 160)
 			{
-				BossUtil.moveAroundRandomly((Boss)getOwner(), (int) (getGame().getMaxX() / 2) - 200, (int)(getGame().getMaxX() / 2) + 200, Game.getGame().getHeight() - 100, Game.getGame().getHeight() - 200, 800);
+				boss.getPathing().setCurrentPath(new SimpleTouhouBossPath(boss));
 			}
 			
 			if(tick % 200 == 0)

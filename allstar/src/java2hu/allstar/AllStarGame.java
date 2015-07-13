@@ -7,6 +7,7 @@ import java2hu.allstar.enemies.AllStarBoss;
 import java2hu.allstar.menu.LoadScreen;
 import java2hu.allstar.menu.MainMenu;
 import java2hu.allstar.util.AllStarUtil;
+import java2hu.background.BackgroundBossAura;
 import java2hu.object.StageObject;
 
 import com.badlogic.gdx.Gdx;
@@ -17,6 +18,8 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 
 public class AllStarGame extends J2hGame
 {
+	public static BackgroundBossAura CURRENT_AURA;
+	
 	LoadScreen screen;
 	
 	public AllStarGame(int width, int height)

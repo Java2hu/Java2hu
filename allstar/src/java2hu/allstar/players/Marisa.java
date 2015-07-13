@@ -123,7 +123,7 @@ public class Marisa extends Player
 		
 		final Marisa marisa = this;
 		
-		for(int i = 180; i <= 360; i += 180)
+		for(int i = 0; i < 360; i += 180)
 		{
 			final float rotation = i;
 			
@@ -288,11 +288,17 @@ public class Marisa extends Player
 			{
 				PlayerBullet shot = new PlayerBullet(AnimationUtil.copyAnimation(bullet2), getX() + i, getY() + 10);
 				
+				final boolean pc98 = idle == pc98Idle;
+				
 				shot.setDamage(!isFocused() ? 1.8f/3f : 1.4f);
-				shot.setRotationDeg(90);
+				
+				if(!pc98)
+					shot.setRotationDeg(90);
 				
 				if(!isFocused())
-					shot.getCurrentSprite().setScale(idle == pc98Idle ? 0.2f : 1f, idle == pc98Idle ? 1f : 0.4f);
+				{
+					shot.getCurrentSprite().setScale(pc98 ? 0.2f : 1f, pc98 ? 1f : 0.4f);
+				}
 
 				shot.getCurrentSprite().setAlpha(0.5f);
 				

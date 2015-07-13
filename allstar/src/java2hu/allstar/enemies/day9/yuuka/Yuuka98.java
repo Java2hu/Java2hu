@@ -9,13 +9,13 @@ import java2hu.Position;
 import java2hu.allstar.AllStarStageScheme;
 import java2hu.allstar.enemies.AllStarBoss;
 import java2hu.background.BackgroundBossAura;
+import java2hu.background.ClearBackground;
 import java2hu.object.DrawObject;
 import java2hu.object.bullet.Bullet;
 import java2hu.touhou.bullet.ThBullet;
 import java2hu.touhou.bullet.ThBulletColor;
 import java2hu.touhou.bullet.ThBulletType;
 import java2hu.util.AnimationUtil;
-import java2hu.util.BossUtil.BackgroundAura;
 import java2hu.util.ImageSplitter;
 import java2hu.util.ImageUtil;
 
@@ -124,6 +124,13 @@ public class Yuuka98 extends AllStarBoss
 
 		final Color[] colors = { Color.BLUE.cpy().sub(0f, 0f, 0.2f, 0f), Color.MAGENTA.cpy().sub(0.2f, 0f, 0.2f, 0f), Color.GREEN.cpy().sub(0f, 0.2f, 0f, 0f) };
 
+		Game.getGame().spawn(new ClearBackground(-140)
+		{
+			{
+				setFrameBuffer(aura.getBackgroundBuffer());
+			}
+		});
+		
 		Game.getGame().spawn(new DrawObject()
 		{
 			Texture[] textures = null;

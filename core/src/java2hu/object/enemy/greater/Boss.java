@@ -110,7 +110,8 @@ public abstract class Boss extends LivingObject
 		}
 		
 		Rectangle b = getPlayerHitHitbox().getBoundingRectangle();
-		getPlayerHitHitbox().setPosition(getX() - b.width / 2, getY() - b.height / 2);
+		
+		playerHitHitbox.setPosition(getX() - b.width / 2, getY() - b.height / 2);
 		
 		if(Intersector.overlapConvexPolygons(g.getPlayer().getHitbox(), getPlayerHitHitbox()))
 			g.getPlayer().onHit(this);

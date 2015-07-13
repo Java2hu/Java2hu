@@ -680,7 +680,7 @@ public class J2hGame extends ApplicationAdapter implements InputProcessor
 		
 		final ArrayList<Runnable> clearRunnables = new ArrayList<Runnable>();
 		
-		for(float size = 0; size < maxSize; size += (expansionSpeed / (double)LOGIC_TPS))
+		for(float size = 0; size < maxSize; size += (expansionSpeed / (double)currentTPS))
 		{
 			final float finalSize = size;
 			
@@ -2031,7 +2031,17 @@ public class J2hGame extends ApplicationAdapter implements InputProcessor
 	/**
 	 * Ticks per second in the logic loop, higher loops require higher FPS from the user!
 	 */
-	public static final int LOGIC_TPS = 60;
+	public static int currentTPS = 60;
+	
+	/**
+	 * Ticks per second while the user is holding down L-Control, used to speed up the game.
+	 */
+	public static final int SPEED_LOGIC_TPS = 140;
+	
+	/**
+	 * Default TPS
+	 */
+	public static final int DEFAULT_LOGIC_TPS = 60;
 	
 	private float nextTick = 0; 
 	private float deltaSkip = 0;
@@ -2039,6 +2049,8 @@ public class J2hGame extends ApplicationAdapter implements InputProcessor
 	@Override
 	public void render()
 	{
+		currentTPS = Gdx.input.isKeyPressed(Keys.CONTROL_LEFT) ? SPEED_LOGIC_TPS : DEFAULT_LOGIC_TPS;
+		
 		if(profiling)
 		{
 			profilingOutput = new ArrayList<String>();
@@ -2097,7 +2109,7 @@ public class J2hGame extends ApplicationAdapter implements InputProcessor
 				drawDebugData();
 			}
 			
-			float secondsPerTick = 1f/LOGIC_TPS;
+			float secondsPerTick = 1f/currentTPS;
 			boolean updateLogic = false;
 			
 			if(internalElapsedTime > nextTick)

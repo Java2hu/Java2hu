@@ -6,6 +6,7 @@ import java2hu.J2hGame;
 import java2hu.J2hGame.ClearType;
 import java2hu.Loader;
 import java2hu.MovementAnimation;
+import java2hu.RNG;
 import java2hu.allstar.AllStarStageScheme;
 import java2hu.allstar.enemies.AllStarBoss;
 import java2hu.allstar.util.AllStarUtil;
@@ -15,6 +16,7 @@ import java2hu.gameflow.GameFlowScheme.WaitConditioner;
 import java2hu.object.DrawObject;
 import java2hu.object.StageObject;
 import java2hu.object.bullet.Bullet;
+import java2hu.object.bullet.LaserDrawer;
 import java2hu.object.enemy.greater.Boss;
 import java2hu.object.player.Player;
 import java2hu.object.ui.CircleHealthBar;
@@ -26,13 +28,15 @@ import java2hu.system.SaveableObject;
 import java2hu.touhou.bullet.ThBullet;
 import java2hu.touhou.bullet.ThBulletColor;
 import java2hu.touhou.bullet.ThBulletType;
+import java2hu.touhou.bullet.ThLaser;
+import java2hu.touhou.bullet.ThLaserType;
 import java2hu.touhou.sounds.TouhouSounds;
 import java2hu.util.BossUtil;
+import java2hu.util.Duration;
 import java2hu.util.Getter;
 import java2hu.util.HitboxUtil;
 import java2hu.util.ImageSplitter;
 import java2hu.util.MathUtil;
-import java2hu.util.MeshUtil;
 import java2hu.util.ObjectUtil;
 import java2hu.util.Scheduler;
 import java2hu.util.SchemeUtil;
@@ -41,7 +45,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.Mesh;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.g2d.Animation;
@@ -310,6 +313,8 @@ public class Raiko extends AllStarBoss
 		public RaikoNonSpell(StageObject owner)
 		{
 			super(owner);
+			
+			setSpellcardTime(Duration.seconds(42));
 		}
 		
 		public int offset = 0;
@@ -474,9 +479,11 @@ public class Raiko extends AllStarBoss
 		{
 			super(owner);
 			
+			setSpellcardTime(Duration.seconds(60));
+			
 			final Raiko raiko = (Raiko)owner;
 			
-			raiko.setDamageModifier(0.3f);
+			raiko.setDamageModifier(0.38f);
 
 			drum = new HitboxSprite(new Sprite(Loader.texture(Gdx.files.internal("enemy/raiko/drum.png"))));
 			drumSkull = new HitboxSprite(new Sprite(Loader.texture(Gdx.files.internal("enemy/raiko/drumSkull.png"))));
@@ -583,7 +590,7 @@ public class Raiko extends AllStarBoss
 		private float activationDistance = 300F;
 
 		@Override
-		public void tick(int tick)
+		public void tick(final int tick)
 		{
 			final Raiko boss = (Raiko)getOwner();
 			
@@ -591,27 +598,56 @@ public class Raiko extends AllStarBoss
 			{
 				((AllStarBoss)getOwner()).playSpecial(true);
 				
-				Game.getGame().spawn(new DrawObject()
+				Game.getGame().spawn(new LaserDrawer(new ThLaser(ThLaserType.LIGHTNING).getAnimation(), 10f, 0f)
 				{
-					Mesh mesh;
+					{
+						setZIndex(5000);
+					}
+					
+					float rotation = 0f;
 					
 					@Override
 					public void onDraw()
 					{
-						Player player = Game.getGame().getPlayer();
+						getPoints().clear();
 						
-						mesh = MeshUtil.makeMesh(mesh, MeshUtil.makeCircleVertices(player.getX(), player.getY(), 100, activationDistance, activationDistance + 1f, Color.GRAY));
+						setThickness(20f);
 						
-						Game.getGame().batch.end();
+						float offset = 0f;
 						
-						MeshUtil.startShader();
+						final int scaleTime = 100;
+						final double multiplier = getTicksAlive() < scaleTime ? RNG.multiplier(scaleTime, getTicksAlive()) : 1f;
 						
-						MeshUtil.renderMesh(mesh);
+						float radius = (float) (multiplier * activationDistance);
 						
-						MeshUtil.endShader();
+						for(int i = 0; i <= 360 - offset; i++)
+						{
+							if(i % 75 == 0)
+							{
+								addPoint(Float.NaN, Float.NaN);
+								offset -= 10f;
+							}
+							
+							float angle = rotation + i + offset;
+							float rad = (float) Math.toRadians(angle);
+							
+							addPoint(game.getPlayer().getX() + (float)(Math.cos(rad) * radius), game.getPlayer().getY() + (float)(Math.sin(rad) * radius));
+						}
 						
-						Game.getGame().batch.begin();
+						super.onDraw();
 					}
+					
+					@Override
+					public void checkCollision()
+					{
+						
+					}
+					
+					@Override
+					public void onUpdateDelta(float delta)
+					{
+						rotation += 30f * delta;
+					};
 				});
 				
 				Game.getGame().spawn(bge);

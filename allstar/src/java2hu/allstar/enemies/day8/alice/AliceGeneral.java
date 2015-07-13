@@ -29,7 +29,10 @@ import java2hu.touhou.bullet.ThLaserColor;
 import java2hu.touhou.bullet.ThLaserType;
 import java2hu.touhou.sounds.TouhouSounds;
 import java2hu.util.BossUtil;
+import java2hu.util.Duration;
 import java2hu.util.MathUtil;
+import java2hu.util.ObjectUtil;
+import java2hu.util.SchemeUtil;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
@@ -55,14 +58,14 @@ public class AliceGeneral implements SpecialFlowScheme<AllStarStageScheme>
 	public void executeFight(AllStarStageScheme scheme)
 	{
 		final J2hGame g = Game.getGame();
-		final SaveableObject<Alice> yuuka = new SaveableObject<Alice>();
+		final SaveableObject<Alice> alice = new SaveableObject<Alice>();
 		
 		Game.getGame().addTaskGame(new Runnable()
 		{
 			@Override
 			public void run()
 			{
-				yuuka.setObject(Alice.newInstance(x, y));
+				alice.setObject(Alice.newInstance(x, y));
 				((AllStarGame)Game.getGame()).setPC98(false);
 			}
 		}, 1);
@@ -72,13 +75,13 @@ public class AliceGeneral implements SpecialFlowScheme<AllStarStageScheme>
 			@Override
 			public boolean returnTrueToWait()
 			{
-				return yuuka.getObject() == null;
+				return alice.getObject() == null;
 			}
 		});
 		
 		scheme.doWait();
 		
-		final Alice firstBoss = yuuka.getObject();
+		final Alice firstBoss = alice.getObject();
 		
 		{
 			final Alice boss = firstBoss;
@@ -109,7 +112,8 @@ public class AliceGeneral implements SpecialFlowScheme<AllStarStageScheme>
 							boss.setDamageModifier(0.8f);
 
 							boss.healUp();
-							BossUtil.backgroundAura(boss, boss.getBgAuraColor());
+							
+							BossUtil.addBossEffects(boss, Color.BLUE, boss.getBgAuraColor());
 
 							Game.getGame().startSpellCard(new AliceSpell(boss));
 						}
@@ -145,9 +149,11 @@ public class AliceGeneral implements SpecialFlowScheme<AllStarStageScheme>
 			});
 
 			scheme.doWait();
+			
+			scheme.getBossAura().clearAuras();
 		}
 		
-		final SaveableObject<Alice98> yuuka98 = new SaveableObject<Alice98>();
+		final SaveableObject<Alice98> alice98 = new SaveableObject<Alice98>();
 		
 		Game.getGame().addTaskGame(new Runnable()
 		{
@@ -157,7 +163,7 @@ public class AliceGeneral implements SpecialFlowScheme<AllStarStageScheme>
 				Game.getGame().getSpellcards().clear();
 				Game.getGame().clearObjects();
 				
-				yuuka98.setObject(Alice98.newInstance(x, y));
+				alice98.setObject(Alice98.newInstance(x, y));
 			}
 		}, 2);
 
@@ -166,13 +172,13 @@ public class AliceGeneral implements SpecialFlowScheme<AllStarStageScheme>
 			@Override
 			public boolean returnTrueToWait()
 			{
-				return yuuka98.getObject() == null;
+				return alice98.getObject() == null;
 			}
 		});
 		
 		scheme.doWait();
 		
-		final Alice98 boss = yuuka98.getObject();
+		final Alice98 boss = alice98.getObject();
 
 		Game.getGame().addTaskGame(new Runnable()
 		{
@@ -190,6 +196,8 @@ public class AliceGeneral implements SpecialFlowScheme<AllStarStageScheme>
 				boss.setMaxHealth(200);
 				boss.setHealing(true);
 				boss.setPosition(firstBoss);
+				
+				BossUtil.addBossEffects(boss, Color.BLUE, boss.getBgAuraColor());
 				
 				float ticks = 40;
 				
@@ -220,7 +228,11 @@ public class AliceGeneral implements SpecialFlowScheme<AllStarStageScheme>
 				
 				AllStarUtil.presentSpellCard(boss, SPELLCARD_NAME);
 				
-				Game.getGame().startSpellCard(new Alice98Spell(boss));
+				final Alice98Spell card = new Alice98Spell(boss);
+				
+				Game.getGame().startSpellCard(card);
+				
+				BossUtil.spellcardCircle(boss, card);
 			}
 		}, 1);
 		
@@ -245,40 +257,37 @@ public class AliceGeneral implements SpecialFlowScheme<AllStarStageScheme>
 		});
 		
 		scheme.doWait();
-		
-		scheme.setWait(new WaitConditioner()
-		{
-			@Override
-			public boolean returnTrueToWait()
-			{
-				try
-				{
-					return !boss.isDead();
-				}
-				catch(Exception e)
-				{
-					return true;
-				}
-			}
-		});
-		
-		scheme.doWait();
+			
+		SchemeUtil.waitForDeath(scheme, boss);
 		
 		Game.getGame().addTaskGame(new Runnable()
 		{
 			@Override
 			public void run()
 			{
-				Game.getGame().delete(boss);
-				
-				Game.getGame().clearSpellcards();
-				Game.getGame().clear(ClearType.ALL_OBJECTS);
-				
-				BossUtil.mapleExplosion(boss.getX(), boss.getY());
+				Game.getGame().clearCircle(800f, boss, ClearType.ALL);
 			}
 		}, 1);
 		
-		scheme.waitTicks(5); // Prevent concurrency issues.
+		scheme.waitTicks(2);
+		
+		boss.playSpecial(false);
+		SchemeUtil.deathAnimation(scheme, boss, boss.getAuraColor());
+		
+		Game.getGame().addTaskGame(new Runnable()
+		{
+			@Override
+			public void run()
+			{
+				ObjectUtil.deathAnimation(boss);
+				
+				Game.getGame().delete(boss);
+				
+				Game.getGame().clear(ClearType.ALL);
+			}
+		}, 5);
+		
+		scheme.waitTicks(10); // Prevent concurrency issues.
 	}
 	
 	public static class AliceSpell extends Spellcard
@@ -286,6 +295,8 @@ public class AliceGeneral implements SpecialFlowScheme<AllStarStageScheme>
 		public AliceSpell(StageObject owner)
 		{
 			super(owner);
+			
+			setSpellcardTime(Duration.seconds(34));
 		}
 
 		@SuppressWarnings("unused")
@@ -296,8 +307,8 @@ public class AliceGeneral implements SpecialFlowScheme<AllStarStageScheme>
 			final Player player = game.getPlayer();
 			final Alice boss = (Alice) getOwner();
 			
-			if(tick % 50 == 0)
-				BossUtil.moveAroundRandomly((Boss)getOwner(), (int) (getGame().getMaxX() / 2) - 100, (int)(getGame().getMaxX() / 2) + 100, Game.getGame().getHeight() - 100, Game.getGame().getHeight() - 200, 600);
+			if(tick % 80 == 0)
+				BossUtil.moveAroundRandomly((Boss)getOwner(), (int) (getGame().getMaxX() / 2) - 100, (int)(getGame().getMaxX() / 2) + 100, Game.getGame().getHeight() - 100, Game.getGame().getHeight() - 200, 800);
 			
 			if(tick > 10 && tick % 4 == 0)
 				TouhouSounds.Enemy.BULLET_1.play(0.3f);
@@ -437,12 +448,21 @@ public class AliceGeneral implements SpecialFlowScheme<AllStarStageScheme>
 		{
 			super(owner);
 			
+			setSpellcardTime(Duration.seconds(46));
+			
 			Alice98 boss = (Alice98)owner;
 			
-			boss.setDamageModifier(0.4f);
+			boss.setDamageModifier(0.45f);
 			
 			Game.getGame().spawn(new DrawObject()
 			{
+				{
+					setZIndex(-5);
+					
+					if(AllStarGame.CURRENT_AURA != null)
+						setFrameBuffer(AllStarGame.CURRENT_AURA.getBackgroundBuffer());
+				}
+				
 				boolean left = true;
 				boolean changed = false;
 				

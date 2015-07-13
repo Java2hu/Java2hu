@@ -3,8 +3,8 @@ package java2hu.allstar.enemies.day8.mai_yuki;
 import java2hu.Border;
 import java2hu.Game;
 import java2hu.J2hGame;
-import java2hu.Loader;
 import java2hu.J2hGame.ClearType;
+import java2hu.Loader;
 import java2hu.SmartTimer;
 import java2hu.allstar.AllStarStageScheme;
 import java2hu.allstar.util.AllStarUtil;
@@ -25,10 +25,13 @@ import java2hu.touhou.bullet.ThBulletColor;
 import java2hu.touhou.bullet.ThBulletType;
 import java2hu.touhou.sounds.TouhouSounds;
 import java2hu.util.BossUtil;
+import java2hu.util.Duration;
 import java2hu.util.Getter;
 import java2hu.util.ImageUtil;
 import java2hu.util.MathUtil;
+import java2hu.util.ObjectUtil;
 import java2hu.util.Scheduler;
+import java2hu.util.SchemeUtil;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Sound;
@@ -54,7 +57,7 @@ public class MaiYukiGeneral implements SpecialFlowScheme<AllStarStageScheme>
 	private boolean done = false;
 
 	@Override
-	public void executeFight(AllStarStageScheme scheme)
+	public void executeFight(final AllStarStageScheme scheme)
 	{
 		final J2hGame g = Game.getGame();
 		final SaveableObject<Yuki> yuki = new SaveableObject<Yuki>();
@@ -93,6 +96,8 @@ public class MaiYukiGeneral implements SpecialFlowScheme<AllStarStageScheme>
 							}
 						}
 						, 0f, 1f, 0.2F));
+						
+						setFrameBuffer(scheme.getBossAura().getBackgroundBuffer());
 
 						addDisposable(black);
 						bge.setOriginCenter();
@@ -177,12 +182,18 @@ public class MaiYukiGeneral implements SpecialFlowScheme<AllStarStageScheme>
 							AllStarUtil.introduce(boss);
 
 							boss.setDamageModifier(0.8f);
+							
+							BossUtil.addBossEffects(boss, Color.RED, Color.BLUE.cpy().mul(0.3f));
 
 							boss.healUp();
 							
 							AllStarUtil.presentSpellCard(boss, YUKI_SPELLCARD_NAME);
 
-							Game.getGame().startSpellCard(new YukiSpell(boss));
+							final YukiSpell card = new YukiSpell(boss);
+							
+							Game.getGame().startSpellCard(card);
+							
+							BossUtil.spellcardCircle(boss, card);
 						}
 					}, 60);
 				}
@@ -223,7 +234,6 @@ public class MaiYukiGeneral implements SpecialFlowScheme<AllStarStageScheme>
 				public void run()
 				{
 					Game.getGame().getSpellcards().clear();
-					Game.getGame().clearObjects();
 					
 					Game.getGame().addTaskGame(new Runnable()
 					{
@@ -247,6 +257,9 @@ public class MaiYukiGeneral implements SpecialFlowScheme<AllStarStageScheme>
 											g.delete(boss);
 
 											bloodExplosion(boss.getX(), boss.getY(), 10f, 2f, 0.5f);
+											
+											scheme.getBossAura().clearAuras();
+											Game.getGame().clearCircle(800f, boss, ClearType.ALL);
 										}
 									}
 								}
@@ -325,12 +338,18 @@ public class MaiYukiGeneral implements SpecialFlowScheme<AllStarStageScheme>
 				Game.getGame().spawn(boss);
 				
 				AllStarUtil.introduce(boss);
+				
+				BossUtil.addBossEffects(boss, Color.BLUE, Color.RED.cpy().mul(0.3f));
 
 				AllStarUtil.presentSpellCard(boss, MAI_SPELLCARD_NAME);
 				
 				BossUtil.moveTo(boss, x, y, 1400);
 
-				Game.getGame().startSpellCard(new MaiSpell(boss));
+				final MaiSpell card = new MaiSpell(boss);
+				
+				Game.getGame().startSpellCard(card);
+				
+				BossUtil.spellcardCircle(boss, card);
 			}
 		}, 1);
 
@@ -356,40 +375,38 @@ public class MaiYukiGeneral implements SpecialFlowScheme<AllStarStageScheme>
 
 		scheme.doWait();
 
-		scheme.setWait(new WaitConditioner()
-		{
-			@Override
-			public boolean returnTrueToWait()
-			{
-				try
-				{
-					return !boss.isDead();
-				}
-				catch(Exception e)
-				{
-					return true;
-				}
-			}
-		});
-
-		scheme.doWait();
-
+		SchemeUtil.waitForDeath(scheme, boss);
+		
 		Game.getGame().addTaskGame(new Runnable()
 		{
 			@Override
 			public void run()
 			{
-				done = true;
-				Game.getGame().delete(boss);
-				
-				Game.getGame().clearSpellcards();
-				Game.getGame().clear(ClearType.ALL_OBJECTS);
-				
-				BossUtil.mapleExplosion(boss.getX(), boss.getY());
+				Game.getGame().clearCircle(800f, boss, ClearType.ALL);
 			}
 		}, 1);
-
-		scheme.waitTicks(5); // Prevent concurrency issues.
+		
+		scheme.waitTicks(2);
+		
+		boss.playSpecial(false);
+		SchemeUtil.deathAnimation(scheme, boss, boss.getAuraColor());
+		
+		done = true;
+		
+		Game.getGame().addTaskGame(new Runnable()
+		{
+			@Override
+			public void run()
+			{
+				ObjectUtil.deathAnimation(boss);
+				
+				Game.getGame().delete(boss);
+				
+				Game.getGame().clear(ClearType.ALL);
+			}
+		}, 5);
+		
+		scheme.waitTicks(10); // Prevent concurrency issues.
 	}
 	
 	public static void bloodExplosion(float x, float y, final float spread, final float maxSize, final float minSize)
@@ -492,6 +509,8 @@ public class MaiYukiGeneral implements SpecialFlowScheme<AllStarStageScheme>
 		public YukiSpell(StageObject owner)
 		{
 			super(owner);
+			
+			setSpellcardTime(Duration.seconds(40));
 		}
 
 		@Override
@@ -509,7 +528,7 @@ public class MaiYukiGeneral implements SpecialFlowScheme<AllStarStageScheme>
 				TouhouSounds.Enemy.BREAK_2.play();
 				boss.setGlowingAura();
 				
-				boss.setDamageModifier(0.5f);
+				boss.setDamageModifier(0.7f);
 			}
 			
 			if(tick < 60)
@@ -553,9 +572,9 @@ public class MaiYukiGeneral implements SpecialFlowScheme<AllStarStageScheme>
 								setBullet(new ThBullet(ThBulletType.KNIFE, ThBulletColor.RED));
 								setRotationFromVelocity(-90);
 								
-								if(!Scheduler.isTracked("reflect", "reflect"))
+								if(!Scheduler.isTracked("reflect", "reflect") && !boss.isDead())
 								{
-									TouhouSounds.Enemy.BREAK_1.play();
+									TouhouSounds.Enemy.BREAK_1.play(0.4f);
 									Scheduler.track("reflect", "reflect", (long) 10);
 								}
 							}
@@ -585,6 +604,8 @@ public class MaiYukiGeneral implements SpecialFlowScheme<AllStarStageScheme>
 		public MaiSpell(StageObject owner)
 		{
 			super(owner);
+			
+			setSpellcardTime(Duration.seconds(40));
 		}
 
 		@Override
@@ -668,7 +689,7 @@ public class MaiYukiGeneral implements SpecialFlowScheme<AllStarStageScheme>
 				TouhouSounds.Enemy.BREAK_2.play();
 				boss.setWingsOpen();
 				
-				boss.setDamageModifier(0.5f);
+				boss.setDamageModifier(0.7f);
 				
 				for(int degree = 0; degree < 360; degree += 10)
 				{
@@ -763,10 +784,10 @@ public class MaiYukiGeneral implements SpecialFlowScheme<AllStarStageScheme>
 					game.spawn(bullet);
 				}
 				
-				for(int i = 0; i < 5; i++)
+				for(int i = 0; i < (player.getY() > boss.getY() ? 30 : 5); i++)
 				{
 					GravityBullet gb = new GravityBullet(new ThBullet(ThBulletType.DOT_SMALL_MOON, ThBulletColor.BLUE).getAnimation(), boss.getX(), boss.getY(), 0.01f, 4f);
-					gb.setDirectionDegTick((float) (270 + (60 * Math.random() - 30)), 10f);
+					gb.setDirectionDegTick((float) (270 + (60 * Math.random() - 30)), 11f);
 					game.spawn(gb);
 				}
 			}

@@ -5,8 +5,10 @@ import java2hu.Game;
 import java2hu.J2hGame;
 import java2hu.J2hGame.ClearType;
 import java2hu.Loader;
+import java2hu.Position;
 import java2hu.SmartTimer;
 import java2hu.StartupLoopAnimation;
+import java2hu.allstar.AllStarGame;
 import java2hu.allstar.AllStarStageScheme;
 import java2hu.allstar.enemies.AllStarBoss;
 import java2hu.allstar.util.AllStarUtil;
@@ -15,9 +17,11 @@ import java2hu.gameflow.GameFlowScheme.WaitConditioner;
 import java2hu.object.DrawObject;
 import java2hu.object.StageObject;
 import java2hu.object.bullet.Bullet;
-import java2hu.object.enemy.greater.Boss;
 import java2hu.object.player.Player;
 import java2hu.object.ui.CircleHealthBar;
+import java2hu.overwrite.J2hMusic;
+import java2hu.pathing.SimpleTouhouBossPath;
+import java2hu.pathing.SinglePositionPath;
 import java2hu.plugin.sprites.FadeInSprite;
 import java2hu.spellcard.Spellcard;
 import java2hu.system.SaveableObject;
@@ -28,12 +32,14 @@ import java2hu.touhou.sounds.TouhouSounds;
 import java2hu.util.AnimationUtil;
 import java2hu.util.BossUtil;
 import java2hu.util.BossUtil.BackgroundAura;
+import java2hu.util.BossUtil.BossEffectsResult;
+import java2hu.util.Duration;
 import java2hu.util.Getter;
 import java2hu.util.ImageSplitter;
 import java2hu.util.MathUtil;
+import java2hu.util.ObjectUtil;
 import java2hu.util.PathUtil;
-
-import shaders.ShaderLibrary;
+import java2hu.util.SchemeUtil;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Music;
@@ -90,12 +96,14 @@ public class Byakuren extends AllStarBoss
 		Sprite bg = new Sprite(Loader.texture(Gdx.files.internal(folder + "bg.png")));
 		Sprite bge = new Sprite(Loader.texture(Gdx.files.internal(folder + "bge.png")));
 
-		Music bgm = Gdx.audio.newMusic(Gdx.files.internal(folder + "bgm.mp3"));
-		bgm.setVolume(1f * Game.getGame().getMusicModifier());
-		bgm.setPosition(7.5f);
+		Music bgm = new J2hMusic(Gdx.audio.newMusic(Gdx.files.internal(folder + "bgm.mp3")));
 		bgm.setLooping(true);
 		
 		final Byakuren boss = new Byakuren(100, nameTag, bg, bge, fbs, idle, left, right, special, bgm, x, y);
+		
+		boss.getPlayerHitHitbox().scale(1.5f);
+		
+		boss.setBgmPosition(7.5f);
 		
 		return boss;
 	}
@@ -133,7 +141,7 @@ public class Byakuren extends AllStarBoss
 	}
 
 	@Override
-	public void executeFight(AllStarStageScheme scheme)
+	public void executeFight(final AllStarStageScheme scheme)
 	{
 		final J2hGame g = Game.getGame();
 		final Byakuren boss = this;
@@ -164,7 +172,10 @@ public class Byakuren extends AllStarBoss
 						AllStarUtil.introduce(boss);
 						
 						boss.healUp();
-						aura.setObject(BossUtil.backgroundAura(boss, boss.getBgAuraColor()));
+						
+						BossEffectsResult r = BossUtil.addBossEffects(boss, Color.RED, boss.getBgAuraColor());
+						
+						aura.setObject(r.bgAura);
 						
 						Game.getGame().startSpellCard(new ByakurenNonSpell(boss));
 					}
@@ -213,43 +224,44 @@ public class Byakuren extends AllStarBoss
 				Game.getGame().delete(aura.getObject());
 				AllStarUtil.presentSpellCard(boss, SPELLCARD_NAME);
 				
-				Game.getGame().startSpellCard(new ByakurenSpell(boss));
+				final ByakurenSpell card = new ByakurenSpell(boss);
+				
+				Game.getGame().startSpellCard(card);
+				
+				BossUtil.spellcardCircle(boss, card, scheme.getBossAura());
 			}
 		}, 1);
 		
-		scheme.setWait(new WaitConditioner()
-		{
-			@Override
-			public boolean returnTrueToWait()
-			{
-				try
-				{
-					return !boss.isDead();
-				}
-				catch(Exception e)
-				{
-					return true;
-				}
-			}
-		});
-		
-		scheme.doWait();
+		SchemeUtil.waitForDeath(scheme, boss);
 		
 		Game.getGame().addTaskGame(new Runnable()
 		{
 			@Override
 			public void run()
 			{
-				Game.getGame().delete(boss);
-				
-				Game.getGame().clearSpellcards();
-				Game.getGame().clear(ClearType.ALL_OBJECTS);
-				
-				BossUtil.mapleExplosion(boss.getX(), boss.getY());
+				Game.getGame().clearCircle(800f, boss, ClearType.ALL);
 			}
 		}, 1);
 		
-		scheme.waitTicks(5); // Prevent concurrency issues.
+		scheme.waitTicks(2);
+		
+		boss.playSpecial(false);
+		SchemeUtil.deathAnimation(scheme, boss, boss.getAuraColor());
+		
+		Game.getGame().addTaskGame(new Runnable()
+		{
+			@Override
+			public void run()
+			{
+				ObjectUtil.deathAnimation(boss);
+				
+				Game.getGame().delete(boss);
+				
+				Game.getGame().clear(ClearType.ALL);
+			}
+		}, 5);
+		
+		scheme.waitTicks(10); // Prevent concurrency issues.
 	}
 	
 	public static class ByakurenNonSpell extends Spellcard
@@ -257,6 +269,8 @@ public class Byakuren extends AllStarBoss
 		public ByakurenNonSpell(StageObject owner)
 		{
 			super(owner);
+			
+			setSpellcardTime(Duration.seconds(36));
 		}
 		
 		Texture texture;
@@ -307,7 +321,7 @@ public class Byakuren extends AllStarBoss
 
 			if(tick % time == time - 100)
 			{
-				BossUtil.moveAroundRandomly((Boss)getOwner(), (int) (getGame().getMaxX() / 2) - 300, (int)(getGame().getMaxX() / 2) + 300, Game.getGame().getHeight() - 100, Game.getGame().getHeight() - 200, 800);
+				boss.getPathing().setCurrentPath(new SimpleTouhouBossPath(boss));
 			}
 			
 			if(tick % time == specialPlay)
@@ -343,18 +357,24 @@ public class Byakuren extends AllStarBoss
 						@Override
 						public void run()
 						{
-							final Bullet bullet = new Bullet(new ThBullet(ThBulletType.BALL_2, color), boss.getX(), boss.getY())
+							final Bullet bullet = new Bullet(new ThBullet(ThBulletType.BALL_2, color), boss.getX() + 5, boss.getY() + 15)
 							{
 								@Override
 								public void onDraw()
 								{
-									if(getShader() != null)
-									{
-										getShader().setUniformf("blurSize", 0.04f);
-										getShader().setUniformf("intensity", 2f);
-									}
-									
 									super.onDraw();
+								}
+								
+								@Override
+								public void draw()
+								{
+									super.draw();
+								}
+								
+								@Override
+								public int getDeleteDistance()
+								{
+									return 10;
 								}
 								
 								@Override
@@ -366,11 +386,11 @@ public class Byakuren extends AllStarBoss
 									
 									if(tick % 10 == 0)
 									{
-										scale = 0.72f;
+										scale += 0.82f;
 									}
 									else if(tick % 10 == 5)
 									{
-										scale = 0.8f;
+										scale += 0.9f;
 									}
 									
 									if(scale != 0)
@@ -383,10 +403,11 @@ public class Byakuren extends AllStarBoss
 								}
 							};
 							
-							bullet.getSpawnAnimationSettings().setTime(20);
-							bullet.getSpawnAnimationSettings().setAlpha(-1f);
+							bullet.setName("ball");
+							bullet.getSpawnAnimationSettings().setTime(8);
+							bullet.getSpawnAnimationSettings().setAlpha(-2f);
 							bullet.getSpawnAnimationSettings().setAddedScale(0.5f);
-							bullet.setShader(ShaderLibrary.GLOW.getProgram());
+							bullet.setGlowing();
 							bullet.setDirectionDegTick(degree, 7f);
 
 							game.spawn(bullet);
@@ -414,10 +435,6 @@ public class Byakuren extends AllStarBoss
 										newColor.b *= 1.5f;
 										newColor.g *= 1.5f;
 									}
-									else
-									{
-
-									}
 									
 									for(TextureRegion r : animation.getKeyFrames())
 									{
@@ -444,12 +461,13 @@ public class Byakuren extends AllStarBoss
 								@Override
 								public void onUpdate(long tick)
 								{
-									if(!bullet.isOnStage())
+									if(!bullet.isOnStageRaw())
 										game.delete(this);
 								}
 							};
 							
 							obj.setZIndex(bullet.getZIndex() - 1);
+							obj.setName("ballAura");
 							game.spawn(obj);
 						}
 					}, (int) (addAngle / 7f) + (left ? 14 : 0));
@@ -463,6 +481,10 @@ public class Byakuren extends AllStarBoss
 		public ByakurenSpell(StageObject owner)
 		{
 			super(owner);
+			
+			setSpellcardTime(Duration.seconds(46));
+			
+			owner.getPathing().setCurrentPath(new SinglePositionPath(owner, new Position(game.getWidth() / 2f, game.getHeight() - 200), Duration.ticks(50)));
 		}
 
 		@Override
@@ -493,6 +515,9 @@ public class Byakuren extends AllStarBoss
 				bg.setZIndex(-3);
 				game.spawn(bg);
 				
+				if(AllStarGame.CURRENT_AURA != null)
+					bg.setFrameBuffer(AllStarGame.CURRENT_AURA.getBackgroundBuffer());
+				
 				DrawObject bge = new DrawObject()
 				{
 					Sprite bge = boss.bge;
@@ -500,6 +525,9 @@ public class Byakuren extends AllStarBoss
 					{
 						bge.setBounds(0, 0, Game.getGame().getWidth(), Game.getGame().getHeight());
 						bge.setOriginCenter();
+						
+						if(AllStarGame.CURRENT_AURA != null)
+							setFrameBuffer(AllStarGame.CURRENT_AURA.getBackgroundBuffer());
 					}
 					
 					@Override
@@ -604,7 +632,7 @@ public class Byakuren extends AllStarBoss
 						{
 							if(scaleBack < 2)
 							{
-								scaleBack += 0.05f;
+								scaleBack += 0.06f;
 								back.setScale(scaleBack);
 							}
 
@@ -621,7 +649,7 @@ public class Byakuren extends AllStarBoss
 						{
 							if(scaleMiddleX < 2)
 							{
-								scaleMiddleX += 0.08f;
+								scaleMiddleX += 0.1f;
 								middle.setScale(scaleMiddleX, 2);
 							}
 							
@@ -632,7 +660,7 @@ public class Byakuren extends AllStarBoss
 						{
 							if(scaleFlowers < 2)
 							{
-								scaleFlowers += 0.1f;
+								scaleFlowers += 0.12f;
 								
 								flowerTopLeft.setScale(scaleFlowers);
 								flowerTopRight.setScale(scaleFlowers);
@@ -665,6 +693,8 @@ public class Byakuren extends AllStarBoss
 						}
 					}
 				};
+				
+				aura.setZIndex(boss.getZIndex() - 20);
 				
 				game.spawn(aura);
 			}
@@ -700,7 +730,7 @@ public class Byakuren extends AllStarBoss
 			{
 				TouhouSounds.Enemy.RELEASE_1.play();
 				
-				float increment = 4f;
+				int amount = 90;
 				
 				boolean top = tick % (2f * time) < time;
 				boolean[] bools = { true, false };
@@ -712,17 +742,20 @@ public class Byakuren extends AllStarBoss
 					
 					final ArrayList<Bullet> bullets = new ArrayList<Bullet>();
 					
-					for(int i = 0; i < 360; i += increment)
+					for(int i = 0; i < amount; i++)
 					{
-						final float finalI = i;
-
-						final boolean knife = i % (8 * (int)increment) == 0;
+						final float mul = (float)i / (float)amount;
+						final float angle = mul * 360f;
+						
+						int interval = amount / 9;
+						
+						final boolean knife = i % (interval) == 0;
 
 						{
 							Bullet bullet = new Bullet(new ThBullet(ThBulletType.SEAL, knife ? ThBulletColor.YELLOW_LIGHT : ThBulletColor.BLUE), xPos, yPos)
 							{
-								float degreeStart = finalI;
-								float degree = finalI;
+								float degreeStart = angle;
+								float degree = angle;
 
 								boolean turned = false;
 
@@ -775,7 +808,7 @@ public class Byakuren extends AllStarBoss
 								}
 							};
 
-							bullet.setDirectionDegTick(i, 5f);
+							bullet.setDirectionDegTick(angle, 5f);
 							bullet.setRotationFromVelocity(-90f);
 							bullet.setZIndex(bullet.getZIndex() + i);
 							game.spawn(bullet);
@@ -822,13 +855,15 @@ public class Byakuren extends AllStarBoss
 						{
 							for(Bullet b : bullets)
 							{
-								if(b.isOnStage())
+								if(b.isOnStageRaw())
 									return b;
 							}
 							
 							return null;
 						}
 					};
+					
+					obj.setZIndex(100);
 					
 					game.spawn(obj);
 				}

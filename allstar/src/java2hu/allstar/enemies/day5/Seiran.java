@@ -214,7 +214,7 @@ public class Seiran extends AllStarBoss
 				
 				double time = ((row) * (1600d / speed));
 				double remainder = time % 1;
-				remainder /= J2hGame.LOGIC_TPS;
+				remainder /= J2hGame.currentTPS;
 				
 				bullet.setX((float) (bullet.getX() + (bullet.getVelocityX() * remainder)));
 				bullet.setY((float) (bullet.getY() + (bullet.getVelocityY() * remainder)));

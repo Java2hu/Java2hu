@@ -108,7 +108,7 @@ public class PathingHelper
 				speed = getDistance() / time.getValue(Unit.SECOND);
 			}
 			
-			speed = speed / J2hGame.LOGIC_TPS;
+			speed = speed / J2hGame.currentTPS;
 		}
 		
 		private int index = 0;

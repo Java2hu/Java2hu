@@ -1,9 +1,10 @@
 package java2hu.allstar.enemies.day8.alice;
 
-import java2hu.Game;
 import java2hu.Loader;
+import java2hu.MovementAnimation;
 import java2hu.allstar.AllStarStageScheme;
 import java2hu.allstar.enemies.AllStarBoss;
+import java2hu.overwrite.J2hMusic;
 import java2hu.util.AnimationUtil;
 import java2hu.util.ImageSplitter;
 
@@ -44,7 +45,7 @@ public class Alice extends AllStarBoss
 		Animation idle = ImageSplitter.getAnimationFromSprite(sprite, chunkHeight, chunkWidth, 10F, 1);
 		idle.setPlayMode(PlayMode.LOOP);
 		
-		Animation left = ImageSplitter.getAnimationFromSprite(sprite, 0, chunkHeight, chunkHeight, chunkWidth, 5F, 1,2,3,4,5);
+		Animation left = new MovementAnimation(ImageSplitter.getAnimationFromSprite(sprite, 0, chunkHeight, chunkHeight, chunkWidth, 5F, 1,2,3,4), ImageSplitter.getAnimationFromSprite(sprite, 0, chunkHeight, chunkHeight, chunkWidth, 5F, 5), 5f);
 		Animation right = AnimationUtil.copyAnimation(left);
 
 		Animation special = ImageSplitter.getAnimationFromSprite(sprite, chunkHeight, chunkWidth, 10F, 1,2,3,4);
@@ -53,12 +54,12 @@ public class Alice extends AllStarBoss
 		Sprite bg = new Sprite(Loader.texture(Gdx.files.internal(folder + "bg.png")));
 		bg.getTexture().setFilter(TextureFilter.MipMapLinearNearest, TextureFilter.Nearest);
 		
-		Music bgm = Gdx.audio.newMusic(Gdx.files.internal(folder + "bgm.mp3"));
-		bgm.setVolume(1f * Game.getGame().getMusicModifier());
-		bgm.setPosition(103f);
+		Music bgm = new J2hMusic(Gdx.audio.newMusic(Gdx.files.internal(folder + "bgm.mp3")));
 		bgm.setLooping(true);
 		
 		final Alice boss = new Alice(100, nameTag, bg, fbs, idle, left, right, special, bgm, x, y);
+		
+		boss.setBgmPosition(103f);
 		
 		return boss;
 	}

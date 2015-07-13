@@ -194,18 +194,11 @@ public class GetsusGeneral implements SpecialFlowScheme<AllStarStageScheme>
 						
 						g.spawn(barMugetsu.getObject());
 						
-//						scheme.getBossAura().setAura(0, new Getter<IPosition>()
-//						{
-//							@Override
-//							public IPosition get()
-//							{
-//								return mugetsu;
-//							}
-//						});
-						
 						barMugetsu.getObject().addSplit(0.8f);
 						
 						AllStarUtil.introduce(mugetsu, gengetsu);
+						
+						BossUtil.bossAura(mugetsu, Color.WHITE, Color.WHITE);
 						
 						mugetsu.healUp();
 					}
@@ -222,18 +215,11 @@ public class GetsusGeneral implements SpecialFlowScheme<AllStarStageScheme>
 						
 						g.spawn(barGengetsu.getObject());
 						
-//						scheme.getBossAura().setAura(1, new Getter<IPosition>()
-//						{
-//							@Override
-//							public IPosition get()
-//							{
-//								return gengetsu;
-//							}
-//						});
-						
 						barGengetsu.getObject().addSplit(0.8f);
 						
 						gengetsu.healUp();
+						
+						BossUtil.bossAura(gengetsu, Color.WHITE, Color.WHITE);
 						
 						Game.getGame().startSpellCard(new GetsusNonSpell(mugetsu, gengetsu));
 					}
@@ -327,6 +313,8 @@ public class GetsusGeneral implements SpecialFlowScheme<AllStarStageScheme>
 				
 				Game.getGame().clearSpellcards();
 				Game.getGame().clear(ClearType.ALL_OBJECTS);
+				
+				TouhouSounds.Enemy.EXPLOSION_2.play();
 				
 				BossUtil.mapleExplosion(mugetsu.getX(), mugetsu.getY());
 				BossUtil.mapleExplosion(gengetsu.getX(), gengetsu.getY());
@@ -613,7 +601,7 @@ public class GetsusGeneral implements SpecialFlowScheme<AllStarStageScheme>
 
 							Game.getGame().spawn(bullet);
 						}
-						else if(i % 9 > 3 && i % 9 <= 6)
+						else if(i % 9 > 4 && i % 9 <= 6)
 						{
 							final int finalI = i;
 							
@@ -643,10 +631,16 @@ public class GetsusGeneral implements SpecialFlowScheme<AllStarStageScheme>
 
 									if(getTicksAlive() > 220)
 									{
-										if(deg - originalDeg < 180)
+										float speed = (8f + (float)finalI / (float)amount * 360 % 20 / 20 * 4f) * 0.8f;
+										
+										if(deg - originalDeg < 140)
 											deg += 1f;
-
-										setDirectionDegTick(deg, (8f + (float)finalI / (float)amount * 360 % 20 / 20 * 4f) * 0.8f);
+										else
+										{
+											speed += 5f;
+										}
+										
+										setDirectionDegTick(deg, speed);
 										setRotationFromVelocity(-90f);
 									}
 								}
@@ -657,7 +651,7 @@ public class GetsusGeneral implements SpecialFlowScheme<AllStarStageScheme>
 
 							Game.getGame().spawn(bullet);
 						}
-						else if(i % 9 >= 7)
+						else if(i % 9 >= 8)
 						{
 							Bullet bullet = new Bullet(new ThBullet(ThBulletType.UNKNOWN_3, ThBulletColor.RED), handX, handY)
 							{
@@ -800,7 +794,7 @@ public class GetsusGeneral implements SpecialFlowScheme<AllStarStageScheme>
 				{
 					boolean close = false;
 
-					for(float i = -90; i <= 270; i += close ? 1 : 4f + MathUtil.getDifference(i, 90) / 90f * 1.5f)
+					for(float i = -90; i <= 270; i += close ? 1 : 7f + MathUtil.getDifference(i, 90) / 90f * 1.5f)
 					{
 						double max = MathUtil.getDifference(180, 90);
 

@@ -5,11 +5,13 @@ import java2hu.IPosition;
 import java2hu.J2hGame;
 import java2hu.J2hGame.ClearType;
 import java2hu.Position;
+import java2hu.ZIndex;
 import java2hu.allstar.AllStarGame;
 import java2hu.allstar.AllStarStageScheme;
 import java2hu.allstar.util.AllStarUtil;
 import java2hu.gameflow.GameFlowScheme.WaitConditioner;
 import java2hu.gameflow.SpecialFlowScheme;
+import java2hu.helpers.ZIndexHelper;
 import java2hu.object.DrawObject;
 import java2hu.object.StageObject;
 import java2hu.object.bullet.Bullet;
@@ -31,9 +33,8 @@ import java2hu.util.BossUtil;
 import java2hu.util.Getter;
 import java2hu.util.MathUtil;
 import java2hu.util.MeshUtil;
+import java2hu.util.ObjectUtil;
 import java2hu.util.SchemeUtil;
-
-import shaders.ShaderLibrary;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Mesh;
@@ -123,7 +124,8 @@ public class YuukaGeneral implements SpecialFlowScheme<AllStarStageScheme>
 							boss.setDamageModifier(0.8f);
 
 							boss.healUp();
-							BossUtil.backgroundAura(boss, boss.getBgAuraColor());
+							
+							BossUtil.addBossEffects(boss, Color.GREEN, boss.getBgAuraColor());
 
 							Game.getGame().startSpellCard(new YuukaNonSpell(boss));
 						}
@@ -171,6 +173,8 @@ public class YuukaGeneral implements SpecialFlowScheme<AllStarStageScheme>
 					Game.getGame().clearObjects();
 					
 					BossUtil.mapleExplosion(boss.getX(), boss.getY());
+					
+					scheme.getBossAura().clearAuras();
 				}
 			}, 1);
 		}
@@ -217,11 +221,15 @@ public class YuukaGeneral implements SpecialFlowScheme<AllStarStageScheme>
 				Game.getGame().spawn(bar);
 				Game.getGame().spawn(boss);
 				
-				BossUtil.backgroundAura(boss, boss.getBgAuraColor());
-				
 				AllStarUtil.presentSpellCard(boss, SPELLCARD_NAME);
 				
-				Game.getGame().startSpellCard(new Yuuka98Spell(boss));
+				BossUtil.addBossEffects(boss, Color.GREEN, boss.getBgAuraColor());
+				
+				final Yuuka98Spell card = new Yuuka98Spell(boss);
+				
+				Game.getGame().startSpellCard(card);
+				
+				BossUtil.spellcardCircle(boss, card);
 			}
 		}, 1);
 		
@@ -232,15 +240,29 @@ public class YuukaGeneral implements SpecialFlowScheme<AllStarStageScheme>
 			@Override
 			public void run()
 			{
-				Game.getGame().delete(boss);
-				
-				Game.getGame().clear(ClearType.ALL);
-				
-				BossUtil.mapleExplosion(boss.getX(), boss.getY());
+				Game.getGame().clearCircle(800f, boss, ClearType.ALL);
 			}
 		}, 1);
 		
-		scheme.waitTicks(5); // Prevent concurrency issues.
+		scheme.waitTicks(2);
+		
+		boss.playSpecial(false);
+		SchemeUtil.deathAnimation(scheme, boss, boss.getAuraColor());
+		
+		Game.getGame().addTaskGame(new Runnable()
+		{
+			@Override
+			public void run()
+			{
+				ObjectUtil.deathAnimation(boss);
+				
+				Game.getGame().delete(boss);
+				
+				Game.getGame().clear(ClearType.ALL);
+			}
+		}, 5);
+		
+		scheme.waitTicks(10); // Prevent concurrency issues.
 	}
 	
 	public static class YuukaNonSpell extends Spellcard
@@ -249,6 +271,8 @@ public class YuukaGeneral implements SpecialFlowScheme<AllStarStageScheme>
 		{
 			super(owner);
 		}
+		
+		private ZIndexHelper indexer = new ZIndexHelper(5000);
 
 		@SuppressWarnings("unused")
 		@Override
@@ -325,9 +349,11 @@ public class YuukaGeneral implements SpecialFlowScheme<AllStarStageScheme>
 								
 								setVelocityXTick(getVelocityXTick() * speedIncrease);
 								setVelocityYTick(getVelocityYTick() * speedIncrease);
+								
+								setZIndex((int) (ZIndex.BULLETS + MathUtil.getDistance(this, boss)));
 							}
 						};
-						bullet.setShader(ShaderLibrary.GLOW.getProgram());
+						
 						bullet.setDirectionDegTick(360 - i + 30, speed);
 						bullet.getSpawnAnimationSettings().setAddedScale(5f);
 
@@ -345,7 +371,7 @@ public class YuukaGeneral implements SpecialFlowScheme<AllStarStageScheme>
 									setVelocityXTick(getVelocityXTick() * speedIncrease);
 									setVelocityYTick(getVelocityYTick() * speedIncrease);
 									
-									setZIndex((int) (this.getZIndex() + MathUtil.getDistance(this, boss)));
+									setZIndex((int) (ZIndex.BULLETS + MathUtil.getDistance(this, boss)));
 								}
 							};
 
@@ -373,10 +399,10 @@ public class YuukaGeneral implements SpecialFlowScheme<AllStarStageScheme>
 								setVelocityXTick(getVelocityXTick() * speedIncrease);
 								setVelocityYTick(getVelocityYTick() * speedIncrease);
 								
-								setZIndex((int) (this.getZIndex() + MathUtil.getDistance(this, boss)));
+								setZIndex((int) (ZIndex.BULLETS + MathUtil.getDistance(this, boss)));
 							}
 						};
-						bullet.setShader(ShaderLibrary.GLOW.getProgram());
+						
 						bullet.getSpawnAnimationSettings().setAddedScale(5f);
 						bullet.setDirectionDegTick(i, speed);
 
@@ -394,11 +420,10 @@ public class YuukaGeneral implements SpecialFlowScheme<AllStarStageScheme>
 									setVelocityXTick(getVelocityXTick() * speedIncrease);
 									setVelocityYTick(getVelocityYTick() * speedIncrease);
 									
-									setZIndex((int) (this.getZIndex() + MathUtil.getDistance(this, boss)));
+									setZIndex((int) (ZIndex.BULLETS + MathUtil.getDistance(this, boss)));
 								}
 							};
 							
-
 							bullet.setDirectionDegTick(i, speed + 0.1f);
 							bullet.setRotationFromVelocity();
 
@@ -688,6 +713,13 @@ public class YuukaGeneral implements SpecialFlowScheme<AllStarStageScheme>
 								float offset = Game.getGame().getWidth() / max;
 								offset = (float) (offset * 0.8f + Math.random() * (offset * 0.2f));
 								offset = offset * finalI;
+								
+								double dist = MathUtil.getDistance(offset, 0, player.getX(), 0);
+								
+								if(dist < 100)
+								{
+									return;
+								}
 								
 								YuukaBulletWorm worm = new YuukaBulletWorm(offset, 0);
 								

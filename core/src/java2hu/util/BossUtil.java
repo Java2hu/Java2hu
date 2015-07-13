@@ -665,6 +665,15 @@ public class BossUtil extends J2hObject
 		
 		public Animation aura;
 		
+		public void setAuraColor(Color color)
+		{
+			for(TextureRegion r : aura.getKeyFrames())
+			{
+				((Sprite)r).setColor(color);
+				((Sprite)r).setScale(1f);
+			}
+		}
+		
 		public Sprite energyLeak;
 		
 		{
@@ -1354,7 +1363,7 @@ public class BossUtil extends J2hObject
 					game.batch.end();
 					
 					program.begin();
-					program.setUniformMatrix("u_projTrans", Game.getGame().camera.camera.combined);
+					program.setUniformMatrix("u_projTrans", Game.getGame().standardProjectionMatrix);
 					
 					program.setUniformi("u_texture", 0);
 					text.bind();

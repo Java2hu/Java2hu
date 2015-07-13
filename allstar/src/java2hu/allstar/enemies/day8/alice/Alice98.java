@@ -1,11 +1,12 @@
 package java2hu.allstar.enemies.day8.alice;
 
 
-import java2hu.Game;
 import java2hu.Loader;
 import java2hu.allstar.AllStarStageScheme;
 import java2hu.allstar.enemies.AllStarBoss;
+import java2hu.overwrite.J2hMusic;
 import java2hu.util.ImageSplitter;
+
 import javafx.util.Duration;
 
 import com.badlogic.gdx.Gdx;
@@ -47,12 +48,12 @@ public class Alice98 extends AllStarBoss
 		Animation right = ImageSplitter.getAnimationFromSprite(sprite, chunkHeight, chunkWidth, 8F, 3);
 		Animation left = ImageSplitter.getAnimationFromSprite(sprite, chunkHeight, chunkWidth, 8F, 4);
 		
-		Music bgm = Gdx.audio.newMusic(Gdx.files.internal(folder + "bgm98.mp3"));
-		bgm.setVolume(1f * Game.getGame().getMusicModifier());
-		bgm.setPosition((float) Duration.seconds(42).toSeconds());
+		Music bgm = new J2hMusic(Gdx.audio.newMusic(Gdx.files.internal(folder + "bgm98.mp3")));
 		bgm.setLooping(true);
 		
 		final Alice98 boss = new Alice98(100, fbs, idle, left, right, special, bgm, x, y);
+		
+		boss.setBgmPosition((float) Duration.seconds(42).toSeconds());
 		
 		return boss;
 	}

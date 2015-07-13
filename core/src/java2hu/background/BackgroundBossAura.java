@@ -13,7 +13,6 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureWrap;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
-import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
 import com.sun.istack.internal.Nullable;
 
@@ -123,7 +122,7 @@ public class BackgroundBossAura extends DrawObject
 			tex.setWrap(TextureWrap.Repeat, TextureWrap.Repeat);
 			sprite = new Sprite(tex);
 		}
-
+		
 		if(getShader() != null)
 		{
 			getShader().setUniformi("water", 1);
@@ -165,10 +164,6 @@ public class BackgroundBossAura extends DrawObject
 		
 		game.batch.flush();
 		
-		Matrix4 before = game.camera.camera.combined;
-		
-		game.batch.setProjectionMatrix(game.standardProjectionMatrix);
-		
 		game.batch.disableBlending();
 		
 		game.camera.applyAspectRatio(true);
@@ -187,8 +182,6 @@ public class BackgroundBossAura extends DrawObject
 		game.camera.applyAspectRatio(true);
 		
 		game.batch.flush();
-		
-		game.batch.setProjectionMatrix(before);
 		
 		getBackgroundBuffer().end();
 		

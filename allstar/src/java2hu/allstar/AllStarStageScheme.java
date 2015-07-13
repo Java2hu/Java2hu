@@ -87,6 +87,8 @@ public class AllStarStageScheme extends GameFlowScheme
 		});
 		
 		doWait();
+		
+		AllStarGame.CURRENT_AURA = bossAura;
 	}
 	
 	private Getter<Player> playerGetter;

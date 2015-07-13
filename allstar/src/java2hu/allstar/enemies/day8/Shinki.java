@@ -7,6 +7,7 @@ import java2hu.J2hGame;
 import java2hu.J2hGame.ClearType;
 import java2hu.Loader;
 import java2hu.ZIndex;
+import java2hu.allstar.AllStarGame;
 import java2hu.allstar.AllStarStageScheme;
 import java2hu.allstar.enemies.AllStarBoss;
 import java2hu.allstar.util.AllStarUtil;
@@ -29,7 +30,7 @@ import java2hu.touhou.bullet.ThBulletColor;
 import java2hu.touhou.bullet.ThBulletType;
 import java2hu.touhou.sounds.TouhouSounds;
 import java2hu.util.BossUtil;
-import java2hu.util.BossUtil.BackgroundAura;
+import java2hu.util.BossUtil.BossEffectsResult;
 import java2hu.util.Duration;
 import java2hu.util.Getter;
 import java2hu.util.ImageSplitter;
@@ -123,7 +124,7 @@ public class Shinki extends AllStarBoss
 	private Animation specialWings;
 	private Sprite wingsNormal;
 	private Sprite wingsDemon;
-	private BackgroundAura aura;
+	private BossEffectsResult aura;
 	
 	public Sprite bg;
 	
@@ -197,7 +198,10 @@ public class Shinki extends AllStarBoss
 			
 			{
 				makeBackgrounds();
-				this.setZIndex(-1);
+				this.setZIndex(-900);
+				
+				if(AllStarGame.CURRENT_AURA != null)
+					setFrameBuffer(AllStarGame.CURRENT_AURA.getBackgroundBuffer());
 			}
 			
 			public void makeBackgrounds()
@@ -376,7 +380,10 @@ public class Shinki extends AllStarBoss
 		special = specialWings;
 		
 		if(aura != null)
-			aura.setMagicSquareEnabled(false);
+		{
+			aura.bgAura.setMagicSquareEnabled(false);
+			aura.bossAura.energyLeak.setColor(Color.PURPLE.cpy().mul(2f));
+		}
 	}
 	
 	public void setNormalWings()
@@ -386,7 +393,10 @@ public class Shinki extends AllStarBoss
 		wingsAnimation(wingsNormal);
 		
 		if(aura != null)
-			aura.setMagicSquareEnabled(false);
+		{
+			aura.bgAura.setMagicSquareEnabled(false);
+			aura.bossAura.energyLeak.setColor(Color.WHITE);
+		}
 	}
 	
 	public void setNoWings()
@@ -395,7 +405,10 @@ public class Shinki extends AllStarBoss
 		special = specialNormal;
 		
 		if(aura != null)
-			aura.setMagicSquareEnabled(true);
+		{
+			aura.bgAura.setMagicSquareEnabled(true);
+			aura.bossAura.energyLeak.setColor(Color.WHITE);
+		}
 	}
 	
 	@Override
@@ -525,10 +538,7 @@ public class Shinki extends AllStarBoss
 						
 						boss.healUp();
 						
-						aura = BossUtil.backgroundAura(boss, boss.getBgAuraColor());
-						
-						if(activeWings != null)
-							aura.setMagicSquareEnabled(false);
+						aura = BossUtil.addBossEffects(boss, Color.WHITE, boss.getBgAuraColor());
 						
 						Game.getGame().startSpellCard(new ShinkiNonSpell(boss));
 					}

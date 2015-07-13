@@ -49,7 +49,7 @@ public class Duration
 	
 	public static enum Unit
 	{
-		MILLISECOND(1d), TICK((1000d / J2hGame.LOGIC_TPS)), SECOND(1000d), MINUTE(60000d), HOUR(3600000d);
+		MILLISECOND(1d), TICK((1000d / J2hGame.currentTPS)), SECOND(1000d), MINUTE(60000d), HOUR(3600000d);
 		
 		private final double milliseconds;
 

@@ -4,6 +4,7 @@ import java2hu.Game;
 import java2hu.J2hGame;
 import java2hu.J2hGame.ClearType;
 import java2hu.Loader;
+import java2hu.allstar.AllStarGame;
 import java2hu.allstar.AllStarStageScheme;
 import java2hu.allstar.enemies.AllStarBoss;
 import java2hu.allstar.util.AllStarUtil;
@@ -22,11 +23,14 @@ import java2hu.touhou.bullet.ThBulletColor;
 import java2hu.touhou.bullet.ThBulletType;
 import java2hu.touhou.sounds.TouhouSounds;
 import java2hu.util.BossUtil;
+import java2hu.util.Duration;
 import java2hu.util.Getter;
 import java2hu.util.ImageSplitter;
 import java2hu.util.ImageUtil;
 import java2hu.util.MathUtil;
+import java2hu.util.ObjectUtil;
 import java2hu.util.PathUtil;
+import java2hu.util.SchemeUtil;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Music;
@@ -86,6 +90,8 @@ public class Yumeko extends AllStarBoss
 		
 		final Yumeko boss = new Yumeko(100, nameTag, bg, fbs, idle, left, right, special, bgm, x, y);
 		
+		boss.setAuraColor(new Color(226F/255F, 194f/255F, 74/255F, 1));
+		
 		return boss;
 	}
 	
@@ -125,7 +131,7 @@ public class Yumeko extends AllStarBoss
 	}
 
 	@Override
-	public void executeFight(AllStarStageScheme scheme)
+	public void executeFight(final AllStarStageScheme scheme)
 	{
 		final J2hGame g = Game.getGame();
 		final Yumeko boss = this;
@@ -154,7 +160,8 @@ public class Yumeko extends AllStarBoss
 						AllStarUtil.introduce(boss);
 						
 						boss.healUp();
-						BossUtil.backgroundAura(boss, boss.getBgAuraColor());
+						
+						BossUtil.addBossEffects(boss, boss.getAuraColor(), boss.getBgAuraColor());
 						
 						Game.getGame().startSpellCard(new YumekoNonSpell(boss));
 					}
@@ -207,39 +214,36 @@ public class Yumeko extends AllStarBoss
 			}
 		}, 1);
 		
-		scheme.setWait(new WaitConditioner()
-		{
-			@Override
-			public boolean returnTrueToWait()
-			{
-				try
-				{
-					return !boss.isDead();
-				}
-				catch(Exception e)
-				{
-					return true;
-				}
-			}
-		});
-		
-		scheme.doWait();
+		SchemeUtil.waitForDeath(scheme, boss);
 		
 		Game.getGame().addTaskGame(new Runnable()
 		{
 			@Override
 			public void run()
 			{
-				Game.getGame().delete(boss);
-				
-				Game.getGame().clearSpellcards();
-				Game.getGame().clear(ClearType.ALL_OBJECTS);
-				
-				BossUtil.mapleExplosion(boss.getX(), boss.getY());
+				Game.getGame().clearCircle(800f, boss, ClearType.ALL);
 			}
 		}, 1);
 		
-		scheme.waitTicks(5); // Prevent concurrency issues.
+		scheme.waitTicks(2);
+		
+		boss.playSpecial(false);
+		SchemeUtil.deathAnimation(scheme, boss, boss.getAuraColor());
+		
+		Game.getGame().addTaskGame(new Runnable()
+		{
+			@Override
+			public void run()
+			{
+				ObjectUtil.deathAnimation(boss);
+				
+				Game.getGame().delete(boss);
+				
+				Game.getGame().clear(ClearType.ALL);
+			}
+		}, 5);
+		
+		scheme.waitTicks(10); // Prevent concurrency issues.
 	}
 	
 	public static class YumekoNonSpell extends Spellcard
@@ -247,6 +251,8 @@ public class Yumeko extends AllStarBoss
 		public YumekoNonSpell(StageObject owner)
 		{
 			super(owner);
+			
+			setSpellcardTime(Duration.seconds(26));
 		}
 
 		@Override
@@ -477,6 +483,8 @@ public class Yumeko extends AllStarBoss
 		{
 			super(owner);
 			
+			setSpellcardTime(Duration.seconds(40));
+			
 			final Sprite bg = ((Yumeko)owner).bg;
 			
 			Game.getGame().spawn(new DrawObject()
@@ -495,6 +503,9 @@ public class Yumeko extends AllStarBoss
 					, 0.01F));
 					setZIndex(-2);
 					addDisposable(black);
+					
+					if(AllStarGame.CURRENT_AURA != null)
+						setFrameBuffer(AllStarGame.CURRENT_AURA.getBackgroundBuffer());
 				}
 				
 				@Override
@@ -591,7 +602,7 @@ public class Yumeko extends AllStarBoss
 							}
 						}
 					};
-
+					
 					game.spawn(bullet);
 				}
 			}
@@ -690,6 +701,7 @@ public class Yumeko extends AllStarBoss
 							super.onUpdateDelta(delta);
 						}
 					};
+					bullet.setGlowing();
 					bullet.useSpawnAnimation(false);
 					bullet.setDirectionDegTick(angle + (opposite ? tick / 8f % 360 : -90), opposite ? 2.5f : 20f);
 					bullet.setRotationFromVelocity(-90);
