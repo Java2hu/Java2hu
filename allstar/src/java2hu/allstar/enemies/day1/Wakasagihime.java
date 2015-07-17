@@ -655,7 +655,7 @@ public class Wakasagihime extends AllStarBoss
 			
 			if(tick > 120 && tick % 300 == 0)
 			{
-				boss.getPathing().setCurrentPath(new SimpleTouhouBossPath(boss));
+				boss.getPathing().path(new SimpleTouhouBossPath(boss));
 			}
 			
 			if(tick > 120 && tick % 150 == 0)

@@ -15,6 +15,7 @@ import java2hu.background.BackgroundBossAura;
 import java2hu.gameflow.GameFlowScheme.WaitConditioner;
 import java2hu.object.DrawObject;
 import java2hu.object.bullet.Bullet;
+import java2hu.object.bullet.phase.ScaleAlphaPhaseAnimation;
 import java2hu.object.player.Player;
 import java2hu.object.ui.CircleHealthBar;
 import java2hu.overwrite.J2hMusic;
@@ -401,7 +402,7 @@ public class Doremy extends AllStarBoss
 							
 							float speed = (200f + (200f * rotationMul));
 
-							bullet.getSpawnAnimationSettings().setTime(10f + (1/speed * 20f));
+//							bullet.getSpawnAnimation().setTime((int) (10f + (1/speed * 20f)));
 
 							final float f = finalAngleMul * 180;
 
@@ -416,7 +417,7 @@ public class Doremy extends AllStarBoss
 			{
 				boss.playSpecial(false);
 				
-				boss.getPathing().setCurrentPath(new SimpleTouhouBossPath(boss));
+				boss.getPathing().path(new SimpleTouhouBossPath(boss));
 				boss.getPathing().getCurrentPath().setTime(Duration.ticks(80));
 			}
 			else
@@ -500,7 +501,11 @@ public class Doremy extends AllStarBoss
 					
 					final float cos = (float) Math.cos(((tick % 60) / 60d) * 2 * Math.PI);
 					
-					bullet.getSpawnAnimationSettings().setTime(60 + (-20 * cos));
+					ScaleAlphaPhaseAnimation ani = new ScaleAlphaPhaseAnimation(bullet);
+					ani.setTime((int) (40 + (-30 * cos)));
+					ani.setAddedScale(0f);
+					
+					bullet.setSpawnAnimation(ani);
 
 					bullet.setDirectionDeg(finalStartAngle + 50 * cos, (dot ? 40f : 300f) + (200f * cos));
 					

@@ -355,7 +355,7 @@ public class YuukaGeneral implements SpecialFlowScheme<AllStarStageScheme>
 						};
 						
 						bullet.setDirectionDegTick(360 - i + 30, speed);
-						bullet.getSpawnAnimationSettings().setAddedScale(5f);
+//						bullet.getSpawnAnimation().setAddedScale(5f);
 
 						Game.getGame().spawn(bullet);
 						
@@ -403,7 +403,7 @@ public class YuukaGeneral implements SpecialFlowScheme<AllStarStageScheme>
 							}
 						};
 						
-						bullet.getSpawnAnimationSettings().setAddedScale(5f);
+//						bullet.getSpawnAnimation().setAddedScale(5f);
 						bullet.setDirectionDegTick(i, speed);
 
 						Game.getGame().spawn(bullet);

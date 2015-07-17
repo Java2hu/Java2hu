@@ -19,7 +19,9 @@ import java2hu.allstar.enemies.day1.Doremy;
 import java2hu.allstar.enemies.day1.Wakasagihime;
 import java2hu.allstar.enemies.day2.Kagerou;
 import java2hu.allstar.enemies.day2.Mokou;
+import java2hu.allstar.enemies.day5.Iku;
 import java2hu.allstar.enemies.day5.Seiran;
+import java2hu.allstar.enemies.day5.Tenshi;
 import java2hu.allstar.enemies.day6.Sekibanki;
 import java2hu.allstar.enemies.day7.Raiko;
 import java2hu.allstar.enemies.day7.Ringo;
@@ -34,7 +36,6 @@ import java2hu.allstar.enemies.day8.Yumeko;
 import java2hu.allstar.enemies.day8.alice.AliceGeneral;
 import java2hu.allstar.enemies.day8.getsus.GetsusGeneral;
 import java2hu.allstar.enemies.day8.mai_yuki.MaiYukiGeneral;
-import java2hu.allstar.enemies.day9.yumemi.Yumemi;
 import java2hu.allstar.enemies.day9.yuuka.YuukaGeneral;
 import java2hu.allstar.stage.MakaiStage;
 import java2hu.background.bg3d.Background3D;
@@ -190,9 +191,28 @@ public class Days extends J2hObject
 			// Ichirin
 			// Murusa
 			// Prismriver Sisters
-			// Iku
+
+			addCharacter(day, type, Iku.FULL_NAME, new Getter<AllStarBoss>()
+			{
+				@Override
+				public AllStarBoss get()
+				{
+					final Iku boss = new Iku(startHP, startX, startY);
+					return boss;
+				}
+			});
+			
 			// Nue
-			// Tenshi
+			
+			addCharacter(day, type, Tenshi.FULL_NAME, new Getter<AllStarBoss>()
+			{
+				@Override
+				public AllStarBoss get()
+				{
+					final Tenshi boss = new Tenshi(startHP, startX, startY);
+					return boss;
+				}
+			});
 		}
 		
 		day++;
@@ -411,16 +431,16 @@ public class Days extends J2hObject
 			// Chiyuri
 			// Futatsuiwa
 			
-			addCharacter(day, type, Yumemi.FULL_NAME, new Getter<AllStarBoss>()
-			{
-				@Override
-				public AllStarBoss get()
-				{
-					final Yumemi yumemi = new Yumemi(100f, startX, startY);
-
-					return yumemi;
-				}
-			});
+//			addCharacter(day, type, Yumemi.FULL_NAME, new Getter<AllStarBoss>()
+//			{
+//				@Override
+//				public AllStarBoss get()
+//				{
+//					final Yumemi yumemi = new Yumemi(100f, startX, startY);
+//
+//					return yumemi;
+//				}
+//			});
 			
 			// Shiki Eiki
 		}

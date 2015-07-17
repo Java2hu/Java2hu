@@ -376,7 +376,7 @@ public class Mokou extends AllStarBoss
 				
 				path.setTime(Duration.ticks(60));
 				
-				getOwner().getPathing().setCurrentPath(path);
+				getOwner().getPathing().path(path);
 			}
 			
 			if(tick % 16 == 0)
@@ -541,7 +541,7 @@ public class Mokou extends AllStarBoss
 				
 				path.setTime(Duration.ticks(100));
 				
-				getOwner().getPathing().setCurrentPath(path);
+				getOwner().getPathing().path(path);
 			}
 			
 			if(tick % 10 == 0 && tick > 120)
@@ -716,7 +716,7 @@ public class Mokou extends AllStarBoss
 			};
 
 			bullet.setVelocityYTick(-6F);
-			bullet.useSpawnAnimation(false);
+//			bullet.useSpawnAnimation(false);
 			bullet.setDeletionColor(Color.PURPLE);
 			indexer.index(bullet);
 			

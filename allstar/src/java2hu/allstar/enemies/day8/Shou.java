@@ -297,7 +297,7 @@ public class Shou extends AllStarBoss
 			
 			if(tick % 200 == 170)
 			{
-				boss.getPathing().setCurrentPath(new SimpleTouhouBossPath(boss));
+				boss.getPathing().path(new SimpleTouhouBossPath(boss));
 			}
 			
 			if(tick % 200 == 0)
@@ -395,7 +395,7 @@ public class Shou extends AllStarBoss
 								Bullet bullet = new Bullet(new ThBullet(ThBulletType.BALL_BIG, ThBulletColor.PURPLE), boss.getX(), boss.getY());
 								bullet.setDirectionRadsTick((float) Math.toRadians(finalAngle), 3f + pos * 1.6f);
 								bullet.setZIndex(bullet.getZIndex() + pos);
-								bullet.useSpawnAnimation(false);
+//								bullet.useSpawnAnimation(false);
 								game.spawn(bullet);
 							}
 						}, i * 5);
@@ -479,7 +479,7 @@ public class Shou extends AllStarBoss
 			
 			if(tick % 200 == 160)
 			{
-				boss.getPathing().setCurrentPath(new SimpleTouhouBossPath(boss));
+				boss.getPathing().path(new SimpleTouhouBossPath(boss));
 			}
 			
 			if(tick % 200 == 0)
@@ -583,6 +583,7 @@ public class Shou extends AllStarBoss
 														clearShader();
 														setBullet(new ThBullet(ThBulletType.DISK, colors[(int) (Math.random() * colors.length)]));
 														setDirectionDegTick(MathUtil.getAngle(this, boss), 4f);
+														spawnAnimation();
 													}
 												}
 												else

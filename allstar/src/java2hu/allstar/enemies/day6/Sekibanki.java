@@ -477,7 +477,7 @@ public class Sekibanki extends AllStarBoss
 			
 			if(tick % 160 == 100)
 			{
-				boss.getPathing().setCurrentPath(new SimpleTouhouBossPath(boss));
+				boss.getPathing().path(new SimpleTouhouBossPath(boss));
 			}
 			
 			
@@ -719,8 +719,8 @@ public class Sekibanki extends AllStarBoss
 							}
 						};
 
-						bullet.getSpawnAnimationSettings().setAlpha(0.1f);
-						bullet.getSpawnAnimationSettings().setTime(10f);
+//						bullet.getSpawnAnimation().setAlpha(0.1f);
+//						bullet.getSpawnAnimation().setTime(10);
 						bullet.setGlowing();
 
 						float dirRads = 0;

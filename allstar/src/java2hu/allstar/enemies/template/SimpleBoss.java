@@ -4,6 +4,7 @@ import java2hu.Game;
 import java2hu.J2hGame;
 import java2hu.J2hGame.ClearType;
 import java2hu.Loader;
+import java2hu.MovementAnimation;
 import java2hu.allstar.AllStarStageScheme;
 import java2hu.allstar.enemies.AllStarBoss;
 import java2hu.allstar.util.AllStarUtil;
@@ -18,11 +19,13 @@ import java2hu.util.AnimationUtil;
 import java2hu.util.BossUtil;
 import java2hu.util.Duration;
 import java2hu.util.ImageSplitter;
+import java2hu.util.InputUtil;
 import java2hu.util.ObjectUtil;
 import java2hu.util.SchemeUtil;
 import java2hu.util.Setter;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
@@ -75,12 +78,12 @@ public class SimpleBoss extends AllStarBoss
 
 		TextureRegion nameTag = new TextureRegion(Loader.texture(FOLDER.child("nametag.png")));
 
-		Animation idle = ImageSplitter.getAnimationFromSprite(sprite, chunkHeight, chunkWidth, 24F, 0);
+		Animation idle = ImageSplitter.getAnimationFromSprite(sprite, chunkHeight, chunkWidth, 8F, 0);
 		idle.setPlayMode(PlayMode.LOOP);
 		
 		boolean faceLeft = false; // Is the character moving left on the sprite.
 		
-		Animation dir1 = ImageSplitter.getAnimationFromSprite(sprite, chunkHeight, chunkWidth, 24F, 0);
+		Animation dir1 = new MovementAnimation(ImageSplitter.getAnimationFromSprite(sprite, chunkHeight, chunkWidth, 8F, 0), ImageSplitter.getAnimationFromSprite(sprite, chunkHeight, chunkWidth, 8F, 0), 8F);
 		Animation dir2 = AnimationUtil.copyAnimation(dir1);
 		
 		Animation left = faceLeft ? dir1 : dir2; 
@@ -89,7 +92,7 @@ public class SimpleBoss extends AllStarBoss
 		for(TextureRegion reg : dir2.getKeyFrames())
 			reg.flip(true, false);
 
-		Animation special = ImageSplitter.getAnimationFromSprite(sprite, chunkHeight, chunkWidth, 20F, 0);
+		Animation special = ImageSplitter.getAnimationFromSprite(sprite, chunkHeight, chunkWidth, 8F, 0);
 		special.setPlayMode(PlayMode.NORMAL);
 	
 		Music bgm = new J2hMusic(Gdx.audio.newMusic(FOLDER.child("bgm.mp3")));
@@ -105,8 +108,11 @@ public class SimpleBoss extends AllStarBoss
 			@Override
 			public void set(BackgroundBossAura t)
 			{
-				Sprite bg = new Sprite(Loader.texture(FOLDER.child("bg.png")));
-				Sprite bge = new Sprite(Loader.texture(FOLDER.child("bge.png")));
+				Texture bg1t = Loader.texture(FOLDER.child("bg1.png"));
+				Texture bg2t = Loader.texture(FOLDER.child("bg2.png"));
+				
+				Sprite bg1 = new Sprite(bg1t);
+				Sprite bg2 = new Sprite(bg2t);
 				
 				// Set backgrounds sprite to the framebuffer of the boss aura to make use of the background bubbles.
 			}
@@ -117,6 +123,10 @@ public class SimpleBoss extends AllStarBoss
 	public void onUpdate(long tick)
 	{
 		super.onUpdate(tick);
+		
+		InputUtil.handleMovementArrowKeys(this, 20f, 10f); // To test.
+		
+		if(Gdx.input.isKeyJustPressed(Keys.V)) { playSpecial(true); };
 	}
 	
 	@Override

@@ -29,7 +29,10 @@ public class PathingHelper
 			getCurrentPath().tick();
 	}
 	
-	public void setCurrentPath(Path currentPath)
+	/**
+	 * Sets the objects path to this one, the previous path will be deleted.
+	 */
+	public void path(Path currentPath)
 	{
 		this.currentPath = currentPath;
 	}

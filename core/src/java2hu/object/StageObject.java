@@ -13,6 +13,8 @@ import java2hu.object.bullet.Bullet;
 import java2hu.overwrite.J2hObject;
 import java2hu.pathing.PathingHelper;
 import java2hu.plugin.Plugin;
+import java2hu.util.Duration;
+import java2hu.util.Duration.Unit;
 
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.Animation;
@@ -707,6 +709,7 @@ public abstract class StageObject extends J2hObject implements IPosition
 			
 			if(owned.getValue().delete)
 			{
+				owned.getKey().onDelete();
 				it.remove();
 			}
 		}
@@ -720,6 +723,21 @@ public abstract class StageObject extends J2hObject implements IPosition
 		{
 			owned.getKey().update(second);
 		}
+	}
+	
+	/**
+	 * Makes this object update forward for the specified duration.
+	 */
+	public void progress(Duration dur)
+	{
+		int ticks = (int) dur.toTicks();
+		
+		for(int i = 0; i < ticks; i++)
+		{
+			update(game.getTick() + i);
+		}
+		
+		update((float)dur.getValue(Unit.SECOND));
 	}
 	
 	/**

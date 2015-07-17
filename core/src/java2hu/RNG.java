@@ -4,7 +4,7 @@ import java.util.Random;
 
 /**
  * Main class to generate random numbers, and even normal numbers.
- * All these methods make use of a seed, which can be saved to replay the stage.
+ * All these methods make use of a seed, which can be saved to replay the stage back with player's keystrokes. (For this everything has to use this class though, it can't take other random generators into account)
  */
 public class RNG
 {
@@ -49,7 +49,7 @@ public class RNG
 	}
 	
 	/**
-	 * Returns a random exclusive -1 to exclusive 1
+	 * Returns a random inclusive -1 to exclusive 1
 	 */
 	public static double randomMirror()
 	{
@@ -85,4 +85,9 @@ public class RNG
 	{
 		return ((currentTick % (2d * ticks)) / ticks) - 1;
 	}
+	
+	/**
+	 * Returns an array of booleans containing true and false, useful to iterate over with 2 possible combinations.
+	 */
+	public final static boolean[] BOOLS = new boolean[] { true, false };
 }

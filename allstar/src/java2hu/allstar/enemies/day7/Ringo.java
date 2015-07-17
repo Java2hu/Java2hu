@@ -453,9 +453,10 @@ public class Ringo extends AllStarBoss
 					
 					bullet.setDirectionDeg(finalAngle, 300f);
 					bullet.setRotationFromVelocity();
-					bullet.getSpawnAnimationSettings().setAlpha(-0.5f);
-					bullet.getSpawnAnimationSettings().setTime(60f);
-					bullet.getSpawnAnimationSettings().setAddedScale(0f);
+//					bullet.getSpawnAnimation().setAlpha(-0.5f);
+//					bullet.getSpawnAnimation().setTime(60);
+//					bullet.getSpawnAnimation().setAddedScale(0f);
+					bullet.useSpawnAnimation(false);
 					bullet.setGlowing();
 					
 					bullet.addEffect(new Plugin<Bullet>()
@@ -492,6 +493,8 @@ public class Ringo extends AllStarBoss
 									};
 								};
 								
+								bullet.useSpawnAnimation(false);
+								
 								bullet.addEffect(new Plugin<Bullet>()
 								{
 									@Override
@@ -516,6 +519,7 @@ public class Ringo extends AllStarBoss
 											bullet.setScale(0.4f * mul);
 											bullet.getCurrentSprite().setAlpha(0.5f);
 											bullet.useDeathAnimation(false);
+											bullet.useSpawnAnimation(false);
 											
 											if(dist < 2)
 											{
@@ -552,7 +556,7 @@ public class Ringo extends AllStarBoss
 			
 			if(tick % 200 == 0)
 			{
-				boss.getPathing().setCurrentPath(new SimpleTouhouBossPath(boss));
+				boss.getPathing().path(new SimpleTouhouBossPath(boss));
 			}
 		}
 	}

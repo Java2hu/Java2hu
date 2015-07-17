@@ -6,10 +6,10 @@ import java2hu.ZIndex;
 import java2hu.object.DrawObject;
 import java2hu.object.FreeStageObject;
 import java2hu.object.StageObject;
-import java2hu.overwrite.J2hObject;
+import java2hu.object.bullet.phase.PhaseAnimation;
+import java2hu.object.bullet.phase.TouhouSpawnAnimation;
 import java2hu.util.AnimationUtil;
 import java2hu.util.ImageSplitter;
-import java2hu.util.MathUtil;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
@@ -75,7 +75,7 @@ public class Bullet extends StageObject
 	@Override
 	public void onDraw()
 	{
-		if(animationPlaying)
+		if(currentAnimation != null && currentAnimation.isPlaying())
 			return;
 		
 		J2hGame g = Game.getGame();
@@ -85,7 +85,7 @@ public class Bullet extends StageObject
 		if(current != null)
 		{
 			current.setPosition(getX() - getWidth() / 2, getY() - getHeight() / 2);
-		
+			
 			current.draw(g.batch);
 		}
 	}
@@ -105,7 +105,7 @@ public class Bullet extends StageObject
 		if(doDelete())
 			g.delete(this);
 		
-		if(!animationPlaying)
+		if(currentAnimation == null || !currentAnimation.isPlaying() || currentAnimation.hasHitbox())
 			checkCollision();
 	}
 	
@@ -367,6 +367,16 @@ public class Bullet extends StageObject
 		return getCurrentSprite().getHeight();
 	}
 	
+	public float getScaledWidth()
+	{
+		return getWidth() * getCurrentSprite().getScaleX();
+	}
+	
+	public float getScaledHeight()
+	{
+		return getHeight() * getCurrentSprite().getScaleY();
+	}
+	
 	public Animation getAnimation()
 	{
 		return animation;
@@ -414,105 +424,10 @@ public class Bullet extends StageObject
 		spawnAnimation();
 	}
 	
-	protected boolean animationPlaying = false;
+	protected PhaseAnimation currentAnimation = null;
+	
 	protected boolean useSpawnAnimation = true;
 	protected boolean useDeleteAnimation = true;
-	protected SpawnAnimationSettings spawnAnimationSettings = new SpawnAnimationSettings();
-	
-	public static class SpawnAnimationSettings extends J2hObject
-	{
-		private float time = 10f;
-		private float addedScaleX = 2f;
-		private float addedScaleY = 2f;
-		private float alpha = -0.5f;
-		private boolean scaleDown = true;
-		
-		/**
-		 * Time the spawn animation takes, default: 10 ticks
-		 * @param time
-		 */
-		public void setTime(float time)
-		{
-			this.time = time;
-		}
-		
-		public float getTime()
-		{
-			return time;
-		}
-		
-		/**
-		 * Starting scale of the spawn animation in x, goes down to the original scale, default: 2x
-		 * @param addedScaleX
-		 */
-		public void setAddedScaleX(float addedScaleX)
-		{
-			this.addedScaleX = addedScaleX;
-		}
-	
-		public float getAddedScaleX()
-		{
-			return addedScaleX;
-		}
-		
-		/**
-		 * Starting scale of the spawn animation in y, goes down to the original scale, default: 2x
-		 * @param addedScaleY
-		 */
-		public void setAddedScaleY(float addedScaleY)
-		{
-			this.addedScaleY = addedScaleY;
-		}
-		
-		public float getAddedScaleY()
-		{
-			return addedScaleY;
-		}
-		
-		/**
-		 * Starting scale of the spawn animation, goes down to the original scale, default: 2x
-		 * @param addedScale
-		 */
-		public void setAddedScale(float addedScale)
-		{
-			setAddedScaleX(addedScale);
-			setAddedScaleY(addedScale);
-		}
-		
-		/**
-		 * Starting scale of the spawn animation, goes down to the original scale, default: 2x
-		 * @param addedScale
-		 */
-		public void setAddedScale(float addedScaleX, float addedScaleY)
-		{
-			setAddedScaleX(addedScaleX);
-			setAddedScaleY(addedScaleY);
-		}
-		
-		/**
-		 * Starting alpha of the spawn animation, the lower the alpha below 0, the longer it will be invisible. default: -0.5f
-		 * @param alpha
-		 */
-		public void setAlpha(float alpha)
-		{
-			this.alpha = alpha;
-		}
-		
-		public float getAlpha()
-		{
-			return alpha;
-		}
-		
-		public void scaleDown()
-		{
-			scaleDown = true;
-		}
-		
-		public void scaleUp()
-		{
-			scaleDown = false;
-		}
-	}
 	
 	public void useSpawnAnimation(boolean useSpawnAnimation)
 	{
@@ -524,95 +439,22 @@ public class Bullet extends StageObject
 		this.useDeleteAnimation = bool;
 	}
 	
-	public SpawnAnimationSettings getSpawnAnimationSettings()
+	public PhaseAnimation getSpawnAnimation()
 	{
-		return spawnAnimationSettings;
+		return spawn;
 	}
+	
+	public void setSpawnAnimation(PhaseAnimation spawn)
+	{
+		this.spawn = spawn;
+	}
+	
+	public PhaseAnimation spawn = new TouhouSpawnAnimation(this);
 	
 	public void spawnAnimation()
 	{	
-		final float originalScaleX = getCurrentSprite().getScaleX();
-		final float originalScaleY = getCurrentSprite().getScaleY();
-		final float originalAlpha = getCurrentSprite().getColor().a;
-		
-		animationPlaying = true;
-		
-		final Bullet bullet = this;
-		
-		final long requestTime = bullet.getTicksAlive();
-		
-		DrawObject obj = new DrawObject()
-		{
-			{
-				setName("Bullet spawn animation");
-			}
-			
-			private float time = bullet.getSpawnAnimationSettings().time;
-			private float alpha = bullet.getSpawnAnimationSettings().alpha;
-			
-			private boolean scaleDown = bullet.getSpawnAnimationSettings().scaleDown;
-		
-			private float scaleX = !scaleDown ? bullet.getSpawnAnimationSettings().addedScaleX : originalScaleX + bullet.getSpawnAnimationSettings().addedScaleX;
-			private float scaleY = !scaleDown ? bullet.getSpawnAnimationSettings().addedScaleY : originalScaleY + bullet.getSpawnAnimationSettings().addedScaleY;
-			private float scaleDecreaseX = Math.abs(scaleX - originalScaleX) / time;
-			private float scaleDecreaseY = Math.abs(scaleY - originalScaleY) / time;
-			private float alphaIncrease = (float) (MathUtil.getDifference(alpha, originalAlpha) / time);
-			
-			@Override
-			public void onDraw()
-			{
-				if(!bullet.isOnStageRaw())
-					return;
-				
-				J2hGame g = Game.getGame();
-				
-				HitboxSprite current = new HitboxSprite(getCurrentSprite());
-				
-				current.setPosition(bullet.getX() - current.getWidth() / 2, bullet.getY() - current.getHeight() / 2);
-				current.setScale(scaleX, scaleY);
-				current.setAlpha(Math.min(Math.max(alpha, 0), 1));
-				current.setHitboxScaleOffsetModifier(0f);
-				
-				current.draw(g.batch);
-			}
-			
-			@Override
-			public void onUpdate(long tick)
-			{
-				if(scaleDown)
-				{
-					scaleX -= scaleDecreaseX;
-					scaleY -= scaleDecreaseY;
-				}
-				else
-				{
-					scaleX += scaleDecreaseX;
-					scaleY += scaleDecreaseY;
-				}
-				
-				alpha += alphaIncrease;
-				
-				if(bullet.getTicksAlive() - requestTime > time || !bullet.isOnStageRaw())
-				{
-					bullet.removeOwnedObject(this);
-					animationPlaying = false;
-				}
-			}
-			
-			@Override
-			public void onDelete()
-			{
-				// Don't destroy assets.
-			}
-			
-			@Override
-			public boolean isPersistant()
-			{
-				return true;
-			}
-		};
-		
-		addOwnedObject(obj);
+		spawn.start();
+		currentAnimation = spawn;
 	}
 	
 	public void onHit()
@@ -656,7 +498,9 @@ public class Bullet extends StageObject
 	 */
 	public Color getDeletionColor()
 	{
-		return deletionColor;
+		final Color color = deletionColor != null ? deletionColor : (getType() != null ? getType().getEffectColor() : null);
+		
+		return color != null ? color : Color.WHITE;
 	}
 	
 	public void deleteAnimation()

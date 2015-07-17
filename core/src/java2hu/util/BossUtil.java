@@ -12,6 +12,7 @@ import java2hu.background.BackgroundBossAura;
 import java2hu.object.DrawObject;
 import java2hu.object.StageObject;
 import java2hu.object.bullet.Bullet;
+import java2hu.object.bullet.phase.ScaleAlphaPhaseAnimation;
 import java2hu.object.enemy.greater.Boss;
 import java2hu.overwrite.J2hObject;
 import java2hu.pathing.PathingHelper.Path;
@@ -95,7 +96,7 @@ public class BossUtil extends J2hObject
 	 */
 	public static void moveAroundRandomly(final Boss boss, final Rectangle box, final int millis, boolean drawBox)
 	{
-		boss.getPathing().setCurrentPath(new SimpleTouhouBossPath(boss, box));
+		boss.getPathing().path(new SimpleTouhouBossPath(boss, box));
 		boss.getPathing().getCurrentPath().setTime(Duration.milliseconds(millis));
 
 		if(drawBox)
@@ -137,7 +138,7 @@ public class BossUtil extends J2hObject
 	 */
 	public static void moveTo(final Boss boss, final float x, final float y, float millis)
 	{
-		boss.getPathing().setCurrentPath(new Path(boss, Duration.milliseconds(millis))
+		boss.getPathing().path(new Path(boss, Duration.milliseconds(millis))
 		{
 			{
 				addPosition(new Position(x, y));
@@ -1325,6 +1326,7 @@ public class BossUtil extends J2hObject
 		{
 			{
 				addDisposable(text);
+				setGlowing();
 			}
 			
 			ShaderProgram program = ShaderLibrary.STANDARD.getProgram();
@@ -1369,7 +1371,7 @@ public class BossUtil extends J2hObject
 					text.bind();
 					
 					Gdx.gl.glEnable(GL20.GL_BLEND);
-					Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+					Gdx.gl.glBlendFunc(getBlendFuncSrc(), getBlendFuncDst());
 					
 					mesh.render(program, GL20.GL_TRIANGLES);
 					
@@ -1971,9 +1973,10 @@ public class BossUtil extends J2hObject
 			
 			useDeathAnimation(false);
 			
-			SpawnAnimationSettings s = getSpawnAnimationSettings();
+			ScaleAlphaPhaseAnimation s = new ScaleAlphaPhaseAnimation(this);
 			
-			s.scaleUp();
+			setSpawnAnimation(s);
+			
 			s.setAddedScale(0f);
 			s.setTime(60);
 			s.setAlpha(0.2f);

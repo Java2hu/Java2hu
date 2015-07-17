@@ -73,7 +73,7 @@ public class SchemeUtil extends J2hObject
 		float x = (float) (1f * ((2 * Math.random()) - 1)) * 300f;
 		float y = (float) (1f * ((2 * Math.random()) - 1)) * 300f;
 		
-		obj.getPathing().setCurrentPath(new SinglePositionPath(obj, new Position(obj).add(new Position(x, y)), Duration.ticks(60).multiply(2f)));
+		obj.getPathing().path(new SinglePositionPath(obj, new Position(obj).add(new Position(x, y)), Duration.ticks(60).multiply(2f)));
 		
 		obj.addEffect(new Plugin<StageObject>()
 		{

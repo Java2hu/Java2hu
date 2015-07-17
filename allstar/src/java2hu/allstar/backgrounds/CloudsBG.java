@@ -146,8 +146,8 @@ public class CloudsBG extends Background3D
 			b.begin();
 
 			Material mat = new Material();
-			mat.set(ColorAttribute.createDiffuse(1, 1f, 1f, 0.99f));
-			mat.set(new BlendingAttribute(true, 0.5f));
+			mat.set(ColorAttribute.createDiffuse(1, 1f, 1f, 0.6f));
+			mat.set(new BlendingAttribute(true, 0.4f));
 			mat.set(TextureAttribute.createDiffuse(cloud));
 
 			String name = "cloud1";
@@ -245,7 +245,7 @@ public class CloudsBG extends Background3D
 		
 		if(tick % 4 == 0)
 		{
-			createCloud((Math.random() * 5f) - 2.5f, 5f * Math.random(), -4f, 0.001f * (2*(Math.random()-0.5f)), 0.015f * ((Math.random())));
+			createCloud((Math.random() * 10f) - 5f, 5f * Math.random(), -4f, 0.001f * (2*(Math.random()-0.5f)), 0.015f * ((Math.random())));
 		}
 		
 		float UVratio = 20f / 8; // Size is 20, 4x UV over the entire area

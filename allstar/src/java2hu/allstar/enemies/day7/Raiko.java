@@ -811,6 +811,7 @@ public class Raiko extends AllStarBoss
 															{
 																set = true;
 																setBullet(new ThBullet(ThBulletType.POINTER, ThBulletColor.RED));
+																spawnAnimation();
 																setRotationDeg(MathUtil.normalizeDegree(degree - 90F - 180F));
 															}
 														}
@@ -830,8 +831,8 @@ public class Raiko extends AllStarBoss
 								rain.setZIndex(rain.getZIndex() + finalI);
 								rain.setDirectionRadsTick((float) Math.toRadians(finalI), 4F);
 								rain.setRotationDeg(finalI);
-								rain.getSpawnAnimationSettings().setAddedScale(3f);
-								rain.getSpawnAnimationSettings().setTime(20f);
+//								rain.getSpawnAnimation().setAddedScale(3f);
+//								rain.getSpawnAnimation().setTime(20);
 								
 								Game.getGame().spawn(rain);
 							}

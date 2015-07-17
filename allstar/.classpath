@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="output" path="bin"/>
 	<classpathentry kind="src" path="src"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER" exported="true"/>
-	<classpathentry kind="src" path="/Java2hu-core" exported="true"/>
-	<classpathentry sourcepath="C:/Users/ThaRedstoner/.gradle/caches/modules-2/files-2.1/com.google.code.gson/gson/1.4/c98d84fe6569f8412e8d578fa3e721366043edcb/gson-1.4-sources.jar" kind="lib" path="C:/Users/ThaRedstoner/.gradle/caches/modules-2/files-2.1/com.google.code.gson/gson/1.4/c2c2d342e134a390723e4802891c0df1bf749171/gson-1.4.jar" exported="true"/>
+	<classpathentry exported="true" kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8"/>
+	<classpathentry exported="true" kind="src" path="/Java2hu-core"/>
+	<classpathentry exported="true" kind="lib" path="C:/Users/ThaRedstoner/.gradle/caches/modules-2/files-2.1/com.google.code.gson/gson/1.4/c2c2d342e134a390723e4802891c0df1bf749171/gson-1.4.jar" sourcepath="C:/Users/ThaRedstoner/.gradle/caches/modules-2/files-2.1/com.google.code.gson/gson/1.4/c98d84fe6569f8412e8d578fa3e721366043edcb/gson-1.4-sources.jar"/>
+	<classpathentry kind="output" path="bin"/>
 </classpath>

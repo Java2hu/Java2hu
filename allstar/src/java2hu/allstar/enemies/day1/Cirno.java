@@ -435,7 +435,7 @@ public class Cirno extends AllStarBoss
 					
 					final SimpleTouhouBossPath p = new SimpleTouhouBossPath(boss);
 					p.setTime(Duration.ticks(80));
-					boss.getPathing().setCurrentPath(p);
+					boss.getPathing().path(p);
 				}
 			});
 		}
@@ -637,7 +637,7 @@ public class Cirno extends AllStarBoss
 					SimpleTouhouBossPath p = new SimpleTouhouBossPath(boss);
 					p.setTime(Duration.ticks(40));
 					
-					boss.getPathing().setCurrentPath(p);
+					boss.getPathing().path(p);
 				}
 			});
 		}

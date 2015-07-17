@@ -425,7 +425,7 @@ public class Seija extends AllStarBoss
 				TouhouSounds.Enemy.BULLET_2.play(0.3F);
 			
 			if(tick % 200 == 0)
-				getOwner().getPathing().setCurrentPath(new SimpleTouhouBossPath(getOwner()));
+				getOwner().getPathing().path(new SimpleTouhouBossPath(getOwner()));
 			
 			if(tick % roundTime > roundTime - 40)
 				((Boss)getOwner()).playSpecial(true);

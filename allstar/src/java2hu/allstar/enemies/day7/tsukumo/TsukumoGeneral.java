@@ -1,7 +1,6 @@
 package java2hu.allstar.enemies.day7.tsukumo;
 
 import java2hu.Game;
-import java2hu.HitboxSprite;
 import java2hu.J2hGame;
 import java2hu.J2hGame.ClearType;
 import java2hu.allstar.AllStarStageScheme;
@@ -36,7 +35,6 @@ import java2hu.util.Scheduler;
 import java2hu.util.SchemeUtil;
 
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
 public class TsukumoGeneral implements SpecialFlowScheme<AllStarStageScheme>
 {
@@ -371,14 +369,6 @@ public class TsukumoGeneral implements SpecialFlowScheme<AllStarStageScheme>
 								angle += 2f;
 							else if(angle - finalI < 360)
 								angle += 4f;
-							
-							if(angle - finalI < 180)
-							{
-								for(TextureRegion r : getAnimation().getKeyFrames())
-								{
-									((HitboxSprite)r).scale(0.002f);
-								}
-							}
 
 							super.onUpdate(tick);
 						}
@@ -390,10 +380,9 @@ public class TsukumoGeneral implements SpecialFlowScheme<AllStarStageScheme>
 						}
 					};
 
-					bullet.getSpawnAnimationSettings().setAlpha(0.5f);
-					bullet.getSpawnAnimationSettings().scaleUp();
-					bullet.getSpawnAnimationSettings().setAddedScale(0);
-					bullet.getSpawnAnimationSettings().setTime(80);
+//					bullet.getSpawnAnimation().setAlpha(0.5f);
+//					bullet.getSpawnAnimation().setAddedScale(0);
+//					bullet.getSpawnAnimation().setTime(80);
 					bullet.setGlowing();
 					
 					game.spawn(bullet);
@@ -411,23 +400,14 @@ public class TsukumoGeneral implements SpecialFlowScheme<AllStarStageScheme>
 								angle += 2f;
 							else if(angle - finalI < 360)
 								angle += 4f;
-							
-							if(angle - finalI < 180)
-							{
-								for(TextureRegion r : getAnimation().getKeyFrames())
-								{
-									((HitboxSprite)r).scale(0.002f);
-								}
-							}
 
 							super.onUpdate(tick);
 						}
 					};
 
-					bullet.getSpawnAnimationSettings().setAlpha(0.5f);
-					bullet.getSpawnAnimationSettings().scaleUp();
-					bullet.getSpawnAnimationSettings().setAddedScale(0);
-					bullet.getSpawnAnimationSettings().setTime(80);
+//					bullet.getSpawnAnimation().setAlpha(0.5f);
+//					bullet.getSpawnAnimation().setAddedScale(0);
+//					bullet.getSpawnAnimation().setTime(80);
 					bullet.setGlowing();
 					game.spawn(bullet);
 				}
@@ -584,7 +564,7 @@ public class TsukumoGeneral implements SpecialFlowScheme<AllStarStageScheme>
 					b.setDirectionDegTick(angle, 6f);
 					b.setRotationDeg(0);
 					
-					b.getSpawnAnimationSettings().setTime(50);
+//					b.getSpawnAnimation().setTime(50);
 					b.setZIndex(b.getZIndex() + tick % 400);
 					
 					game.spawn(b);

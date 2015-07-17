@@ -89,8 +89,8 @@ public class Byakuren extends AllStarBoss
 		
 		Animation right = new StartupLoopAnimation(ImageSplitter.getAnimationFromSprite(sprite, chunkHeight, chunkWidth, 1f, 5,6,7,8), ImageSplitter.getAnimationFromSprite(sprite, chunkHeight, chunkWidth, 1f, 8), 8);
 		Animation left = new StartupLoopAnimation(ImageSplitter.getAnimationFromSprite(sprite, chunkHeight, chunkWidth, 1f, 9,10,11,12), ImageSplitter.getAnimationFromSprite(sprite, chunkHeight, chunkWidth, 1f, 12), 8);
-
-		Animation special = new StartupLoopAnimation(ImageSplitter.getAnimationFromSprite(sprite, chunkHeight, chunkWidth, 10F, 13,14), ImageSplitter.getAnimationFromSprite(sprite, chunkHeight, chunkWidth, 10F, 15,16), 10f);
+		
+		Animation special = ImageSplitter.getAnimationFromSprite(sprite, chunkHeight, chunkWidth, 10F, 13,14,15,16,15,16,15,16,15,16,14,13);
 		special.setPlayMode(PlayMode.NORMAL);
 
 		Sprite bg = new Sprite(Loader.texture(Gdx.files.internal(folder + "bg.png")));
@@ -321,7 +321,7 @@ public class Byakuren extends AllStarBoss
 
 			if(tick % time == time - 100)
 			{
-				boss.getPathing().setCurrentPath(new SimpleTouhouBossPath(boss));
+				boss.getPathing().path(new SimpleTouhouBossPath(boss));
 			}
 			
 			if(tick % time == specialPlay)
@@ -404,9 +404,9 @@ public class Byakuren extends AllStarBoss
 							};
 							
 							bullet.setName("ball");
-							bullet.getSpawnAnimationSettings().setTime(8);
-							bullet.getSpawnAnimationSettings().setAlpha(-2f);
-							bullet.getSpawnAnimationSettings().setAddedScale(0.5f);
+//							bullet.getSpawnAnimation().setTime(8);
+//							bullet.getSpawnAnimation().setAlpha(-2f);
+//							bullet.getSpawnAnimation().setAddedScale(0.5f);
 							bullet.setGlowing();
 							bullet.setDirectionDegTick(degree, 7f);
 
@@ -484,7 +484,7 @@ public class Byakuren extends AllStarBoss
 			
 			setSpellcardTime(Duration.seconds(46));
 			
-			owner.getPathing().setCurrentPath(new SinglePositionPath(owner, new Position(game.getWidth() / 2f, game.getHeight() - 200), Duration.ticks(50)));
+			owner.getPathing().path(new SinglePositionPath(owner, new Position(game.getWidth() / 2f, game.getHeight() - 200), Duration.ticks(50)));
 		}
 
 		@Override
@@ -719,11 +719,6 @@ public class Byakuren extends AllStarBoss
 			{
 				TouhouSounds.Enemy.ACTIVATE_2.play();
 				boss.playSpecial(true);
-			}
-			
-			if(tick % time == 20)
-			{
-				boss.playSpecial(false);
 			}
 			
 			if(tick % time == 0)

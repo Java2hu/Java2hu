@@ -503,7 +503,7 @@ public class Sukuna extends AllStarBoss
 			
 			if(tick % 250 == 0 && tick > 60)
 			{
-				boss.getPathing().setCurrentPath(new SimpleTouhouBossPath(boss));
+				boss.getPathing().path(new SimpleTouhouBossPath(boss));
 			}
 			
 			if(tick % 180 == 0)
@@ -1159,8 +1159,8 @@ public class Sukuna extends AllStarBoss
 					for(int rotation = timers[i]; rotation < timers[i + 1]; rotation += (2.5 - bulletScale) * 20)
 					{
 						Bullet bullet = new Bullet(new ThBullet(ThBulletType.KUNAI, rainbow[rainbowTimer]), boss.getX(), boss.getY());
-						bullet.getSpawnAnimationSettings().setAddedScale(5f);
-						bullet.getSpawnAnimationSettings().setTime(30f);
+//						bullet.getSpawnAnimation().setAddedScale(5f);
+//						bullet.getSpawnAnimation().setTime(30);
 						bullet.setDirectionRadsTick((float) Math.toRadians(rotation), 2f);
 						bullet.setRotationFromVelocity(-90f);
 						
@@ -1214,9 +1214,9 @@ public class Sukuna extends AllStarBoss
 						bullet.setZIndex(bullet.getZIndex() + rotation);
 						bullet.setDirectionRadsTick((float) Math.toRadians(rotation), 4f);
 						bullet.setScale(bulletScale);
-						bullet.getSpawnAnimationSettings().setAlpha(-1f);
-						bullet.getSpawnAnimationSettings().setAddedScale(3f);
-						bullet.getSpawnAnimationSettings().setTime(30f);
+//						bullet.getSpawnAnimation().setAlpha(-1f);
+//						bullet.getSpawnAnimation().setAddedScale(3f);
+//						bullet.getSpawnAnimation().setTime(30);
 						
 						game.spawn(bullet);
 					}

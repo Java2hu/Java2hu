@@ -359,7 +359,7 @@ public class Seiran extends AllStarBoss
 			{
 				boss.playSpecial(false);
 				
-				boss.getPathing().setCurrentPath(new SimpleTouhouBossPath(boss)
+				boss.getPathing().path(new SimpleTouhouBossPath(boss)
 				{
 					{
 						setTime(Duration.ticks(80));
@@ -477,7 +477,7 @@ public class Seiran extends AllStarBoss
 				if(tick % period == 40)
 				{
 					boss.playSpecial(false);
-					boss.getPathing().setCurrentPath(new SimpleTouhouBossPath(boss)
+					boss.getPathing().path(new SimpleTouhouBossPath(boss)
 					{
 						{
 							setTime(Duration.ticks(80));
