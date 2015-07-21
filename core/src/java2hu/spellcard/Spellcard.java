@@ -152,6 +152,9 @@ public abstract class Spellcard extends J2hObject
 	
 	public void onRemove()
 	{
+		if(game.isOutOfGame())
+			return;
+		
 		if(!timedOut)
 		{
 			onCapture();

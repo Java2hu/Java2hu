@@ -14,6 +14,7 @@ import java2hu.background.bg3d.Background3D;
 import java2hu.gameflow.GameFlowScheme;
 import java2hu.gameflow.SpecialFlowScheme;
 import java2hu.menu.Menu;
+import java2hu.menu.ShadowedTextButton;
 import java2hu.system.SaveableObject;
 import java2hu.touhou.sounds.TouhouSounds;
 import java2hu.util.Getter;
@@ -132,8 +133,10 @@ public class SpellPracticeDay extends AllStarMenu
 				((AllStarGame)Game.getGame()).score = 0;
 				((AllStarGame)Game.getGame()).deaths = 0;
 				
-				Game.getGame().setPaused(false);
+				System.out.println("HEREEEE");
+				
 				Game.getGame().setOutOfGame(false);
+				Game.getGame().setPaused(false);
 				
 				TouhouSounds.Hud.OK.play();
 				

@@ -1,7 +1,6 @@
 package java2hu.util;
 
 import java.util.ArrayList;
-
 import java2hu.Game;
 import java2hu.IPosition;
 import java2hu.object.StageObject;

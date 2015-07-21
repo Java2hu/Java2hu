@@ -7,6 +7,7 @@ import java2hu.events.input.KeyDownEvent;
 import java2hu.menu.ButtonManager;
 import java2hu.menu.ButtonManager.Button;
 import java2hu.menu.Menu;
+import java2hu.menu.ShadowedTextButton;
 import java2hu.object.DrawObject;
 import java2hu.touhou.sounds.TouhouSounds;
 import java2hu.util.Getter;
@@ -19,7 +20,6 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.BitmapFont.TextBounds;
-import com.badlogic.gdx.utils.Disposable;
 
 public class Options extends AllStarMenu
 {
@@ -65,16 +65,9 @@ public class Options extends AllStarMenu
 
 			pbhMusic.setZIndex(getZIndex() + 2);
 
+			addChild(pbhMusic);
+			
 			game.spawn(pbhMusic);
-
-			addDisposable(new Disposable()
-			{
-				@Override
-				public void dispose()
-				{
-					game.delete(pbhMusic);
-				}
-			});
 		}
 		
 		// Sound button for J2hGame.getSoundModifier()
@@ -113,16 +106,9 @@ public class Options extends AllStarMenu
 
 			pbhSound.setZIndex(getZIndex() + 2);
 
+			addChild(pbhSound);
+			
 			game.spawn(pbhSound);
-
-			addDisposable(new Disposable()
-			{
-				@Override
-				public void dispose()
-				{
-					game.delete(pbhSound);
-				}
-			});
 		}
 		
 		TextBounds bound = medFont.getBounds("Exit");
@@ -142,8 +128,6 @@ public class Options extends AllStarMenu
 	@Override
 	public void onHide()
 	{
-		disposeAll();
-		
 		super.onHide();
 	}
 	
@@ -191,8 +175,6 @@ public class Options extends AllStarMenu
 				
 				float newAmount = Math.max(0, Math.min(1, get + increment));
 				
-				System.out.println("New amount: " + newAmount);
-				
 				setValue.set(newAmount);
 			}
 			else if(keyCode == Keys.LEFT)
@@ -200,8 +182,6 @@ public class Options extends AllStarMenu
 				float get = getValue.get();
 				
 				float newAmount = Math.max(0, Math.min(1, get - increment));
-				
-				System.out.println("New amount: " + newAmount);
 				
 				setValue.set(newAmount);
 			}
@@ -213,6 +193,9 @@ public class Options extends AllStarMenu
 		@Override
 		public void onDraw()
 		{
+			if(!isOnStage())
+				return;
+			
 			float posX = button.getX() + 200;
 			float posY = button.getY();
 			
@@ -221,6 +204,8 @@ public class Options extends AllStarMenu
 			
 			float value = getValue.get();
 			float whiteWidth = value * width;
+			
+			game.batch.setColor(Color.WHITE);
 			
 			game.batch.draw(gray, posX, posY - height, width, height);
 			game.batch.draw(white, posX, posY - height, whiteWidth, height);

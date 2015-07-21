@@ -3,6 +3,7 @@ package java2hu.allstar.menu;
 import java2hu.Game;
 import java2hu.J2hGame;
 import java2hu.menu.Menu;
+import java2hu.menu.ShadowedTextButton;
 import java2hu.touhou.sounds.TouhouSounds;
 
 import com.badlogic.gdx.graphics.Color;
@@ -125,11 +126,15 @@ public class Story extends AllStarMenu
 		topFont.setScale(0.5f);
 		
 		writeLine("-----", topFont, game.getWidth() / 2f, y - 75);
-		
+	
 		topFont.setScale(1f);
 		
 		String[] devnotes = { 
 				"Sanae and Reimu are not yet playable.",
+				"Right now, the game is only about 15% done, but one of the largest parts,",
+				"the internal engine, effects, etc, are done.",
+				"So after this it's basically only new spells and stuff getting added,",
+				"and less about improvements to the engine."
 				};
 
 		y -= 120;

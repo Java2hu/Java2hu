@@ -140,6 +140,11 @@ public abstract class AllStarBoss extends Boss
 	@Override
 	public void onSpawn()
 	{
+		spawnBGM();
+	}
+	
+	public void spawnBGM()
+	{
 		if(getBackgroundMusic() == null)
 			return;
 		
@@ -152,15 +157,21 @@ public abstract class AllStarBoss extends Boss
 			}
 		};
 		
+		bgmPlayer.getBgm().play();
+		
+		bgmPlayer.getBgm().setVolume(0f);
+		
 		game.runAsync(new Runnable()
 		{
 			@Override
 			public void run()
 			{
-				bgmPlayer.getBgm().play();
-				bgmPlayer.getBgm().setVolume(0f);
+				boolean playing = bgmPlayer.getBgm().isPlaying();
 				
 				bgmPlayer.getBgm().setPosition(bgmPosition);
+				
+				if(!playing)
+					bgmPlayer.getBgm().pause();
 				
 				bgmPlayer.fadeIn();
 			}

@@ -3,12 +3,10 @@ package java2hu.allstar;
 import java2hu.Game;
 import java2hu.J2hGame;
 import java2hu.Loader;
-import java2hu.allstar.enemies.AllStarBoss;
 import java2hu.allstar.menu.LoadScreen;
 import java2hu.allstar.menu.MainMenu;
 import java2hu.allstar.util.AllStarUtil;
 import java2hu.background.BackgroundBossAura;
-import java2hu.object.StageObject;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
@@ -145,6 +143,8 @@ public class AllStarGame extends J2hGame
 		
 		super.drawUI();
 		
+		font.setColor(Color.WHITE);
+		
 		deathScore.setColor(new Color(52 / 256f, 99 / 256f, 229 / 256f, 1.0f));
 		deathScore.setPosition(getWidth() - deathScore.getWidth() - 100, getHeight() - deathScore.getHeight());
 		deathScore.setScale(1f, 1f);
@@ -164,30 +164,12 @@ public class AllStarGame extends J2hGame
 	@Override
 	public void onPause()
 	{
-		for(StageObject obj : getStageObjects())
-		{
-			if(obj instanceof AllStarBoss)
-			{
-				if(((AllStarBoss)obj).getBackgroundMusic() != null)
-					((AllStarBoss)obj).getBackgroundMusic().pause();
-			}
-		}
-		
 		super.onPause();
 	}
 	
 	@Override
 	public void onDePause()
 	{
-		for(StageObject obj : getStageObjects())
-		{
-			if(obj instanceof AllStarBoss)
-			{
-				if(((AllStarBoss)obj).getBackgroundMusic() != null)
-					((AllStarBoss)obj).getBackgroundMusic().play();
-			}
-		}
-		
 		super.onDePause();
 	};
 	

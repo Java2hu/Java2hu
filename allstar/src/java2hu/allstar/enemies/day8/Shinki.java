@@ -3,9 +3,11 @@ package java2hu.allstar.enemies.day8;
 import java.util.ArrayList;
 import java2hu.Game;
 import java2hu.HitboxSprite;
+import java2hu.IPosition;
 import java2hu.J2hGame;
 import java2hu.J2hGame.ClearType;
 import java2hu.Loader;
+import java2hu.Position;
 import java2hu.ZIndex;
 import java2hu.allstar.AllStarGame;
 import java2hu.allstar.AllStarStageScheme;
@@ -22,6 +24,8 @@ import java2hu.object.enemy.greater.Boss;
 import java2hu.object.player.Player;
 import java2hu.object.ui.CircleHealthBar;
 import java2hu.overwrite.J2hMusic;
+import java2hu.pathing.SinglePositionPath;
+import java2hu.plugin.Plugin;
 import java2hu.plugin.sprites.FadeInSprite;
 import java2hu.spellcard.Spellcard;
 import java2hu.system.SaveableObject;
@@ -72,6 +76,19 @@ public class Shinki extends AllStarBoss
 	
 	public static Shinki newInstance(float x, float y, final boolean conversation)
 	{
+		for(StageObject obj : game.getStageObjects())
+		{
+			if(obj instanceof Shinki)
+			{
+				final Shinki boss = (Shinki) obj;
+				
+				boss.getPathing().path(new SinglePositionPath(boss, new Position(x, y), Duration.ticks(30)));
+				boss.wasOnStage = true;
+				
+				return boss;
+			}
+		}
+		
 		String folder = "enemy/" + BOSS_NAME.toLowerCase() + "/";
 		
 		int chunkHeight = 128;
@@ -125,6 +142,8 @@ public class Shinki extends AllStarBoss
 	private Sprite wingsNormal;
 	private Sprite wingsDemon;
 	private BossEffectsResult aura;
+	
+	private boolean wasOnStage = false;
 	
 	public Sprite bg;
 	
@@ -186,6 +205,11 @@ public class Shinki extends AllStarBoss
 	
 	@Override
 	public void onSpawn()
+	{
+		startStage();
+	}
+	
+	public void startStage()
 	{
 		super.onSpawn();
 		
@@ -520,7 +544,22 @@ public class Shinki extends AllStarBoss
 			@Override
 			public void run()
 			{
-				BossUtil.cloudEntrance(boss, 60);
+				if(!boss.wasOnStage)
+				{
+					BossUtil.cloudEntrance(boss, 60);
+				}
+				else
+				{
+					boss.startStage();
+					scheme.getBossAura().setAura(0, new Getter<IPosition>()
+					{
+						@Override
+						public IPosition get()
+						{
+							return boss;
+						}
+					});
+				}
 
 				g.addTaskGame(new Runnable()
 				{
@@ -528,8 +567,12 @@ public class Shinki extends AllStarBoss
 					public void run()
 					{
 						bar.setObject(new CircleHealthBar(boss));
+					
+						if(!boss.wasOnStage)
+						{
+							g.spawn(boss);
+						}
 						
-						g.spawn(boss);
 						g.spawn(bar.getObject());
 						
 						bar.getObject().addSplit(0.8f);
@@ -551,7 +594,7 @@ public class Shinki extends AllStarBoss
 			@Override
 			public boolean returnTrueToWait()
 			{
-				return !boss.isOnStage();
+				return aura == null;
 			}
 		});
 		
@@ -853,6 +896,8 @@ public class Shinki extends AllStarBoss
 					{
 						Bullet bullet = new Bullet(getCheetosAnimation(getAnimation().getKeyFrames()[0].getTexture()), x, y);
 						bullet.getCurrentSprite().setColor(Color.YELLOW);
+						bullet.setZIndex(i);
+						bullet.setGlowing();
 						clones.add(i / 2, bullet);
 						Game.getGame().spawn(bullet);
 					}
@@ -890,7 +935,7 @@ public class Shinki extends AllStarBoss
 
 		Bullet laser1;
 		Bullet laser2;
-
+		
 		@Override
 		public void tick(int tick)
 		{
@@ -903,6 +948,8 @@ public class Shinki extends AllStarBoss
 				BossUtil.moveTo(boss, Game.getGame().getWidth()/2f, 800, 1000);
 				boss.setDamageModifier(0.4f);
 			}
+			
+			final float timeMul = Math.min(1f, tick > 1500 ? (tick - 1500) / 1000f : 0f);
 			
 			if(tick == 50)
 				BossUtil.cloudEntrance(boss, Color.MAGENTA, Color.MAGENTA, 20);
@@ -975,7 +1022,9 @@ public class Shinki extends AllStarBoss
 				}
 			}
 			
-			if(tick == 140)
+			int change = 140;
+			
+			if(tick == change)
 			{
 				TouhouSounds.Enemy.EXPLOSION_3.play();
 				boss.setDemonWings();
@@ -1012,26 +1061,44 @@ public class Shinki extends AllStarBoss
 			{
 				float addRotation = ((tick - 40 + 50) % 100 - 50) / 3f;
 
-				if(tick < 140)
-					addRotation = 140 - tick;
+				if(tick < change)
+					addRotation = change - tick;
 
 				if(addRotation > 0)
 					addRotation = -addRotation;
 
 				int[] positions = { -300, -100, 100, 300 };
-
+				
 				for(int xAdd : positions)
 				{
 					float[] rot = tick < 140 ? new float[]{ 90 } : new float[]{ 90, 20, 160 };
 
 					for(float f : rot)
 					{
-						Bullet knife = new Bullet(new ThBullet(ThBulletType.KNIFE, ThBulletColor.RED), boss.getX() + xAdd, boss.getY() + 50);
+						final float directionAngle = (float) Math.toRadians(f + (xAdd < 0 ? addRotation : -addRotation));
+						
+						if(timeMul < 0.7f)
+						{
+							Bullet knife = new Bullet(new ThBullet(ThBulletType.KNIFE, ThBulletColor.RED), boss.getX() + xAdd, boss.getY() + 50);
 
-						knife.setDirectionRadsTick((float) Math.toRadians(f + (xAdd < 0 ? addRotation : -addRotation)), 20f);
-						knife.setRotationFromVelocity(-90);
-						knife.setZIndex(boss.getZIndex() - 3);
-						knife.setGlowing();
+							knife.addEffect(new Plugin<Bullet>()
+									{
+								@Override
+								public void update(Bullet object, long tick)
+								{
+									if(object.getTicksAlive() == 2)
+									{
+										object.setDirectionRadsTick(directionAngle, 20f);
+										object.setRotationFromVelocity(-90);
+									}
+								}
+									});
+
+							knife.setZIndex(boss.getZIndex() - 3);
+							knife.setGlowing();
+
+							game.spawn(knife);
+						}
 						
 						Bullet spawner = new Bullet(new ThBullet(ThBulletType.BALL_BIG, ThBulletColor.RED), boss.getX() + xAdd, boss.getY() + 50)
 						{
@@ -1039,25 +1106,31 @@ public class Shinki extends AllStarBoss
 							public void onUpdate(long tick)
 							{
 								super.onUpdate(tick);
-
+								
+								if(getTicksAlive() == 2)
+								{
+									setDirectionRadsTick(directionAngle, 20f);
+								}
+							
+								if(getTicksAlive() < 2)
+									return;
+								
 								HitboxSprite sprite = getCurrentSprite();
 
-								sprite.setScale(sprite.getScaleX() * 0.9f);
-
-								if(getTicksAlive() > 15)
+								sprite.setScale(sprite.getScaleX() * (0.91f + (0.08f * timeMul)));
+								
+								if(sprite.getScaleX() < 0.01f)
 									game.delete(this);
 							}
 						};
 
+						spawner.setGlowing();
 						spawner.setZIndex(boss.getZIndex() - 2);
-						spawner.getCurrentSprite().setScale(3f);
-						spawner.setVelocityXTick(knife.getVelocityXTick());
-						spawner.setVelocityYTick(knife.getVelocityYTick());
+						spawner.getCurrentSprite().setScale(3f + (2f * (timeMul > 0.75f ? (timeMul - 0.75f) * 4 : 0f)));
+						
 						spawner.useSpawnAnimation(false);
 						spawner.useDeathAnimation(false);
 						game.spawn(spawner);
-
-						game.spawn(knife);
 					}
 
 					for(int i = 0; i < 2; i++)

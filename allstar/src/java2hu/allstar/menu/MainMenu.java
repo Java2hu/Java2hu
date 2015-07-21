@@ -3,12 +3,14 @@ package java2hu.allstar.menu;
 import java2hu.Game;
 import java2hu.J2hGame.ClearType;
 import java2hu.allstar.AllStarGame;
+import java2hu.allstar.Days;
 import java2hu.allstar.ExtraStageScheme;
 import java2hu.events.EventHandler;
 import java2hu.events.EventListener;
 import java2hu.events.game.ObjectRemoveEvent;
 import java2hu.events.input.KeyDownEvent;
 import java2hu.menu.Menu;
+import java2hu.menu.ShadowedTextButton;
 import java2hu.overwrite.J2hMusic;
 import java2hu.system.SaveableObject;
 import java2hu.touhou.sounds.TouhouSounds;
@@ -53,16 +55,26 @@ public class MainMenu extends AllStarMenu
 			@Override
 			public void run()
 			{
+				final int day = dayObject.getObject();
+				
+				boolean exists = Days.getDay(day) != null;
+				
+				if(!exists)
+				{
+					TouhouSounds.Hud.INVALID.play();
+					return;
+				}
+				
 				game.clear(ClearType.ALL, true);
 				
 				((AllStarGame)Game.getGame()).score = 0;
 				((AllStarGame)Game.getGame()).deaths = 0;
-				((AllStarGame)Game.getGame()).day = dayObject.getObject();
+				((AllStarGame)Game.getGame()).day = day;
 				
 				Game.getGame().onStartGame();
 				
-				Game.getGame().setPaused(false);
 				Game.getGame().setOutOfGame(false);
+				Game.getGame().setPaused(false);
 				
 				TouhouSounds.Hud.OK.play();
 			}
@@ -78,7 +90,6 @@ public class MainMenu extends AllStarMenu
 				if(event.getObject() == MainMenu.this)
 				{
 					game.unregisterEvents(this);
-					System.out.println("Delete");
 				}
 			}
 			
@@ -98,10 +109,13 @@ public class MainMenu extends AllStarMenu
 				
 				dayObject.setObject(day);
 				
+				boolean exists = Days.getDay(day) != null;
+				
 				final String text = "Play Day " + day;
 				
 				TextBounds b = play.getFont().getBounds(text);
 				
+				play.setInactiveColor(exists ? Color.GRAY : Color.DARK_GRAY);
 				play.setText(text);
 				play.setX(game.getWidth() / 2f - (b.width / 2f));
 			}
@@ -114,7 +128,11 @@ public class MainMenu extends AllStarMenu
 			@Override
 			public void run()
 			{
+				TouhouSounds.Hud.INVALID.play();
+				
 				String haha = "Well wouldn't you loooooooveeeee to know what's going to be here (^-^)";
+				
+				System.out.println(haha);
 				
 				if(true)
 					return;
@@ -127,8 +145,8 @@ public class MainMenu extends AllStarMenu
 				Game.getGame().setScheme(new ExtraStageScheme());
 				Game.getGame().getScheme().start();
 				
-				Game.getGame().setPaused(false);
 				Game.getGame().setOutOfGame(false);
+				Game.getGame().setPaused(false);
 				
 				TouhouSounds.Hud.OK.play();
 			}
@@ -227,7 +245,7 @@ public class MainMenu extends AllStarMenu
 			}
 		});
 		
-		button.setInactiveColor(Color.DARK_GRAY);
+//		button.setInactiveColor(Color.DARK_GRAY);
 		
 		y -= 50;
 		

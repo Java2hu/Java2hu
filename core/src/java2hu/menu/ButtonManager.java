@@ -57,26 +57,36 @@ public class ButtonManager implements EventListener
 	
 	public void draw()
 	{
-		Color previous = Game.getGame().font.getColor();
-		
-		Game.getGame().font.setColor(Color.GRAY);
-		
 		for(int i = 0; i < getNextId(); i++)
 		{
 			Button b = buttons.get(i);
 			
+			BitmapFont f = ((TextButton)b).getFont();
+			
+			Color previous = f.getColor();
+			
+			Color setTo = Color.GRAY;
+			
+			if(b instanceof TextButton)
+			{
+				setTo = ((TextButton) b).getInactiveColor();
+			}
+			
+			f.setColor(setTo);
+			
 			boolean selected = i == currentSelected;
 			
 			if(b instanceof TextButton && selected)
-				((TextButton)b).getFont().setColor(new Color(red, 1f - red, 1f - red, 1f));
+			{
+				float minRed = 1f - red;
+				
+				f.setColor(new Color((setTo.r * minRed) + red, (setTo.g * minRed) + 1f - red, (setTo.b * minRed) + 1f - red, (red * 2f)));
+			}
 			
 			b.draw(selected);
 			
-			if(b instanceof TextButton && selected)
-				((TextButton)b).getFont().setColor(((TextButton)b).getInactiveColor());
+			f.setColor(previous);
 		}
-		
-		Game.getGame().font.setColor(previous);
 	}
 	
 	int ticksInactive = 20; // Dont handle anything for 10 ticks, so that concurrent key presses dont open up a menu 1000x

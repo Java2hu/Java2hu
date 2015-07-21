@@ -702,7 +702,7 @@ public class Yumeko extends AllStarBoss
 						}
 					};
 					bullet.setGlowing();
-					bullet.useSpawnAnimation(false);
+//					bullet.useSpawnAnimation(false);
 					bullet.setDirectionDegTick(angle + (opposite ? tick / 8f % 360 : -90), opposite ? 2.5f : 20f);
 					bullet.setRotationFromVelocity(-90);
 					game.spawn(bullet);

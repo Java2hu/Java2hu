@@ -210,7 +210,7 @@ public class AllStarStageScheme extends GameFlowScheme
 						
 						if(current != null)
 						{
-							current.setZIndex(-100);
+							current.setZIndex(-1000);
 							current.setFrameBuffer(getBossAura().getBackgroundBuffer());
 							game.spawn(current);
 						}

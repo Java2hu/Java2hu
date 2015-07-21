@@ -5,6 +5,7 @@ import java2hu.Game;
 import java2hu.Loader;
 import java2hu.menu.ButtonManager;
 import java2hu.menu.Menu;
+import java2hu.menu.ShadowedTextButton;
 import java2hu.touhou.font.TouhouFont;
 
 import com.badlogic.gdx.Gdx;

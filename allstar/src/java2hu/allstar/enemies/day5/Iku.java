@@ -282,7 +282,7 @@ public class Iku extends AllStarBoss
 			
 			tick -= wait;
 			
-			int interval = 250;
+			int interval = 200;
 			
 			if(tick % interval == (interval - 80))
 			{
@@ -342,23 +342,23 @@ public class Iku extends AllStarBoss
 						float curAngle = 0;
 						
 						@Override
-						public void update(Laser object, long tick)
+						public void update(final Laser object, long tick)
 						{
 							curAngle -= 3f;
 							
-							laser.setThickness(laser.getThickness() + 0.1f);
+							object.setThickness(object.getThickness() + 0.1f);
 							
 							final float degree = dirAngle + curAngle;
 							
 							if(curAngle <= -320)
 							{
-								object.setDirectionDeg(degree - 90, 420f /** Ayy lmao **/);
+								object.setDirectionDeg(degree - 90, 520f);
 								
 								delete();
 								
-								game.addTask(() -> { object.progress(Duration.seconds(finalRay * 0.04f)); }, 1); // Fix offset
+								game.addTask(new Runnable() { @Override public void run() { object.progress(Duration.seconds(finalRay * 0.02f)); } }, 1); // Fix offset
 								
-								game.addTask(() -> { object.setLengthOnScreen(1200f); laser.setThickness(10f); }, 10);
+								game.addTask(new Runnable() { @Override public void run() { object.setLengthOnScreen(1200f); object.setThickness(10f); } }, 10);
 								
 								return;
 							}
@@ -398,7 +398,7 @@ public class Iku extends AllStarBoss
 						
 						Bullet bullet = new Bullet(new ThBullet(ThBulletType.BALL_2, ThBulletColor.RED), x, y);
 						
-						bullet.setDirectionDeg((subAngle + ((mirror ? -amount : amount) * -bendAngle)), 150f + (350f * mul));
+						bullet.setDirectionDeg((subAngle + ((mirror ? -amount : amount) * -bendAngle)), 250f + (350f * mul));
 //						bullet.setGlowing();
 						
 						bullet.setZIndex(bullet.getZIndex() + amount);
@@ -507,16 +507,16 @@ public class Iku extends AllStarBoss
 						game.spawn(bullet);
 					}
 					
-					if(tick > 200 && tick % 3 <= 1)
+					if(tick > 200 && tick % 4 <= 1)
 					{
-						float rotation = (float) (RNG.multiplier(80, tick) * 360f);
+						float rotation = (float) (RNG.multiplier(200, tick) * 360f);
 						
 						if(b)
 							rotation = 180 - rotation;
 						
 						Bullet bullet = new Bullet(new ThBullet(ThBulletType.BALL_2, ThBulletColor.RED), x, y);
 						
-						bullet.setDirectionDeg(rotation, 300f);
+						bullet.setDirectionDeg(rotation, 450f);
 						bullet.setRotationFromVelocity();
 						
 						game.spawn(bullet);

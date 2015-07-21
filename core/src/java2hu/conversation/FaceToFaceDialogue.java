@@ -16,6 +16,7 @@ import java2hu.util.MathUtil;
 import java2hu.util.PathUtil;
 import java2hu.util.PathUtil.PathTask;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 
@@ -168,6 +169,16 @@ public class FaceToFaceDialogue extends UpdateObject implements EventListener
 	@Override
 	public void onUpdate(long tick)
 	{
+		if(getTicksAlive() < 30)
+			return;
+		
+		if(Gdx.input.isKeyPressed(Keys.CONTROL_LEFT) && tick % 20 == 0)
+		{
+			KeyDownEvent e = new KeyDownEvent(Keys.CONTROL_LEFT);
+			
+			keyDown(e);
+		}
+		
 		final J2hGame game = Game.getGame();
 		
 		leftHolder.onUpdate(tick);
@@ -278,8 +289,6 @@ public class FaceToFaceDialogue extends UpdateObject implements EventListener
 	{
 		float time = distance / 10f;
 		
-		System.out.println(time);
-		
 		return time;
 	}
 	
@@ -309,13 +318,16 @@ public class FaceToFaceDialogue extends UpdateObject implements EventListener
 	{
 		int keyCode = event.getKey();
 		
-		if(keyCode == Keys.Z && !game.isPaused())
+		boolean CTRL = keyCode == Keys.CONTROL_LEFT;
+		
+		if((CTRL || keyCode == Keys.Z) && !game.isPaused())
 		{
 			event.setCancelled(true);
 			
 			if(!isDone() && cooldown <= 0)
 			{
-				cooldown = 40;
+				if(!CTRL)
+					cooldown = 40;
 				
 				Dialogue old = dialogue.get(index);
 
@@ -323,7 +335,9 @@ public class FaceToFaceDialogue extends UpdateObject implements EventListener
 					old.doAfter.run();
 
 				index++;
-				TouhouSounds.Hud.OK.play();
+				
+				if(!CTRL)
+					TouhouSounds.Hud.OK.play();
 
 				if(!isDone())
 				{

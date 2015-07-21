@@ -19,7 +19,7 @@ public class BGMPlayer extends StageObject implements EventListener
 	
 	public BGMPlayer(final Music mediaPlayer)
 	{
-		this(mediaPlayer, false);
+		this(mediaPlayer, true);
 	}
 	
 	public BGMPlayer(final Music mediaPlayer, boolean pauseOnPause)
@@ -36,13 +36,14 @@ public class BGMPlayer extends StageObject implements EventListener
 				mediaPlayer.dispose();
 			}
 		});
+	}
+	
+	@Override
+	public void onSpawn()
+	{
+		super.onSpawn();
 		
-		if(pauseOnPause)
-		{
-			System.out.println("Registering");
-			game.registerEvents(this);
-			System.out.println("Done");
-		}
+		game.registerEvents(this);
 	}
 	
 	boolean wasPlaying = false;
@@ -50,22 +51,33 @@ public class BGMPlayer extends StageObject implements EventListener
 	@EventHandler
 	public void onPause(PauseGameEvent event)
 	{
+		if(!pauseOnPause)
+			return;
+		
 		wasPlaying = bgm.isPlaying();
 		
-		bgm.pause();
+		if(wasPlaying)
+			bgm.pause();
 	}
 	
 	@EventHandler
 	public void onUnPause(UnPauseGameEvent event)
 	{
+		if(!pauseOnPause)
+			return;
+		
 		if(wasPlaying)
 			bgm.play();
+		
+		wasPlaying = false;
 	}
 	
 	@Override
 	public void onDelete()
 	{
 		bgm.stop();
+		
+		game.unregisterEvents(this);
 	}
 
 	@Override
@@ -156,7 +168,8 @@ public class BGMPlayer extends StageObject implements EventListener
 	
 	public void fade(final float start, final float end, int overTicks, final boolean disposeOnFinish)
 	{
-		bgm.setVolume(start);
+		if(bgm.isPlaying())
+			bgm.setVolume(start);
 		
 		final float increase = (end - start)/overTicks;
 		
@@ -171,12 +184,6 @@ public class BGMPlayer extends StageObject implements EventListener
 				{
 					if(bgm.isPlaying())
 						bgm.setVolume(start + finalI * increase);
-					
-					if(disposeOnFinish && bgm.getVolume() < 0.01f)
-					{
-						System.out.println("Dispose");
-						bgm.dispose();
-					}
 				}
 			}, (int) i + getFadeDelay());
 		}

@@ -1980,6 +1980,8 @@ public class BossUtil extends J2hObject
 			s.setAddedScale(0f);
 			s.setTime(60);
 			s.setAlpha(0.2f);
+			
+			setGlowing();
 		}
 		
 		@Override

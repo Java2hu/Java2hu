@@ -3,33 +3,38 @@ package java2hu.menu;
 import java2hu.Game;
 import java2hu.J2hGame;
 import java2hu.Loader;
-import java2hu.menu.ButtonManager.TextButton;
 import java2hu.object.DrawObject;
 import java2hu.object.LivingObject;
 import java2hu.object.StageObject;
 import java2hu.touhou.sounds.TouhouSounds;
 import java2hu.util.MathUtil;
 
+import shaders.ShaderLibrary;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.ScreenUtils;
 
 public class PauseMenu extends Menu
 {
-	public PauseMenu(Menu parent)
+	private boolean canGoBackToGame = false;
+	
+	public boolean canGoBackToGame()
+	{
+		return canGoBackToGame;
+	}
+	
+	public PauseMenu(Menu parent, boolean canGoBackToGame)
 	{
 		super(parent);
+		
+		this.canGoBackToGame = canGoBackToGame;
 	}
 
-	Color textureColor = null;
-	
-	{
-		textureColor = Color.BLACK.cpy();
-	}
+	Color textureColor = Color.BLACK.cpy();
 	
 	private Sprite flower;
 	private boolean forward = true;
@@ -39,64 +44,103 @@ public class PauseMenu extends Menu
 	
 	private ButtonManager manager = new ButtonManager();
 	
+	private int pauseY = 0;
+	private int debugY = 0;
+	
+	@Override
+	public void onSpawn()
+	{
+		super.onSpawn();
+		
+		init();
+	}
+	
+	private void init()
 	{
 		final Rectangle b = Game.getGame().getBoundary();//new Rectangle(0, 0, 300, 300); //Game.getGame().getBoundary();
 		
 		final float xOffset = Game.getGame().camera.viewport.x;
 		final float yOffset = Game.getGame().camera.viewport.y;
 
-		float xMul = Game.getGame().camera.viewport.width / Game.getGame().camera.lastWidth;
-		float yMul = Game.getGame().camera.viewport.height / Game.getGame().camera.lastHeight;
+		float xMul = Game.getGame().camera.viewport.width / Game.getGame().getWidth();
+		float yMul = Game.getGame().camera.viewport.height / Game.getGame().getHeight();
 		
 		final Sprite bgText = new Sprite(ScreenUtils.getFrameBufferTexture((int)(xOffset + b.x), (int)(yOffset + b.y), (int)(b.width * xMul), (int)(b.height * yMul)));
 		
-		final Texture water = Loader.texture(Gdx.files.internal("sprites/water.jpg"));
+		bgText.setAlpha(0f);
 		
 		fakeBg = new DrawObject()
 		{
 			@Override
 			public void onDraw()
 			{
-				if(getShader() != null)
-				{
-					water.setFilter(TextureFilter.Nearest, TextureFilter.Nearest);
-				}
-				
 				bgText.setBounds(b.x, b.y, b.width, b.height);
 				bgText.draw(Game.getGame().batch);
+			}
+			
+			@Override
+			public boolean isActiveDuringPause()
+			{
+				return true;
+			}
+			
+			@Override
+			public void onUpdateDelta(float delta)
+			{
+				if(bgText.getColor().a >= 1)
+					return;
+				
+				final float newAlpha = Math.min(1, bgText.getColor().a + (1f * delta));
+
+				bgText.setAlpha(newAlpha);
 			}
 		};
 		
 		fakeBg.setZIndex(getZIndex() - 1);
-//		fakeBg.setShader(ShaderLibrary.RELIEF.getProgram());
+		fakeBg.setShader(ShaderLibrary.RELIEF.getProgram());
 		
-//		Game.getGame().spawn(fakeBg);
+		Game.getGame().spawn(fakeBg);
 		
 		Texture texture = Loader.texture(Gdx.files.internal("pause_1280.png"));
 
 		flower = new Sprite(texture, 96, 420);
 		flower.setColor(Game.getGame().batch.getColor());
 		
-		manager.addButton(new TextButton(450, 600, "Return to Game", new Runnable()
-		{
-			@Override
-			public void run()
-			{
-				TouhouSounds.Hud.OK.play();
-				
-				Game.getGame().addTaskPause(new Runnable()
-				{
-					@Override
-					public void run()
-					{
-						Game.getGame().setPaused(false);
-						Game.getGame().onDePause();
-					}
-				}, 1);
-			}
-		}));
+		int y = 650;
 		
-		manager.addButton(new TextButton(450, 550, "Return to Title", new Runnable()
+		if(!canGoBackToGame)
+		{
+			y -= 100;
+		}
+		
+		pauseY = y;
+		
+		y -= 50;
+		
+		if(canGoBackToGame)
+		{
+			manager.addButton(new ShadowedTextButton(450, y, "Return to Game", new Runnable()
+			{
+				@Override
+				public void run()
+				{
+					TouhouSounds.Hud.OK.play();
+
+					Game.getGame().addTaskPause(new Runnable()
+					{
+						@Override
+						public void run()
+						{
+							Game.getGame().setPaused(false);
+						}
+					}, 1);
+				}
+			}));
+			
+			y -= 50;
+		}
+		
+		manager.addButton(new ShadowedTextButton(450, y, "Return to Title", new Runnable()
 		{
 			@Override
 			public void run()
@@ -108,13 +152,17 @@ public class PauseMenu extends Menu
 					@Override
 					public void run()
 					{
+						game.setPaused(true);
+						game.setOutOfGame(true);
 						Game.getGame().onToTitle();
 					}
 				}, 1);
 			}
 		}));
 		
-		manager.addButton(new TextButton(450, 500, "Give up and Retry", new Runnable()
+		y -= 50;
+		
+		manager.addButton(new ShadowedTextButton(450, y, canGoBackToGame ? "Give up and Retry" : "Play again", new Runnable()
 		{
 			@Override
 			public void run()
@@ -127,14 +175,25 @@ public class PauseMenu extends Menu
 					public void run()
 					{
 						Game.getGame().setPaused(false);
-						Game.getGame().onDePause();
 						Game.getGame().onRetry();
 					}
 				}, 1);
 			}
 		}));
 		
-		manager.addButton(new TextButton(450, 350, "(S) Kill Screen / Skip", new Runnable()
+		y -= 50;
+		
+		if(!canGoBackToGame)
+		{
+			debugY = -10;
+			return;
+		}
+		
+		debugY = y;
+		
+		y -= 50;
+		
+		manager.addButton(new ShadowedTextButton(450, y, "(S) Kill Screen / Skip", new Runnable()
 		{
 			@Override
 			public void run()
@@ -150,7 +209,9 @@ public class PauseMenu extends Menu
 			}
 		}));
 		
-		manager.addButton(new TextButton(450, 300, "(D) Toggle Debug Mode (LAGGY!)", new Runnable()
+		y -= 50;
+		
+		manager.addButton(new ShadowedTextButton(450, y, "(D) Toggle Debug Mode (LAGGY!)", new Runnable()
 		{
 			@Override
 			public void run()
@@ -160,7 +221,9 @@ public class PauseMenu extends Menu
 			}
 		}));
 		
-		manager.addButton(new TextButton(450, 250, "(F) Toggle Profiling Mode (Needs console)", new Runnable()
+		y -= 50;
+		
+		manager.addButton(new ShadowedTextButton(450, y, "(F) Toggle Profiling Mode (Needs console)", new Runnable()
 		{
 			@Override
 			public void run()
@@ -170,7 +233,9 @@ public class PauseMenu extends Menu
 			}
 		}));
 		
-		manager.addButton(new TextButton(450, 200, "(G) Toggle Z-Indexing Mode (Shows draw order)", new Runnable()
+		y -= 50;
+		
+		manager.addButton(new ShadowedTextButton(450, y, "(G) Toggle Z-Indexing Mode (Shows draw order)", new Runnable()
 		{
 			@Override
 			public void run()
@@ -181,6 +246,8 @@ public class PauseMenu extends Menu
 		}));
 	}
 	
+	private int ticks = 0;
+	
 	@Override
 	public void onDraw()
 	{
@@ -188,15 +255,49 @@ public class PauseMenu extends Menu
 		
 		game.batch.setProjectionMatrix(game.standardProjectionMatrix);
 		
+//		game.batch.end();
+//		
+//		game.shape.begin(ShapeType.Filled);
+//		
+//		game.shape.setColor(0.3f, 0.3f, 0.3f, 0.1f);
+//		
+//		game.shape.rect(450 - 30, 700, 500, -500);
+//		
+//		game.shape.end();
+//		
+//		game.batch.begin();
+		
 		flower.setRotation(rot);
-		flower.setPosition(330, 670 - flower.getHeight());
+		
+		float mul = 0.5f + (Math.min(1, ticks / 30f) * 0.5f);
+		Color batchColor = game.batch.getColor();
+		
+		flower.setPosition(330 - 5, 670 - flower.getHeight());
+	
+		flower.setColor(0f, 0f, 0f, (mul - 0.5f) * 2f);
 		flower.draw(game.batch);
+		
+		flower.setPosition(330, 670 - flower.getHeight());
+		
+		flower.setColor(mul * batchColor.r, mul * batchColor.g, mul * batchColor.b, (mul - 0.5f) * 2f);
+		flower.draw(game.batch);
+		
+		game.font.setColor(Color.BLACK);
+		
+		game.font.draw(game.batch, canGoBackToGame ? "Pause Menu:" : "End menu:", 450 + 2, pauseY - 2);
 		
 		game.font.setColor(new Color(0.4f, 1f, 0.4f, 1f));
 		
-		game.font.draw(game.batch, "Pause Menu:", 450, 650);
+		game.font.draw(game.batch, canGoBackToGame ? "Pause Menu:" : "End menu:", 450, pauseY);
 		
-		game.font.draw(game.batch, "Debug Menu:", 450, 400);
+		
+		game.font.setColor(Color.BLACK);
+		
+		game.font.draw(game.batch, "Debug Menu:", 450 + 2, debugY - 2);
+	
+		game.font.setColor(new Color(0.4f, 1f, 0.4f, 1f));
+		
+		game.font.draw(game.batch, "Debug Menu:", 450, debugY);
 		
 		game.font.setColor(Color.WHITE);
 		
@@ -208,6 +309,8 @@ public class PauseMenu extends Menu
 	@Override
 	public void onUpdate(long tick)
 	{
+		ticks++;
+		
 		float rotSpeed = 1f;
 		float maxRot = 10f;
 		float minRot = 0f;
@@ -227,8 +330,6 @@ public class PauseMenu extends Menu
 			if(rot < minRot)
 				forward = true;
 		}
-		
-		fakeBg.setZIndex(getZIndex() - 1);
 		
 		manager.update();
 	}

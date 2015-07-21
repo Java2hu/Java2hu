@@ -493,7 +493,7 @@ public class Ringo extends AllStarBoss
 									};
 								};
 								
-								bullet.useSpawnAnimation(false);
+//								bullet.useSpawnAnimation(false);
 								
 								bullet.addEffect(new Plugin<Bullet>()
 								{

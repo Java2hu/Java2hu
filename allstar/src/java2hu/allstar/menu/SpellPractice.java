@@ -4,6 +4,7 @@ import java2hu.Game;
 import java2hu.J2hGame;
 import java2hu.allstar.Days;
 import java2hu.menu.Menu;
+import java2hu.menu.ShadowedTextButton;
 import java2hu.touhou.sounds.TouhouSounds;
 
 import com.badlogic.gdx.graphics.Color;

@@ -130,7 +130,7 @@ public class J2hGame extends ApplicationAdapter implements InputProcessor
 		
 	}
 	
-	private PauseMenu pauseMenu;
+	public PauseMenu pauseMenu;
 	
 	/**
 	 * Ran once the player pauses the game.
@@ -141,8 +141,15 @@ public class J2hGame extends ApplicationAdapter implements InputProcessor
 		if(isOutOfGame())
 			return;
 		
+		if(pauseMenu != null)
+		{
+			System.out.println("Paused exists");
+			return; // Another pause menu is present.
+		}
+		
 		TouhouSounds.Hud.PAUSE.play();
-		pauseMenu = new PauseMenu(null);
+		
+		pauseMenu = new PauseMenu(null, true);
 		spawn(pauseMenu);
 	}
 	
@@ -155,11 +162,12 @@ public class J2hGame extends ApplicationAdapter implements InputProcessor
 		if(isOutOfGame())
 			return;
 		
+		System.out.println("Depause");
+		
 		if(pauseMenu == null)
 			return;
 		
 		delete(pauseMenu);
-		pauseMenu.disposeAll();
 		pauseMenu = null;
 	}
 	
@@ -197,6 +205,11 @@ public class J2hGame extends ApplicationAdapter implements InputProcessor
 	public void onStartGame()
 	{
 		resetStage();
+		
+		System.out.println("Starting game pause");
+		
+		setPaused(true);
+		setPaused(false);
 	}
 	
 	private GameFlowScheme scheme;
@@ -1221,26 +1234,30 @@ public class J2hGame extends ApplicationAdapter implements InputProcessor
 	
 	public void setPaused(boolean paused)
 	{
-		this.paused = paused;
+		boolean change = this.paused != paused;
 		
+		System.out.println("Has been changed pause ? " + change);
+		
+		this.paused = paused;
+	
 		if(!paused)
 		{
 			pauseTick = 0;
 			pauseElapsedTime = 0;
-			
+
 			UnPauseGameEvent event = new UnPauseGameEvent();
 			callEvent(event);
-			
+
 			onDePause();
 		}
 		else
 		{
 			PauseGameEvent event = new PauseGameEvent();
 			callEvent(event);
-			
+
 			onPause();
 		}
-		
+
 		System.out.println(paused ? "Game Paused" : "Game (Re)started");
 	}
 	
@@ -2004,6 +2021,8 @@ public class J2hGame extends ApplicationAdapter implements InputProcessor
 	
 	public void drawDebugUI()
 	{
+		font.setColor(Color.WHITE);
+		
 		String fps = "FPS: " + Gdx.graphics.getFramesPerSecond();
 		TextBounds bounds = font.getBounds(fps);
 		font.draw(batch, fps, Game.getGame().getWidth() - bounds.width, Game.getGame().getHeight()); // Draws downwards.
@@ -2049,8 +2068,8 @@ public class J2hGame extends ApplicationAdapter implements InputProcessor
 	@Override
 	public void render()
 	{
-		currentTPS = Gdx.input.isKeyPressed(Keys.CONTROL_LEFT) ? SPEED_LOGIC_TPS : DEFAULT_LOGIC_TPS;
-		
+//		currentTPS = Gdx.input.isKeyPressed(Keys.CONTROL_LEFT) ? SPEED_LOGIC_TPS : DEFAULT_LOGIC_TPS;
+	
 		if(profiling)
 		{
 			profilingOutput = new ArrayList<String>();
@@ -2181,6 +2200,8 @@ public class J2hGame extends ApplicationAdapter implements InputProcessor
 		}
 	}
 
+	private long lastPause = 0;
+	
 	@Override
 	public boolean keyDown(int keycode)
 	{
@@ -2217,7 +2238,19 @@ public class J2hGame extends ApplicationAdapter implements InputProcessor
 			
 			if(keycode == Keys.ESCAPE)
 			{
-				setPaused(!isPaused());
+				if(pauseMenu == null || pauseMenu != null && pauseMenu.canGoBackToGame())
+				{
+					System.out.println("Her");
+					
+					long diff = System.currentTimeMillis() - lastPause;
+					
+					if(diff > 100)
+					{
+						setPaused(!isPaused());
+
+						lastPause = System.currentTimeMillis();
+					}
+				}
 			}
 			else if(keycode == Input.Keys.S)
 			{

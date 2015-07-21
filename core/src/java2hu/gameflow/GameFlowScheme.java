@@ -1,7 +1,10 @@
 package java2hu.gameflow;
 
 import java2hu.Game;
+import java2hu.menu.PauseMenu;
 import java2hu.overwrite.J2hObject;
+import java2hu.touhou.sounds.TouhouSounds;
+import java2hu.util.Duration;
 
 
 /**
@@ -37,9 +40,12 @@ public abstract class GameFlowScheme extends Thread
 	{
 		System.out.println("Running scheme");
 		
+		boolean completed = false;
+		
 		try
 		{
 			runScheme();
+			completed = true;
 		}
 		catch (ThreadDeath e)
 		{
@@ -53,6 +59,48 @@ public abstract class GameFlowScheme extends Thread
 		}
 		
 		System.out.println("Done running scheme");
+		
+		if(completed)
+			onComplete();
+	}
+	
+	public void onComplete()
+	{
+		if(Game.getGame().isOutOfGame())
+			return;
+		
+		Game.getGame().addTask(new Runnable()
+		{
+			@Override
+			public void run()
+			{
+				if(Game.getGame().isOutOfGame())
+					return;
+				
+				if(Game.getGame().pauseMenu != null)
+				{
+					Game.getGame().delete(Game.getGame().pauseMenu);
+				}
+				
+				Game.getGame().pauseMenu = new PauseMenu(null, false);
+			}
+		}, 0);
+		
+		Game.getGame().addTask(new Runnable()
+		{
+			@Override
+			public void run()
+			{
+				if(Game.getGame().isOutOfGame())
+					return;
+				
+				Game.getGame().spawn(Game.getGame().pauseMenu);
+				
+				TouhouSounds.Hud.PAUSE.play();
+				
+				Game.getGame().setPaused(true);
+			}
+		}, (int) Duration.seconds(2).toTicks());
 	}
 	
 	public abstract void runScheme();

@@ -16,6 +16,7 @@ import java2hu.gameflow.DialogueFlowScheme;
 import java2hu.gameflow.GameFlowScheme;
 import java2hu.gameflow.SpecialFlowScheme;
 import java2hu.menu.Menu;
+import java2hu.menu.ShadowedTextButton;
 import java2hu.object.StageObject;
 import java2hu.object.enemy.greater.Boss;
 import java2hu.overwrite.J2hObject;
@@ -284,8 +285,9 @@ public class DeveloperMenu extends AllStarMenu
 				((AllStarGame)Game.getGame()).deaths = 0;
 				
 				Game.getGame().spawn(Marisa.newInstance(Game.getGame().getWidth()/2, Game.getGame().getHeight()/2));
-				Game.getGame().setPaused(false);
+				
 				Game.getGame().setOutOfGame(false);
+				Game.getGame().setPaused(false);
 				
 				stageRunner.run();
 				

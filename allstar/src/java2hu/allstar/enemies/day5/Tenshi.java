@@ -30,6 +30,7 @@ import java2hu.touhou.sounds.TouhouSounds;
 import java2hu.util.AnimationUtil;
 import java2hu.util.BossUtil;
 import java2hu.util.Duration;
+import java2hu.util.Duration.Unit;
 import java2hu.util.ImageSplitter;
 import java2hu.util.MathUtil;
 import java2hu.util.ObjectUtil;
@@ -39,6 +40,7 @@ import java2hu.util.Setter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.g2d.Animation;
@@ -362,8 +364,6 @@ public class Tenshi extends AllStarBoss
 				{
 					float offset = offsets[i];
 					
-					System.out.println(offset);
-					
 					Bullet bullet = new Bullet(new ThBullet(ThBulletType.BALL_BIG, ThBulletColor.RED), boss.getX(), boss.getY());
 					bullet.setDirectionDeg(angleOffset + 90 + offset, 400f);
 					bullet.progress(Duration.seconds(0.2f));
@@ -379,7 +379,7 @@ public class Tenshi extends AllStarBoss
 		public Spell(Tenshi owner)
 		{
 			super(owner);
-			setSpellcardTime(Duration.seconds(30));
+			setSpellcardTime(Duration.seconds(43));
 			owner.setDamageModifier(0.5f);
 		}
 
@@ -389,6 +389,15 @@ public class Tenshi extends AllStarBoss
 			final Player player = game.getPlayer();
 			
 			int wait = 60;
+			
+			if(tick == 0)
+			{
+				Position pos = new Position(game.getCenterX(), game.getCenterY() + 200);
+
+				SinglePositionPath p = new SinglePositionPath(boss, pos, Duration.ticks(wait));
+
+				boss.getPathing().path(p);
+			}
 			
 			if(tick < wait)
 				return;
@@ -400,20 +409,38 @@ public class Tenshi extends AllStarBoss
 			
 			int interval = 60;
 			
-			if(tick % interval == 30 || tick == 0)
+			if(getTimeLeft().toSeconds() < 20)
+			{
+				float mul = (float) (1f - (getTimeLeft().getValue(Unit.SECOND) / 20f));
+				
+				int value = 30;
+				
+				if(getTimeLeft().toSeconds() < 4)
+				{
+					interval = 15;
+					
+					if(tick % 30 == 0)
+					{
+						BossUtil.cloudEntrance(boss, Color.RED, Color.BLUE, 30);
+					}
+				}
+				else
+				{
+					interval = (int) (interval - (value * mul));
+					interval = Math.round(interval / 5) * 5;
+				}
+			}
+			
+			if(tick % interval == 30)
 			{
 				float range = 20;
 				
 				Position pos = new Position(game.getCenterX(), game.getCenterY() + 200).add(new Position(range * RNG.randomMirror(), range * RNG.randomMirror()));
 				
 				SinglePositionPath p = new SinglePositionPath(boss, pos, Duration.ticks(30));
-				p.setTime(Duration.ticks(30));
 				
 				boss.getPathing().path(p);
 			}
-			
-			if(tick < 30)
-				return;
 			
 			if(tick % interval == 0)
 			{
@@ -429,19 +456,19 @@ public class Tenshi extends AllStarBoss
 					bullet.setZIndex(bullet.getZIndex() + 5);
 					bullet.useSpawnAnimation(false);
 					
-					final double xDist = (MathUtil.getDifference(boss.getX(), player.getX()) / 10f) + 20f;
-					final boolean above = boss.getY() < player.getY();
+					final double xDist = (MathUtil.getDifference(boss.getX(), player.getX()) / 10f) + 30f;
+					final boolean above = bullet.getY() < player.getY();
 					
 					bullet.addEffect(new Plugin<Bullet>()
 					{
 						@Override
 						public void update(Bullet object, long tick)
 						{
-							float aboveMul = above ? -1f : 1f;
+							final float aboveMul = above ? -1f : 1f;
 							
 							int length = (int) (20 + (60 * progressMul));
 							
-							if(length < xDist)
+							if(length < (xDist * 0.5f))
 							{
 								length = (int) xDist;
 							}

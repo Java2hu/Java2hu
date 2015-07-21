@@ -82,8 +82,7 @@ public class TouhouSpawnAnimation extends AnimationPhaseAnimation
 				}
 				
 //				current.setAlpha((float) (targetAlpha - (targetAlpha * mul)));
-				
-				bullet.getCurrentSprite().setAlpha(targetAlpha * (float) mul);
+				bullet.setAlpha(targetAlpha * (float) mul);
 				
 				current.setPosition(bullet.getX() - current.getWidth() / 2f, bullet.getY() - current.getHeight() / 2f);
 				

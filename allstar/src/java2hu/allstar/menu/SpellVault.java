@@ -12,8 +12,10 @@ import java2hu.allstar.spellcards.YouAreTheBoss;
 import java2hu.background.bg3d.Background3D;
 import java2hu.gameflow.GameFlowScheme;
 import java2hu.menu.Menu;
+import java2hu.menu.ShadowedTextButton;
 import java2hu.object.StageObject;
 import java2hu.object.enemy.greater.Boss;
+import java2hu.overwrite.J2hMusic;
 import java2hu.overwrite.J2hObject;
 import java2hu.spellcard.Spellcard;
 import java2hu.touhou.sounds.TouhouSounds;
@@ -89,7 +91,7 @@ public class SpellVault extends AllStarMenu
 						}
 					}, 1 * 60);
 					
-					final Music bgm = Gdx.audio.newMusic(Gdx.files.internal("music/wakasagihime/bgm.mp3"));
+					final Music bgm = new J2hMusic(Gdx.audio.newMusic(Gdx.files.internal("music/wakasagihime/bgm.mp3")));
 					bgm.setVolume(1f * Game.getGame().getMusicModifier());
 					bgm.setLooping(true);
 					
@@ -97,7 +99,8 @@ public class SpellVault extends AllStarMenu
 					dummy.getBackgroundMusic().dispose();
 		
 					dummy.setBackgroundMusic(bgm);
-					dummy.getBackgroundMusic().play();
+					
+					dummy.spawnBGM();
 					
 					dummy.addDisposable(new Disposable()
 					{
@@ -131,6 +134,15 @@ public class SpellVault extends AllStarMenu
 					}, 50);
 				}
 			}, 10);
+			
+			wait(new WaitConditioner()
+			{
+				@Override
+				public boolean returnTrueToWait()
+				{
+					return true; // Wait forever.
+				}
+			});
 		}
 	}
 	
@@ -179,6 +191,8 @@ public class SpellVault extends AllStarMenu
 						Spellcard card = new YouAreTheBoss(boss, getBossAura());
 						
 						Game.getGame().startSpellCard(card);
+						
+						BossUtil.spellcardCircle(boss, card, getBossAura());
 					}
 				};
 			}
@@ -353,8 +367,8 @@ public class SpellVault extends AllStarMenu
 				((AllStarGame)Game.getGame()).deaths = 0;
 				
 				stageRunner.run();
-				Game.getGame().setPaused(false);
 				Game.getGame().setOutOfGame(false);
+				Game.getGame().setPaused(false);
 				TouhouSounds.Hud.OK.play();
 				
 				Menu parent = screen.getParent();

@@ -120,7 +120,8 @@ public class Seiran extends AllStarBoss
 				
 				bg.setFrameBuffer(t.getBackgroundBuffer());
 				bg.setVelV(0.1d);
-				bg.setEndU(1d);
+				bg.setEndU(2d);
+				bg.setEndV(2d);
 				bg.getSprite().setAlpha(0.99f);
 				bg.setZIndex(bg.getZIndex() + 100);
 				game.spawn(bg);

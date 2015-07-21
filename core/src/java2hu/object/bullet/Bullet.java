@@ -2,6 +2,7 @@ package java2hu.object.bullet;
 import java2hu.Game;
 import java2hu.HitboxSprite;
 import java2hu.J2hGame;
+import java2hu.RNG;
 import java2hu.ZIndex;
 import java2hu.object.DrawObject;
 import java2hu.object.FreeStageObject;
@@ -10,6 +11,7 @@ import java2hu.object.bullet.phase.PhaseAnimation;
 import java2hu.object.bullet.phase.TouhouSpawnAnimation;
 import java2hu.util.AnimationUtil;
 import java2hu.util.ImageSplitter;
+import java2hu.util.Setter;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
@@ -279,13 +281,25 @@ public class Bullet extends StageObject
 		setVelocityY((float) (Math.sin(radians) * speed));
 	}
 	
-	public void setRotationDeg(float rotation)
+	/**
+	 * Halts the movement of this bullet, making it stand still.
+	 */
+	public void haltMovement()
 	{
-		for(TextureRegion t : animation.getKeyFrames())
+		setVelocityX(0);
+		setVelocityY(0);
+	}
+	
+	public void setRotationDeg(final float rotation)
+	{
+		applyAnimationChange(new Setter<HitboxSprite>()
 		{
-			HitboxSprite s = (HitboxSprite) t;
-			s.setRotation(rotation);
-		}
+			@Override
+			public void set(HitboxSprite t)
+			{
+				t.setRotation(rotation);
+			};
+		});
 	}
 	
 	public void setRotationRads(float rotation)
@@ -298,12 +312,39 @@ public class Bullet extends StageObject
 		setScale(scale, scale);
 	}
 	
-	public void setScale(float scaleX, float scaleY)
+	public void setScale(final float scaleX, final float scaleY)
+	{
+		applyAnimationChange(new Setter<HitboxSprite>()
+		{
+			@Override
+			public void set(HitboxSprite t)
+			{
+				t.setScale(scaleX, scaleY);
+			};
+		});
+	}
+	
+	public void setAlpha(final float alpha)
+	{
+		applyAnimationChange(new Setter<HitboxSprite>()
+		{
+			@Override
+			public void set(HitboxSprite t)
+			{
+				t.setAlpha(alpha);
+			};
+		});
+	}
+	
+	/**
+	 * Apply a setter to all frames of the bullet's animation, usefull if you need to alter a specific property of all the frames.
+	 */
+	public void applyAnimationChange(Setter<HitboxSprite> change)
 	{
 		for(TextureRegion t : animation.getKeyFrames())
 		{
 			HitboxSprite s = (HitboxSprite) t;
-			s.setScale(scaleX, scaleY);
+			change.set(s);
 		}
 	}
 	
@@ -525,6 +566,8 @@ public class Bullet extends StageObject
 		final float width = bullet.getWidth();
 		final float height = bullet.getHeight();
 		
+		final float rotationOffset = (float) (RNG.random() * 360f);
+		
 		final Animation ani = AnimationUtil.copyAnimation(BREAK_ANI);
 		
 		Color effect = getType().getEffectColor();
@@ -536,8 +579,6 @@ public class Bullet extends StageObject
 			effect = Color.WHITE;
 		
 		effect = effect.cpy();
-		
-		boolean flip = getZIndex() % 2 == 0;
 		
 		for(TextureRegion r : ani.getKeyFrames())
 		{
@@ -554,9 +595,10 @@ public class Bullet extends StageObject
 			sprite.setColor(effect);
 			sprite.setAlpha(0.3f);
 			
-			if(flip)
-				sprite.setFlip(true, false);
+			sprite.setOriginCenter();
 		}
+		
+		setGlowing();
 		
 		StageObject obj = new FreeStageObject(bullet.getX(), bullet.getY())
 		{
@@ -579,11 +621,17 @@ public class Bullet extends StageObject
 			@Override
 			public void onDraw()
 			{
+				game.batch.setBlendFunction(getBlendFuncSrc(), getBlendFuncDst());
+				
 				J2hGame g = Game.getGame();
 				
 				HitboxSprite current = (HitboxSprite) ani.getKeyFrame(ticks/2f);
 
 				current.setPosition(getX() - (current.getWidth() / 2f), getY() - (current.getHeight() / 2f));
+				current.setRotation(rotationOffset);
+				current.draw(g.batch);
+				
+				current.setRotation(180 + rotationOffset);
 				current.draw(g.batch);
 			}
 			
