@@ -75,6 +75,9 @@ public class HitboxSprite extends Sprite
 	
 	public void setHitbox(Polygon hitbox)
 	{
+		if(hitbox == null)
+			return;
+			
 		this.hitbox = hitbox;
 		hitbox.setOrigin(getOriginX(), getOriginY());
 		setRotation(getRotation());

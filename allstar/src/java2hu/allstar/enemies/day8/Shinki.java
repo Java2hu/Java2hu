@@ -649,7 +649,7 @@ public class Shinki extends AllStarBoss
 			{
 				boss.setNoWings();
 				
-				Game.getGame().clearCircle(800f, boss, ClearType.ALL);
+				Game.getGame().clearCircle(2000f, boss, ClearType.ALL);
 			}
 		}, 1);
 		
@@ -740,6 +740,7 @@ public class Shinki extends AllStarBoss
 									{
 										Bullet bullet = new Bullet(new ThBullet(ThBulletType.BUTTERFLY, ThBulletColor.RED), boss.getX(), boss.getY());
 										bullet.setDirectionDegTick(MathUtil.getAngle(bullet, player) + angle, 2f + i * 3f);
+										bullet.setRotationFromVelocity(-90);
 										bullet.setGlowing();
 										game.spawn(bullet);
 									}
@@ -1129,7 +1130,6 @@ public class Shinki extends AllStarBoss
 						spawner.getCurrentSprite().setScale(3f + (2f * (timeMul > 0.75f ? (timeMul - 0.75f) * 4 : 0f)));
 						
 						spawner.useSpawnAnimation(false);
-						spawner.useDeathAnimation(false);
 						game.spawn(spawner);
 					}
 

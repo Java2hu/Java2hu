@@ -4,6 +4,7 @@ import java2hu.HitboxSprite;
 import java2hu.Loader;
 import java2hu.StartupLoopAnimation;
 import java2hu.object.enemy.IEnemyType;
+import java2hu.util.AnimationUtil;
 import java2hu.util.Getter;
 
 import com.badlogic.gdx.Gdx;
@@ -35,7 +36,7 @@ public enum TouhouEnemyType implements IEnemyType
 				saved = new Animation(5f, array);
 			}
 			
-			Animation ani = utils().animation().copyAnimation(saved);
+			Animation ani = AnimationUtil.copyAnimation(saved);
 			ani.setPlayMode(PlayMode.LOOP);
 			
 			return ani;
@@ -50,7 +51,7 @@ public enum TouhouEnemyType implements IEnemyType
 		{
 			if(saved == null)
 			{
-				saved = utils().animation().copyAnimation(SMALL_FAIRY_BLUE.getRightAnimation());
+				saved = AnimationUtil.copyAnimation(SMALL_FAIRY_BLUE.getRightAnimation());
 				
 				for(TextureRegion r : saved.getKeyFrames())
 				{
@@ -58,7 +59,7 @@ public enum TouhouEnemyType implements IEnemyType
 				}
 			}
 			
-			return utils().animation().copyAnimation(saved);
+			return AnimationUtil.copyAnimation(saved);
 		}
 	},
 	new Getter<Animation>()
@@ -83,7 +84,7 @@ public enum TouhouEnemyType implements IEnemyType
 				saved = new StartupLoopAnimation(startup, loop, 5f);
 			}
 			
-			return utils().animation().copyAnimation(saved);
+			return AnimationUtil.copyAnimation(saved);
 		}
 	},
 	new Getter<Animation>()

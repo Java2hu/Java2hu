@@ -270,6 +270,8 @@ public class Iku extends AllStarBoss
 			setSpellcardTime(Duration.seconds(25));
 		}
 
+		private Position center;
+		
 		@Override
 		public void tick(int tick, J2hGame game, Iku boss)
 		{
@@ -286,7 +288,9 @@ public class Iku extends AllStarBoss
 			
 			if(tick % interval == (interval - 80))
 			{
-				boss.getPathing().path(new SimpleTouhouBossPath(boss));
+				final SimpleTouhouBossPath path = new SimpleTouhouBossPath(boss);
+				path.setTime(Duration.ticks(70));
+				boss.getPathing().path(path);
 			}
 			
 			if(tick % interval == 130)
@@ -297,6 +301,8 @@ public class Iku extends AllStarBoss
 			if(tick % interval == 0)
 			{
 				TouhouSounds.Enemy.ACTIVATE_3.play();
+				
+				center = new Position(boss);
 				
 				boss.playSpecial(true);
 				
@@ -317,8 +323,8 @@ public class Iku extends AllStarBoss
 					
 					float distance = (100 + rayOffset);
 					
-					float x = (float) (boss.getX() + (Math.cos(rad) * distance));
-					float y = (float) (boss.getY() + (Math.sin(rad) * distance));
+					float x = (float) (center.getX() + (Math.cos(rad) * distance));
+					float y = (float) (center.getY() + (Math.sin(rad) * distance));
 					
 					Laser laser = new Laser(new ThLaser(ThLaserType.NORMAL, ThLaserColor.RED), x, y, 200)
 					{
@@ -393,8 +399,8 @@ public class Iku extends AllStarBoss
 						float subAngle = angle + ((mirror ? -1 : 1) * (amount * 10));
 						float mul = (amount / (float)subRows);
 						
-						float x = boss.getX() - (float) (Math.cos(rad) * 20);
-						float y = boss.getY() - (float) (Math.sin(rad) * 20);
+						float x = center.getX() - (float) (Math.cos(rad) * 20);
+						float y = center.getY() - (float) (Math.sin(rad) * 20);
 						
 						Bullet bullet = new Bullet(new ThBullet(ThBulletType.BALL_2, ThBulletColor.RED), x, y);
 						
@@ -474,8 +480,6 @@ public class Iku extends AllStarBoss
 							TouhouSounds.Enemy.LAZER_2.play(0.2f);
 						
 						Bullet bullet = new Bullet(new ThBullet(ThBulletType.RICE_LARGE, ThBulletColor.RED), x, y);
-						
-						bullet.useDeathAnimation(false);
 
 						float dir = angle + ((b ? -1f : 1f) * 30);//(float) ((mul * 60) + angleOffset);
 						float speed = 250f;

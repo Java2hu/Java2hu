@@ -36,6 +36,16 @@ public class StartupLoopAnimation extends Animation
 		this.timePerFrame = timePerFrame;
 	}
 	
+	public Array<TextureRegion> getStartFrames()
+	{
+		return startFrames;
+	}
+	
+	public Array<TextureRegion> getLoopFrames()
+	{
+		return loopFrames;
+	}
+	
 	/**
 	 * Draw the movement animation
 	 * @param batch

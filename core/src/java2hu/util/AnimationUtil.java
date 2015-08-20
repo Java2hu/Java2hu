@@ -1,5 +1,7 @@
 package java2hu.util;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java2hu.Game;
 import java2hu.HitboxSprite;
 import java2hu.J2hGame;
@@ -11,6 +13,7 @@ import java2hu.overwrite.J2hObject;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
 
@@ -28,12 +31,12 @@ public class AnimationUtil extends J2hObject
 	{
 		J2hGame g = Game.getGame();
 		
-		return (HitboxSprite) animation.getKeyFrame(g.getElapsedTime());
+		return (HitboxSprite) animation.getKeyFrame(g.getTotalElapsedTime());
 	}
 	
 	public static HitboxSprite getCurrentSprite(Animation animation, boolean loop)
 	{
-		return getCurrentSprite(animation, Game.getGame().getElapsedTime(), loop);
+		return getCurrentSprite(animation, Game.getGame().getTotalElapsedTime(), loop);
 	}
 	
 	/**
@@ -52,8 +55,122 @@ public class AnimationUtil extends J2hObject
 	}
 	
 	/**
-	 * When using a class other than TextureRegion.class, the method is UNSAFE!
-	 * It'll assume every texture region is the same class.
+	 * Loads an animation from a texture atlas.
+	 * The format is { name1, name2, name3... }, where name is the name parameter.
+	 * Save an animation with {@link #toAtlas(TextureAtlas, Animation, String)}
+	 * @param <T> - The class to create this object from, this works by calling a constructor with TextureRegion as the only argument.
+	 */
+	public static <T extends TextureRegion> Animation fromAltas(TextureAtlas atlas, Class<T> type, String name, float frameDuration)
+	{
+		Array<T> array = new Array<T>();
+		
+		int i = 0;
+		
+		while(true)
+		{
+			TextureRegion r = atlas.findRegion(name + i);
+			
+			if(r == null)
+			{
+				if(i == 0)
+				{
+					// Check if this is a StartupLoopAnimation or MovementAnimation
+					TextureRegion check = atlas.findRegion(name + "_start0"); // Check if a start0 frame exists.
+					
+					if(check != null)
+					{
+						Animation start = fromAltas(atlas, type, name + "_start", frameDuration);
+						Animation loop = fromAltas(atlas, type, name + "_loop", frameDuration);
+						Animation end = fromAltas(atlas, type, name + "_end", frameDuration);
+						
+						if(end.getKeyFrames().length == 0)
+						{
+							return new StartupLoopAnimation(start, loop, frameDuration);
+						}
+						else
+						{
+							return new MovementAnimation(start, loop, end, frameDuration);
+						}
+					}
+				}
+				break;
+			}
+			
+			i++;
+			
+			if(type == TextureRegion.class)
+			{
+				array.add((T) r);
+				continue;
+			}
+			
+			T t = null;
+			Constructor<T> c = null;
+
+			try
+			{
+				c = type.getConstructor(TextureRegion.class);
+			}
+			catch (NoSuchMethodException e)
+			{
+				e.printStackTrace();
+			}
+			catch (SecurityException e)
+			{
+				e.printStackTrace();
+			}
+
+			if(c == null)
+				System.out.println(type.getSimpleName() + " does not have a TextureRegion constructor! Please make sure you can construct it with only TextureRegion as argument.");
+
+			try
+			{
+				t = c.newInstance(r);
+			}
+			catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e)
+			{
+				e.printStackTrace();
+			}
+			
+			array.add(t);
+		}
+		
+		return new Animation(frameDuration, array);
+	}
+	
+	/**
+	 * Maps an animation to the TextureAtlas.
+	 * In case of a normal animation, it's frames will be saved as { name1, name2, name3... }.
+	 * In case of a StartupLoopAnimation, it's frames will be saved as { name_start1, name_start2, name_loop1, name_loop2... }
+	 * In case of a MovementAnimation, same as StartupLoopAnimation, except with _end frames as well.
+	 */
+	public static void toAtlas(TextureAtlas atlas, Animation ani, String name)
+	{
+		if(ani instanceof StartupLoopAnimation)
+		{
+			AnimationUtil.toAtlas(atlas, new Animation(0f, ((StartupLoopAnimation)ani).getStartFrames()), name + "_start");
+			AnimationUtil.toAtlas(atlas, new Animation(0f, ((StartupLoopAnimation)ani).getLoopFrames()), name + "_loop");
+
+			if(ani instanceof MovementAnimation)
+			{
+				AnimationUtil.toAtlas(atlas, new Animation(0f, ((MovementAnimation) ani).getEndFrames()), name + "_end");
+			}
+			
+			return;
+		}
+		
+		int i = 0;
+		
+		for(TextureRegion r : ani.getKeyFrames())
+		{
+			ImageUtil.addToTextureAtlas(atlas, name + i++, r);
+		}
+	}
+	
+	/**
+	 * Conduct an action on all frames inside the specified animations.
+	 * All frames in the animation should be the same type of class,
+	 * or have the same super class, because this method will cast them to the generic type.
 	 * @param ani
 	 * @param clazz
 	 * @param setter

@@ -119,10 +119,10 @@ public abstract class SwirlingBackground extends ABackground
 			mesh.setVertices(makeSwirlMesh(getTimer(), useColor ? color : null));
 		}
 
-		Gdx.graphics.getGL20().glEnable(GL20.GL_TEXTURE_2D);
-		Gdx.graphics.getGL20().glActiveTexture(GL20.GL_TEXTURE0);
-		Gdx.graphics.getGL20().glEnable(GL20.GL_BLEND);
-		applyGl20Changes();
+		Gdx.gl.glEnable(GL20.GL_TEXTURE_2D);
+		Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0);
+		Gdx.gl.glEnable(GL20.GL_BLEND);
+		Gdx.gl.glBlendFunc(getBlendFuncSrc(), getBlendFuncDst());
 
 		sp.begin();
 		sp.setUniformi("u_texture", 0);
@@ -131,8 +131,6 @@ public abstract class SwirlingBackground extends ABackground
 		mesh.render(sp, GL20.GL_TRIANGLES);
 
 		sp.end();
-
-		removeGl20Changes();
 
 		Game.getGame().batch.begin();
 	}
@@ -143,17 +141,6 @@ public abstract class SwirlingBackground extends ABackground
 		super.onUpdate(tick);
 		
 		updateTimer();
-	}
-	
-	public void applyGl20Changes()
-	{
-		Gdx.graphics.getGL20().glBlendEquationSeparate(GL20.GL_FUNC_ADD, GL20.GL_FUNC_ADD);
-		Gdx.graphics.getGL20().glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_DST_ALPHA);
-	}
-	
-	public void removeGl20Changes()
-	{
-		Gdx.graphics.getGL20().glBlendEquationSeparate(GL20.GL_FUNC_ADD, GL20.GL_FUNC_ADD);
 	}
 	
 	public abstract void updateTimer();

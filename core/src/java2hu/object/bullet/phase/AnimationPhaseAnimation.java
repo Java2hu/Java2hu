@@ -2,7 +2,7 @@ package java2hu.object.bullet.phase;
 
 import java2hu.Game;
 import java2hu.J2hGame;
-import java2hu.object.UpdateObject;
+import java2hu.object.StageObject;
 import java2hu.object.bullet.Bullet;
 import java2hu.util.Duration;
 
@@ -12,7 +12,7 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 /**
  * A phase animation that plays an animation for a specific time.
  */
-public class AnimationPhaseAnimation extends UpdateObject implements PhaseAnimation
+public class AnimationPhaseAnimation extends StageObject implements PhaseAnimation
 {
 	/**
 	 * Create a phase animation of the animation with the time of the animation, in ticks, as duration.
@@ -31,6 +31,8 @@ public class AnimationPhaseAnimation extends UpdateObject implements PhaseAnimat
 	 */
 	public AnimationPhaseAnimation(Bullet bullet, Animation ani, Duration time)
 	{
+		super(bullet.getX(), bullet.getY());
+		
 		this.bullet = bullet;
 		
 		if(time != null)
@@ -64,11 +66,9 @@ public class AnimationPhaseAnimation extends UpdateObject implements PhaseAnimat
 		if(!bullet.isOnStageRaw())
 			return;
 		
-		game.batch.setBlendFunction(getBlendFuncSrc(), getBlendFuncDst());
-
 		J2hGame g = Game.getGame();
 
-		Sprite current = (Sprite) ani.getKeyFrame(getTicksAlive());
+		Sprite current = getCurrentSprite();
 
 		if(scaleAnimationToBullet)
 		{
@@ -82,8 +82,11 @@ public class AnimationPhaseAnimation extends UpdateObject implements PhaseAnimat
 		current.setPosition(bullet.getX() - current.getWidth() / 2, bullet.getY() - current.getHeight() / 2);
 
 		current.draw(g.batch);
-		
-		game.batch.setBlendFunction(bullet.getBlendFuncSrc(), bullet.getBlendFuncDst());
+	}
+
+	private Sprite getCurrentSprite()
+	{
+		return (Sprite) ani.getKeyFrame(getTicksAlive());
 	}
 	
 	@Override
@@ -91,8 +94,7 @@ public class AnimationPhaseAnimation extends UpdateObject implements PhaseAnimat
 	{
 		if(getTicksAlive() > time.toTicks())
 		{
-			animationPlaying = false;
-			bullet.removeOwnedObject(this);
+			onComplete();
 		}
 	}
 	
@@ -106,6 +108,12 @@ public class AnimationPhaseAnimation extends UpdateObject implements PhaseAnimat
 	public void setScaleAnimationToBullet(boolean scaleAnimationToBullet)
 	{
 		this.scaleAnimationToBullet = scaleAnimationToBullet;
+	}
+	
+	public void onComplete()
+	{
+		animationPlaying = false;
+		bullet.removeOwnedObject(this);
 	}
 
 	@Override
@@ -137,5 +145,17 @@ public class AnimationPhaseAnimation extends UpdateObject implements PhaseAnimat
 	public boolean isPlaying()
 	{
 		return animationPlaying;
+	}
+
+	@Override
+	public float getWidth()
+	{
+		return getCurrentSprite().getWidth();
+	}
+
+	@Override
+	public float getHeight()
+	{
+		return getCurrentSprite().getHeight();
 	}
 }

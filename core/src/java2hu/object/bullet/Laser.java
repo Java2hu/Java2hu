@@ -6,6 +6,9 @@ import java.util.LinkedList;
 import java2hu.Position;
 import java2hu.util.MathUtil;
 
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.g2d.Animation;
+
 /**
  * Position of the laser is the tip of the laser, the specified length of the laser will follow in trail of the tip.
  * 
@@ -35,9 +38,26 @@ public class Laser extends LaserDrawer
 	ArrayList<Integer> deletedPoints = new ArrayList<Integer>();
 	boolean doUpdate = true;
 	
-	public Laser(ILaserType type, float x, float y, float lengthOnScreen)
+	public Laser(final ILaserType type, float x, float y, float lengthOnScreen)
 	{
 		this(type.getAnimation(), type.getThickness(), type.getHitboxThickness(), x, y, lengthOnScreen);
+		
+		setDeletionColor(type.getColor());
+		
+		this.type = new IBulletType()
+		{
+			@Override
+			public Color getEffectColor()
+			{
+				return type.getColor();
+			}
+			
+			@Override
+			public Animation getAnimation()
+			{
+				return null;
+			}
+		};
 	}
 	
 	public Laser(LaserAnimation animation, float thickness, float hitboxThickness, float x, float y, float lengthOnScreen)
@@ -133,13 +153,13 @@ public class Laser extends LaserDrawer
 			{
 				Position pos = it.next();
 				
-				if(getMaxPoints() > 0 && amount > getMaxPoints())
+				if(getMaxPoints() >= 0 && amount > getMaxPoints())
 				{
 					it.remove();
 					continue;
 				}
 				
-				if(getMaximumLengthOnScreen() > 0 && totalDistance > getMaximumLengthOnScreen())
+				if(getMaximumLengthOnScreen() >= 0 && totalDistance > getMaximumLengthOnScreen())
 				{
 					it.remove();
 					continue;

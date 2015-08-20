@@ -23,6 +23,7 @@ import java2hu.allstar.enemies.day5.Iku;
 import java2hu.allstar.enemies.day5.Seiran;
 import java2hu.allstar.enemies.day5.Tenshi;
 import java2hu.allstar.enemies.day6.Sekibanki;
+import java2hu.allstar.enemies.day7.Junko;
 import java2hu.allstar.enemies.day7.Raiko;
 import java2hu.allstar.enemies.day7.Ringo;
 import java2hu.allstar.enemies.day7.Seija;
@@ -307,6 +308,17 @@ public class Days extends J2hObject
 			// Watatsuki's
 			// Eirin
 			// Kaguya
+			
+			addCharacter(day, type, "Junko", new Getter<AllStarBoss>()
+			{
+				@Override
+				public AllStarBoss get()
+				{
+					final Junko boss = new Junko(startHP, startX, startY);
+
+					return boss;
+				}
+			});
 		}
 		
 		day++;

@@ -2,12 +2,15 @@ package java2hu.object.bullet;
 import java2hu.Game;
 import java2hu.HitboxSprite;
 import java2hu.J2hGame;
+import java2hu.Position;
 import java2hu.RNG;
 import java2hu.ZIndex;
 import java2hu.object.DrawObject;
 import java2hu.object.FreeStageObject;
 import java2hu.object.StageObject;
+import java2hu.object.VelocityObject;
 import java2hu.object.bullet.phase.PhaseAnimation;
+import java2hu.object.bullet.phase.TouhouBreakAnimation;
 import java2hu.object.bullet.phase.TouhouSpawnAnimation;
 import java2hu.util.AnimationUtil;
 import java2hu.util.ImageSplitter;
@@ -25,18 +28,20 @@ import com.badlogic.gdx.math.Rectangle;
 /**
  * A simple bullet
  */
-public class Bullet extends StageObject
+public class Bullet extends VelocityObject
 {
 	protected IBulletType type;
 	protected Animation animation;
 	
-	protected float velocityX;
-	protected float velocityY;
-	
 	public Bullet(IBulletType type, float x, float y)
 	{
-		this(type.getAnimation(), x, y);
+		super(x, y);
+		
+		this.animation = type.getAnimation();
+		
 		this.type = type;
+		
+		init();
 	}
 	
 	/**
@@ -47,7 +52,7 @@ public class Bullet extends StageObject
 	 */
 	public Bullet(final Animation animation, float x, float y)
 	{
-		this(animation, null, x, y);
+		this(animation, Color.WHITE.cpy(), x, y);
 	}
 	
 	public Bullet(final Animation animation, final Color color, float x, float y)
@@ -71,7 +76,13 @@ public class Bullet extends StageObject
 			}
 		};
 		
+		init();
+	}
+	
+	private void init()
+	{
 		this.setZIndex(ZIndex.BULLETS);
+		spawn = new TouhouSpawnAnimation(this);
 	}
 	
 	@Override
@@ -83,6 +94,14 @@ public class Bullet extends StageObject
 		J2hGame g = Game.getGame();
 		
 		HitboxSprite current = getCurrentSprite();
+		
+		
+		int bufferRate = (int) Math.max(getScaledWidth(), getScaledHeight()) * 2;
+		
+		boolean hide = g.getMinX() + getX() < g.getMinX() - bufferRate || g.getMinY() + getY() < g.getMinY() - bufferRate || getX() > g.getMaxX() + bufferRate || getY() > g.getMaxY() + bufferRate;
+		
+		if(hide)
+			return;
 		
 		if(current != null)
 		{
@@ -111,15 +130,6 @@ public class Bullet extends StageObject
 			checkCollision();
 	}
 	
-	@Override
-	public void onUpdateDelta(float delta)
-	{
-		super.onUpdateDelta(delta);
-		
-		this.setX(getX() - velocityX * delta);
-		this.setY(getY() - velocityY * delta);
-	}
-	
 	public boolean doDelete()
 	{
 		J2hGame g = Game.getGame();
@@ -127,6 +137,11 @@ public class Bullet extends StageObject
 		int bufferRate = getDeleteDistance();
 		
 		boolean delete = g.getMinX() + getX() < g.getMinX() - bufferRate || g.getMinY() + getY() < g.getMinY() - bufferRate || getX() > g.getMaxX() + bufferRate || getY() > g.getMaxY() + bufferRate;
+		
+		if(delete)
+		{
+			useDeathAnimation(false);
+		}
 		
 		return delete;
 	}
@@ -156,68 +171,6 @@ public class Bullet extends StageObject
 	}
 	
 	/**
-	 * Legacy method to set velocity from ticks (and is calculated to velocity per second)
-	 * @param velocityX
-	 */
-	@Deprecated
-	public void setVelocityXTick(float velocityX)
-	{
-		float perSecond = velocityX * game.currentTPS;
-		
-		this.velocityX = perSecond;
-	}
-	
-	/**
-	 * Legacy method to set velocity from ticks (and is calculated to velocity per second)
-	 * @param velocityY
-	 */
-	@Deprecated
-	public void setVelocityYTick(float velocityY)
-	{
-		float perSecond = velocityY * game.currentTPS;
-		
-		this.velocityY = perSecond;
-	}
-	
-	/**
-	 * Legacy method to return the velocity x from ticks (and is calculated from velocity per second to velocity per tick)
-	 */
-	@Deprecated
-	public float getVelocityXTick()
-	{
-		return velocityX / game.currentTPS;
-	}
-	
-	/**
-	 * Legacy method to return the velocity y from ticks (and is calculated from velocity per second to velocity per tick)
-	 */
-	@Deprecated
-	public float getVelocityYTick()
-	{
-		return velocityY / game.currentTPS;
-	}
-	
-	public void setVelocityX(float velocityX)
-	{
-		this.velocityX = velocityX;
-	}
-	
-	public void setVelocityY(float velocityY)
-	{
-		this.velocityY = velocityY;
-	}
-	
-	public float getVelocityX()
-	{
-		return velocityX;
-	}
-	
-	public float getVelocityY()
-	{
-		return velocityY;
-	}
-	
-	/**
 	 * Will set the rotation based on the current velocity, with an offset of 0.
 	 * If your bullet comes off weird, like 90 degree away from what it should be, use that offset as the first argument to fix it.
 	 * This is used to easily rotate bullets to an intuitive direction
@@ -235,59 +188,6 @@ public class Bullet extends StageObject
 	public void setRotationFromVelocity(float offsetDegree)
 	{
 		setRotationDeg((float) (Math.atan2(velocityY, velocityX) * (180 / Math.PI) - offsetDegree));
-	}
-	
-	/**
-	 * Send a bullet in the direction derived from the degree supplied with the set speed (ticks).
-	 * @param radians
-	 * @param speed
-	 */
-	@Deprecated
-	public void setDirectionDegTick(float degree, float speed)
-	{
-		setDirectionRadsTick((float) Math.toRadians(degree), speed);
-	}
-	
-	/**
-	 * Send a bullet in the direction derived from the radians supplied with the set speed (ticks).
-	 * @param radians
-	 * @param speed
-	 */
-	@Deprecated
-	public void setDirectionRadsTick(float radians, float speed)
-	{
-		setVelocityXTick((float) (Math.cos(radians) * speed));
-		setVelocityYTick((float) (Math.sin(radians) * speed));
-	}
-	
-	/**
-	 * Send a bullet in the direction derived from the degree supplied with the set speed.
-	 * @param radians
-	 * @param speed
-	 */
-	public void setDirectionDeg(float degree, float speed)
-	{
-		setDirectionRads((float) Math.toRadians(degree), speed);
-	}
-	
-	/**
-	 * Send a bullet in the direction derived from the radians supplied with the set speed.
-	 * @param radians
-	 * @param speed
-	 */
-	public void setDirectionRads(float radians, float speed)
-	{
-		setVelocityX((float) (Math.cos(radians) * speed));
-		setVelocityY((float) (Math.sin(radians) * speed));
-	}
-	
-	/**
-	 * Halts the movement of this bullet, making it stand still.
-	 */
-	public void haltMovement()
-	{
-		setVelocityX(0);
-		setVelocityY(0);
 	}
 	
 	public void setRotationDeg(final float rotation)
@@ -490,7 +390,7 @@ public class Bullet extends StageObject
 		this.spawn = spawn;
 	}
 	
-	public PhaseAnimation spawn = new TouhouSpawnAnimation(this);
+	public PhaseAnimation spawn;
 	
 	public void spawnAnimation()
 	{	
@@ -546,6 +446,32 @@ public class Bullet extends StageObject
 	
 	public void deleteAnimation()
 	{
+		final Bullet bullet = this;
+		
+		final TouhouBreakAnimation breakAni = new TouhouBreakAnimation(this)
+		{
+			@Override
+			public boolean isPersistant()
+			{
+				return true;
+			}
+		};
+		
+		breakAni.setPosition(bullet);
+		
+		game.spawn(breakAni);
+		
+		breakAni.setZIndex(getZIndex() - 1);
+		
+		breakAni.start();
+		
+		Position pos = new Position(bullet);
+		
+		spawnSwirl(pos, true);
+	}
+
+	protected void spawnSwirl(Position pos, final boolean dispose)
+	{
 		if(BREAK_ANI == null)
 		{
 			BREAK = new Texture(Gdx.files.internal("sprites/bullet_break.png"))
@@ -565,8 +491,6 @@ public class Bullet extends StageObject
 		
 		final float width = bullet.getWidth();
 		final float height = bullet.getHeight();
-		
-		final float rotationOffset = (float) (RNG.random() * 360f);
 		
 		final Animation ani = AnimationUtil.copyAnimation(BREAK_ANI);
 		
@@ -598,15 +522,14 @@ public class Bullet extends StageObject
 			sprite.setOriginCenter();
 		}
 		
-		setGlowing();
+		final float rotationOffset = (float) (RNG.random() * 360f);
 		
-		StageObject obj = new FreeStageObject(bullet.getX(), bullet.getY())
+		StageObject obj = new FreeStageObject(pos.getX(), pos.getY())
 		{
 			int ticks = 0;
 
 			{
 				setName("Death animation " + bullet.getName());
-				setPosition(bullet);
 				setGlowing();
 				
 				bullet.setOwnedBy(this);
@@ -621,8 +544,6 @@ public class Bullet extends StageObject
 			@Override
 			public void onDraw()
 			{
-				game.batch.setBlendFunction(getBlendFuncSrc(), getBlendFuncDst());
-				
 				J2hGame g = Game.getGame();
 				
 				HitboxSprite current = (HitboxSprite) ani.getKeyFrame(ticks/2f);
@@ -648,7 +569,7 @@ public class Bullet extends StageObject
 					
 					cur.setScale(Math.max(0, cur.getScaleX() * multiplier), Math.max(0, cur.getScaleY() * multiplier));
 				}
-				
+
 				if(ani.isAnimationFinished(ticks / 2f) || !isOnStageRaw())
 				{
 					Game.getGame().delete(this);
@@ -659,15 +580,13 @@ public class Bullet extends StageObject
 			public void onUpdateDelta(float delta)
 			{
 				super.onUpdateDelta(delta);
-				
-				setX(getX() - (bullet.getVelocityX() * delta));
-				setY(getY() - (bullet.getVelocityY() * delta));
 			}
 			
 			@Override
 			public void onDelete()
 			{
-				bullet.disposeAll();
+				if(dispose)
+					bullet.disposeAll();
 			}
 			
 			@Override
@@ -689,7 +608,7 @@ public class Bullet extends StageObject
 			}
 		};
 		
-		obj.setGlowing();
+		obj.setBlendFunc(getBlendFuncSrc(), getBlendFuncDst());
 		obj.setZIndex(getZIndex());
 		
 		Game.getGame().spawn(obj);

@@ -1,10 +1,10 @@
 package java2hu.allstar.enemies.day1;
 
 import java2hu.Game;
+import java2hu.HitboxSprite;
 import java2hu.J2hGame;
 import java2hu.J2hGame.ClearType;
 import java2hu.Loader;
-import java2hu.MovementAnimation;
 import java2hu.RNG;
 import java2hu.allstar.AllStarStageScheme;
 import java2hu.allstar.AllStarStageScheme.SpawnBossTask;
@@ -31,7 +31,6 @@ import java2hu.touhou.sounds.TouhouSounds;
 import java2hu.util.AnimationUtil;
 import java2hu.util.BossUtil;
 import java2hu.util.Duration;
-import java2hu.util.ImageSplitter;
 import java2hu.util.MathUtil;
 import java2hu.util.ObjectUtil;
 import java2hu.util.SchemeUtil;
@@ -46,6 +45,7 @@ import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Animation.PlayMode;
 import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
 /**
@@ -68,29 +68,27 @@ public class Cirno extends AllStarBoss
 	{
 		super(maxHealth, x, y);
 		
-		int chunkHeight = 160;
-		int chunkWidth = 128;
-
-		Texture sprite = Loader.texture(FOLDER.child("anm.png"));
+		final FileHandle anm = FOLDER.child("anm.png");
+		
+		Texture sprite = Loader.texture(anm);
 		sprite.setFilter(TextureFilter.MipMapLinearNearest, TextureFilter.Nearest);
 		
-		Sprite fbs = new Sprite(Loader.texture(FOLDER.child("fbs.png")));
+		Sprite fbs = new Sprite(Loader.texture(FOLDER.child("fbs.png")), 0, 0, 256, 400);
 		fbs.setScale(2F);
 
-		TextureRegion nameTag = new TextureRegion(Loader.texture(FOLDER.child("nametag.png")));
-
-		Animation idle = ImageSplitter.getAnimationFromSprite(sprite, chunkHeight, chunkWidth, 10F, 1,2,3,4);
-		idle.setPlayMode(PlayMode.LOOP);
+		TextureRegion nameTag = new TextureRegion(Loader.texture(FOLDER.child("nametag.png")), 0, 0, 223, 232);
 		
-		Animation left = new MovementAnimation(ImageSplitter.getAnimationFromSprite(sprite, chunkHeight, chunkWidth, 10F, 5,6,7), ImageSplitter.getAnimationFromSprite(sprite, chunkHeight, chunkWidth, 15F, 8), 10f);
-		Animation right = AnimationUtil.copyAnimation(left);
+		Animation idle = null, left = null, right = null, special = null;
 
-		for(TextureRegion reg : left.getKeyFrames())
-			reg.flip(true, false);
+		TextureAtlas atlas = loadAtlas(anm);
 
-		Animation special = ImageSplitter.getAnimationFromSprite(sprite, chunkHeight, chunkWidth, 10F, 9,10,11,10,9);
-		special.setPlayMode(PlayMode.NORMAL);
-	
+		idle = AnimationUtil.fromAltas(atlas, HitboxSprite.class, "idle", 10f);
+		idle.setPlayMode(PlayMode.LOOP);
+		left = AnimationUtil.fromAltas(atlas, HitboxSprite.class, "left", 10f);
+		right = AnimationUtil.fromAltas(atlas, HitboxSprite.class, "right", 10f);
+
+		special = AnimationUtil.fromAltas(atlas, HitboxSprite.class, "special", 10f);
+		
 		Music bgm = new J2hMusic(Gdx.audio.newMusic(FOLDER.child("bgm.mp3")));
 		
 		setAuraColor(new Color(0 / 255f, 102 / 255f, 187 / 255f, 1.0f));
@@ -111,6 +109,7 @@ public class Cirno extends AllStarBoss
 				game.spawn(new VerticalScrollingBackground(bg, 0.7f, false)
 				{
 					{
+						addDisposable(bg);
 						setFrameBuffer(t.getBackgroundBuffer());
 						setZIndex(-100);
 					}
@@ -224,7 +223,7 @@ public class Cirno extends AllStarBoss
 		
 		scheme.waitTicks(10); // Prevent concurrency issues.
 		
-		if(card.isTimedOut())
+		if(false && card.isTimedOut())
 		{
 			scheme.waitTicks(60);
 			
@@ -264,6 +263,34 @@ public class Cirno extends AllStarBoss
 			});
 			
 			SchemeUtil.waitForDeath(scheme, newBoss);
+			
+			Game.getGame().addTaskGame(new Runnable()
+			{
+				@Override
+				public void run()
+				{
+					Game.getGame().clearCircle(800f, boss, ClearType.ALL);
+				}
+			}, 1);
+			
+			scheme.waitTicks(2);
+			
+			SchemeUtil.deathAnimation(scheme, boss, boss.getAuraColor());
+			
+			Game.getGame().addTaskGame(new Runnable()
+			{
+				@Override
+				public void run()
+				{
+					ObjectUtil.deathAnimation(boss);
+					
+					Game.getGame().delete(boss);
+					
+					Game.getGame().clear(ClearType.ALL);
+				}
+			}, 5);
+			
+			scheme.waitTicks(10); // Prevent concurrency issues.
 		}
 	}
 	
@@ -501,7 +528,7 @@ public class Cirno extends AllStarBoss
 							if(r % 2 == 0)
 								continue;
 							
-							for(int amount = 0; amount < 3; amount++)
+							for(int amount = 0; amount < 30; amount++)
 							{
 								final int finalAmount = amount;
 								
@@ -568,7 +595,7 @@ public class Cirno extends AllStarBoss
 					
 					if(tick == 0)
 					{
-						for(int i = 0; i < 5; i++)
+						for(int i = 0; i < 50; i++)
 						for(final boolean bool : i == 0 ? new boolean[]{ true, false } : new boolean[] { RNG.random() < 0.5f ? false : true })
 						{
 							int pos = 0;
@@ -596,6 +623,7 @@ public class Cirno extends AllStarBoss
  
 											bullet.setDirectionDeg(bool ? 90 : 270, 500f);
 											bullet.setGlowing();
+											bullet.useSpawnAnimation(false);
 
 											bullet.addEffect(new Plugin<Bullet>()
 											{
@@ -616,6 +644,7 @@ public class Cirno extends AllStarBoss
 											});
 
 											bullet.setRotationDeg((side ? -1 : 1) * (bool ? -1 : 1) * 140);
+											bullet.setZIndex(bullet.getZIndex() + 10 + finalTime);
 
 											game.spawn(bullet);
 										};

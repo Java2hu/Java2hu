@@ -70,6 +70,9 @@ public class ThBullet implements IBulletType
 	@Override
 	public Animation getAnimation()
 	{
+		if(true)
+			return LegacyTouhouBulletMaker.getSchematic(getType(), getBulletColor());
+		
 		String identifier = type.name() + " " + color.name();
 		
 		if(animations.containsKey(identifier))

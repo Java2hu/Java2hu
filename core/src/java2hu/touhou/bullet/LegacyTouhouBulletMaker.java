@@ -1,31 +1,23 @@
 package java2hu.touhou.bullet;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.HashMap;
-
 import java2hu.Game;
 import java2hu.HitboxSprite;
+import java2hu.StartLoader.LoadOnStartup;
 import java2hu.overwrite.J2hObject;
 import java2hu.util.AnimationUtil;
 import java2hu.util.HitboxUtil;
-import java2hu.util.HitboxUtil.HitboxSpecification;
-import util.PNG;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Polygon;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.ScreenUtils;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 
 /**
  * LEGACY: This dissects ZUN's bullet sprites into useable Animations, we now use the combination between IBulletType and IBulletSubType.
@@ -65,865 +57,993 @@ public class LegacyTouhouBulletMaker extends J2hObject
 		}
 	};
 
-//	@LoadOnStartup
+	@LoadOnStartup
 	public static void load()
 	{
-		new Runnable()
+		Game.getGame().addTask(new Runnable()
 		{
 			@SuppressWarnings("unused")
 			@Override
 			public void run()
 			{
 				System.out.println("[BulletLoader] Loading bullets");
-				long start = System.currentTimeMillis();
 				
-				ThBulletType type = null;
+				final FileHandle atlasFile = Gdx.files.internal("sprites/bullets/bullets.atlas");
 				
-				{
-					final String file = "sprites/bullets/bullet1.png";
-
-					Game.getGame().assets.load(file, Texture.class);
-					Game.getGame().assets.finishLoading();
-
-					Texture texture = Game.getGame().assets.get(file);
-
-					int chunkHeight = 32;
-					int chunkWidth = 32;
-
-					int index = 1;
-
-					type = ThBulletType.LAZER_STATIONARY;
-
-					add(type, ThBulletColor.BLACK, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.RED_DARK, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.RED, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.PURPLE, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.PINK, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.BLUE_DARK, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.BLUE, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.CYAN, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.CYAN_LIGHT, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.GREEN, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.GREEN_LIGHT, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.GREEN_LIGHTER, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.YELLOW, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.YELLOW_LIGHT, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.ORANGE, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.WHITE, getTexture(texture, chunkHeight, chunkWidth, index++));
-
-					type = ThBulletType.POINTER;
-
-					add(type, ThBulletColor.BLACK, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.RED_DARK, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.RED, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.PURPLE, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.PINK, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.BLUE_DARK, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.BLUE, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.CYAN, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.CYAN_LIGHT, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.GREEN, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.GREEN_LIGHT, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.GREEN_LIGHTER, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.YELLOW, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.YELLOW_LIGHT, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.ORANGE, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.WHITE, getTexture(texture, chunkHeight, chunkWidth, index++));
-
-					type = ThBulletType.BALL_1;
-
-					add(type, ThBulletColor.BLACK, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.RED_DARK, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.RED, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.PURPLE, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.PINK, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.BLUE_DARK, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.BLUE, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.CYAN, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.CYAN_LIGHT, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.GREEN, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.GREEN_LIGHT, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.GREEN_LIGHTER, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.YELLOW, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.YELLOW_LIGHT, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.ORANGE, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.WHITE, getTexture(texture, chunkHeight, chunkWidth, index++));
-
-					type = ThBulletType.BALL_2;
-
-					add(type, ThBulletColor.BLACK, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.RED_DARK, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.RED, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.PURPLE, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.PINK, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.BLUE_DARK, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.BLUE, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.CYAN, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.CYAN_LIGHT, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.GREEN, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.GREEN_LIGHT, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.GREEN_LIGHTER, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.YELLOW, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.YELLOW_LIGHT, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.ORANGE, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.WHITE, getTexture(texture, chunkHeight, chunkWidth, index++));
-
-					type = ThBulletType.RAIN;
-
-					add(type, ThBulletColor.BLACK, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.RED_DARK, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.RED, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.PURPLE, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.PINK, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.BLUE_DARK, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.BLUE, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.CYAN, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.CYAN_LIGHT, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.GREEN, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.GREEN_LIGHT, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.GREEN_LIGHTER, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.YELLOW, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.YELLOW_LIGHT, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.ORANGE, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.WHITE, getTexture(texture, chunkHeight, chunkWidth, index++));
-
-					type = ThBulletType.KUNAI;
-
-					add(type, ThBulletColor.BLACK, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.RED_DARK, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.RED, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.PURPLE, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.PINK, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.BLUE_DARK, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.BLUE, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.CYAN, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.CYAN_LIGHT, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.GREEN, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.GREEN_LIGHT, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.GREEN_LIGHTER, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.YELLOW, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.YELLOW_LIGHT, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.ORANGE, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.WHITE, getTexture(texture, chunkHeight, chunkWidth, index++));
-
-					type = ThBulletType.CRYSTAL;
-
-					add(type, ThBulletColor.BLACK, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.RED_DARK, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.RED, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.PURPLE, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.PINK, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.BLUE_DARK, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.BLUE, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.CYAN, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.CYAN_LIGHT, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.GREEN, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.GREEN_LIGHT, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.GREEN_LIGHTER, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.YELLOW, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.YELLOW_LIGHT, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.ORANGE, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.WHITE, getTexture(texture, chunkHeight, chunkWidth, index++));
-
-					type = ThBulletType.SEAL;
-
-					add(type, ThBulletColor.BLACK, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.RED_DARK, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.RED, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.PURPLE, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.PINK, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.BLUE_DARK, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.BLUE, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.CYAN, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.CYAN_LIGHT, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.GREEN, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.GREEN_LIGHT, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.GREEN_LIGHTER, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.YELLOW, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.YELLOW_LIGHT, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.ORANGE, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.WHITE, getTexture(texture, chunkHeight, chunkWidth, index++));
-
-					type = ThBulletType.BULLET;
-
-					add(type, ThBulletColor.BLACK, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.RED_DARK, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.RED, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.PURPLE, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.PINK, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.BLUE_DARK, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.BLUE, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.CYAN, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.CYAN_LIGHT, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.GREEN, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.GREEN_LIGHT, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.GREEN_LIGHTER, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.YELLOW, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.YELLOW_LIGHT, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.ORANGE, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.WHITE, getTexture(texture, chunkHeight, chunkWidth, index++));
-
-					type = ThBulletType.RICE;
-
-					add(type, ThBulletColor.BLACK, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.RED_DARK, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.RED, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.PURPLE, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.PINK, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.BLUE_DARK, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.BLUE, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.CYAN, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.CYAN_LIGHT, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.GREEN, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.GREEN_LIGHT, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.GREEN_LIGHTER, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.YELLOW, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.YELLOW_LIGHT, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.ORANGE, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.WHITE, getTexture(texture, chunkHeight, chunkWidth, index++));
-
-					type = ThBulletType.STAR;
-
-					add(type, ThBulletColor.BLACK, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.RED_DARK, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.RED, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.PURPLE, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.PINK, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.BLUE_DARK, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.BLUE, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.CYAN, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.CYAN_LIGHT, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.GREEN, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.GREEN_LIGHT, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.GREEN_LIGHTER, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.YELLOW, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.YELLOW_LIGHT, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.ORANGE, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.WHITE, getTexture(texture, chunkHeight, chunkWidth, index++));
-
-					type = ThBulletType.BALL_REFLECTING;
-
-					add(type, ThBulletColor.BLACK, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.RED_DARK, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.RED, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.PURPLE, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.PINK, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.BLUE_DARK, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.BLUE, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.CYAN, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.CYAN_LIGHT, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.GREEN, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.GREEN_LIGHT, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.GREEN_LIGHTER, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.YELLOW, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.YELLOW_LIGHT, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.ORANGE, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.WHITE, getTexture(texture, chunkHeight, chunkWidth, index++));
-
-					index += 13;
-
-					type = ThBulletType.DISK;
-
-					add(type, ThBulletColor.YELLOW, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.WHITE, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.ORANGE, getTexture(texture, chunkHeight, chunkWidth, index++));
-
-					index += 2 * 16;
-					index += 4;
-
-					type = ThBulletType.DOT_MEDIUM;
-
-					add(type, ThBulletColor.WHITE, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.RED, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.PURPLE, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.GREEN_LIGHT, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.YELLOW_LIGHT, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.BLACK, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.RED_DARK, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.BLUE, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.GREEN, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.YELLOW, getTexture(texture, chunkHeight, chunkWidth, index++));
-				}
-
-				{
-					Texture texture = Game.getGame().assets.get("sprites/bullets/bullet1.png");
-
-					int chunkHeight = 16;
-					int chunkWidth = 16;
-
-					int index = 1;
-
-					type = ThBulletType.DOT_SMALL_FILLED;
-
-					index += 2 * 12 * 32;
-
-					add(type, ThBulletColor.BLACK, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.RED_DARK, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.RED, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.PURPLE, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.PINK, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.BLUE_DARK, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.BLUE, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.CYAN, getTexture(texture, chunkHeight, chunkWidth, index++));
-
-					type = ThBulletType.DOT_SMALL_OUTLINE;
-
-					add(type, ThBulletColor.BLACK, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.RED_DARK, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.RED, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.PURPLE, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.PINK, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.BLUE_DARK, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.BLUE, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.CYAN, getTexture(texture, chunkHeight, chunkWidth, index++));
-
-					index += 16;
-
-					type = ThBulletType.DOT_SMALL_FILLED;
-
-					add(type, ThBulletColor.CYAN_LIGHT, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.GREEN, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.GREEN_LIGHT, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.GREEN_LIGHTER, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.YELLOW, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.YELLOW_LIGHT, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.ORANGE, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.WHITE, getTexture(texture, chunkHeight, chunkWidth, index++));
-
-					type = ThBulletType.DOT_SMALL_OUTLINE;
-
-					add(type, ThBulletColor.CYAN_LIGHT, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.GREEN, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.GREEN_LIGHT, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.GREEN_LIGHTER, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.YELLOW, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.YELLOW_LIGHT, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.ORANGE, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.WHITE, getTexture(texture, chunkHeight, chunkWidth, index++));
-
-					index += 16;
-					index += 4 * 32;
-
-					type = ThBulletType.DOT_SMALL_MOON;
-
-					add(type, ThBulletColor.BLACK, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.RED_DARK, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.RED, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.PURPLE, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.PINK, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.BLUE_DARK, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.BLUE, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.CYAN, getTexture(texture, chunkHeight, chunkWidth, index++));
-
-					index += 24;
-
-					type = ThBulletType.DOT_SMALL_MOON;
-
-					add(type, ThBulletColor.CYAN_LIGHT, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.GREEN, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.GREEN_LIGHT, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.GREEN_LIGHTER, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.YELLOW, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.YELLOW_LIGHT, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.ORANGE, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.WHITE, getTexture(texture, chunkHeight, chunkWidth, index++));
-				}
-
-				{
-					final String file = "sprites/bullets/bullet2.png";
-
-					Game.getGame().assets.load(file, Texture.class);
-					Game.getGame().assets.finishLoading();
-
-					Texture texture = Game.getGame().assets.get(file);
-
-					int chunkHeight = 64;
-					int chunkWidth = 64;
-
-					int index = 1;
-
-					type = ThBulletType.STAR_LARGE;
-
-					add(type, ThBulletColor.BLACK, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.RED, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.PURPLE, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.BLUE, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.CYAN, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.GREEN, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.YELLOW, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.WHITE, getTexture(texture, chunkHeight, chunkWidth, index++));
-
-					type = ThBulletType.BALL_BIG;
-
-					add(type, ThBulletColor.BLACK, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.RED, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.PURPLE, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.BLUE, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.CYAN, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.GREEN, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.YELLOW, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.WHITE, getTexture(texture, chunkHeight, chunkWidth, index++));
-
-					type = ThBulletType.BUTTERFLY;
-
-					add(type, ThBulletColor.BLACK, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.RED, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.PURPLE, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.BLUE, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.CYAN, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.GREEN, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.YELLOW, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.WHITE, getTexture(texture, chunkHeight, chunkWidth, index++));
-
-					type = ThBulletType.KNIFE;
-
-					add(type, ThBulletColor.BLACK, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.RED, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.PURPLE, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.BLUE, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.CYAN, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.GREEN, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.YELLOW, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.WHITE, getTexture(texture, chunkHeight, chunkWidth, index++));
-
-					type = ThBulletType.RICE_LARGE;
-
-					add(type, ThBulletColor.BLACK, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.RED, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.PURPLE, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.BLUE, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.CYAN, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.GREEN, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.YELLOW, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.WHITE, getTexture(texture, chunkHeight, chunkWidth, index++));
-
-					type = ThBulletType.ORB_MEDIUM;
-
-					add(type, ThBulletColor.BLACK, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.RED, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.PURPLE, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.BLUE, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.CYAN, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.GREEN, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.YELLOW, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.WHITE, getTexture(texture, chunkHeight, chunkWidth, index++));
-				}
-
-				{
-					Texture texture = Game.getGame().assets.get("sprites/bullets/bullet2.png");
-
-					int chunkHeight = 128;
-					int chunkWidth = 128;
-
-					int index = 1;
-
-					index += 3 * 4;
-
-					type = ThBulletType.BALL_LARGE_HOLLOW;
-
-					HitboxSpecification largeOrb = new HitboxSpecification()
-					{
-						@Override
-						public boolean isHitbox(Color color, int x, int y)
-						{
-							return color.a > 0 && color.a < 0.5;
-						}
-					};
-
-					TextureRegion region;
-					add(type, ThBulletColor.RED, region = getTexture(texture, chunkHeight, chunkWidth, index++), HitboxUtil.makeHitboxFromSprite(region, largeOrb));
-					add(type, ThBulletColor.BLUE, region = getTexture(texture, chunkHeight, chunkWidth, index++), HitboxUtil.makeHitboxFromSprite(region, largeOrb));
-					add(type, ThBulletColor.GREEN, region = getTexture(texture, chunkHeight, chunkWidth, index++), HitboxUtil.makeHitboxFromSprite(region, largeOrb));
-					add(type, ThBulletColor.YELLOW, region = getTexture(texture, chunkHeight, chunkWidth, index++), HitboxUtil.makeHitboxFromSprite(region, largeOrb));
-				}
-
-				{
-					final String file = "sprites/bullets/bullet3.png";
-
-					Game.getGame().assets.load(file, Texture.class);
-					Game.getGame().assets.finishLoading();
-
-					Texture texture = Game.getGame().assets.get(file);
-
-					int chunkHeight = 64;
-					int chunkWidth = 64;
-
-					int index = 1;
-
-					type = ThBulletType.HEART;
-
-					add(type, ThBulletColor.BLACK, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.RED, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.PURPLE, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.BLUE, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.CYAN, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.GREEN, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.YELLOW, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.WHITE, getTexture(texture, chunkHeight, chunkWidth, index++));
-
-					type = ThBulletType.ARROW;
-
-					add(type, ThBulletColor.BLACK, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.RED, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.PURPLE, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.BLUE, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.CYAN, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.GREEN, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.YELLOW, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.WHITE, getTexture(texture, chunkHeight, chunkWidth, index++));
-
-					type = ThBulletType.ORB;
-
-					add(type, ThBulletColor.BLACK, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.RED, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.PURPLE, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.BLUE, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.CYAN, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.GREEN, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.YELLOW, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.WHITE, getTexture(texture, chunkHeight, chunkWidth, index++));
-
-					index += 8;
-
-					type = ThBulletType.UNKNOWN_1;
-
-					Array<TextureRegion> animation = new Array<TextureRegion>();
-
-					for(int frameNr = 0; frameNr < 4; frameNr++)
-					{
-						TextureRegion frame = getTexture(texture, chunkHeight, chunkWidth, index++);
-
-						animation.add(makeFullHitboxSpriteFromTexture(frame));
-					}
-
-					add(type, ThBulletColor.RED, new Animation(1, animation));
-
-					animation = new Array<TextureRegion>();
-
-					for(int frameNr = 0; frameNr < 4; frameNr++)
-					{
-						TextureRegion frame = getTexture(texture, chunkHeight, chunkWidth, index++);
-
-						animation.add(makeFullHitboxSpriteFromTexture(frame));
-					}
-
-					add(type, ThBulletColor.PINK, new Animation(1, animation));
-
-					animation = new Array<TextureRegion>();
-
-					for(int frameNr = 0; frameNr < 4; frameNr++)
-					{
-						TextureRegion frame = getTexture(texture, chunkHeight, chunkWidth, index++);
-
-						animation.add(makeFullHitboxSpriteFromTexture(frame));
-					}
-
-					add(type, ThBulletColor.PURPLE, new Animation(1, animation));
-
-					animation = new Array<TextureRegion>();
-
-					for(int frameNr = 0; frameNr < 4; frameNr++)
-					{
-						TextureRegion frame = getTexture(texture, chunkHeight, chunkWidth, index++);
-
-						animation.add(makeFullHitboxSpriteFromTexture(frame));
-					}
-
-					add(type, ThBulletColor.ORANGE, new Animation(1, animation));
-
-					index += 8;
-
-					type = ThBulletType.UNKNOWN_2;
-
-					add(type, ThBulletColor.BLACK, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.RED, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.PURPLE, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.BLUE, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.CYAN, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.GREEN, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.YELLOW, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.WHITE, getTexture(texture, chunkHeight, chunkWidth, index++));
-				}
-
-				{
-					Texture texture = Game.getGame().assets.get("sprites/bullets/bullet3.png");
-
-					int chunkHeight = 32;
-					int chunkWidth = 32;
-
-					int index = 1;
-
-					index += 12 * 16;
-
-					type = ThBulletType.UNKNOWN_3;
-
-					add(type, ThBulletColor.BLACK, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.RED_DARK, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.RED, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.PURPLE, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.PINK, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.BLUE_DARK, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.BLUE, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.CYAN, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.CYAN_LIGHT, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.GREEN, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.GREEN_LIGHT, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.GREEN_LIGHTER, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.YELLOW, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.YELLOW_LIGHT, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.ORANGE, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.WHITE, getTexture(texture, chunkHeight, chunkWidth, index++));
-				}
-
-				{
-					final String file = "sprites/bullets/bullet4.png";
-
-					Game.getGame().assets.load(file, Texture.class);
-					Game.getGame().assets.finishLoading();
-
-					Texture texture = Game.getGame().assets.get(file);
-
-					int chunkHeight = 128;
-					int chunkWidth = 128;
-
-					int index = 1;
-
-					type = ThBulletType.ORB_LARGE;
-
-					add(type, ThBulletColor.BLACK, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.RED, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.PURPLE, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.BLUE, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.CYAN, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.GREEN, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.YELLOW, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.WHITE, getTexture(texture, chunkHeight, chunkWidth, index++));
-				}
-				
-				{
-					final String file = "sprites/bullets/bullet4.png";
-
-					Texture texture = Game.getGame().assets.get(file);
-
-					int chunkHeight = 64;
-					int chunkWidth = 64;
-
-					type = ThBulletType.ORB_SHADE;
-
-					add(type, ThBulletColor.WHITE, new TextureRegion(texture, 448, 448, chunkHeight, chunkWidth));
-				}
-
-				{
-					final String file = "sprites/bullets/bullet5.png";
-
-					Game.getGame().assets.load(file, Texture.class);
-					Game.getGame().assets.finishLoading();
-
-					Texture texture = Game.getGame().assets.get(file);
-
-					int chunkHeight = 64;
-					int chunkWidth = 64;
-
-					int index = 1;
-
-					type = ThBulletType.NOTE_EIGHT;
-
-					Array<TextureRegion> animation = new Array<TextureRegion>();
-
-					for(int frameNr = 0; frameNr < 3; frameNr++)
-					{
-						TextureRegion frame = getTexture(texture, chunkHeight, chunkWidth, index++);
-
-						animation.add(makeFullHitboxSpriteFromTexture(frame));
-					}
-
-					add(type, ThBulletColor.RED, new Animation(1, animation));
-
-					animation = new Array<TextureRegion>();
-
-					for(int frameNr = 0; frameNr < 3; frameNr++)
-					{
-						TextureRegion frame = getTexture(texture, chunkHeight, chunkWidth, index++);
-
-						animation.add(makeFullHitboxSpriteFromTexture(frame));
-					}
-
-					add(type, ThBulletColor.BLUE, new Animation(1, animation));
-
-					index += 2;
-
-					animation = new Array<TextureRegion>();
-
-					for(int frameNr = 0; frameNr < 3; frameNr++)
-					{
-						TextureRegion frame = getTexture(texture, chunkHeight, chunkWidth, index++);
-
-						animation.add(makeFullHitboxSpriteFromTexture(frame));
-					}
-
-					add(type, ThBulletColor.GREEN, new Animation(1, animation));
-
-					animation = new Array<TextureRegion>();
-
-					for(int frameNr = 0; frameNr < 3; frameNr++)
-					{
-						TextureRegion frame = getTexture(texture, chunkHeight, chunkWidth, index++);
-
-						animation.add(makeFullHitboxSpriteFromTexture(frame));
-					}
-
-					add(type, ThBulletColor.PURPLE, new Animation(1, animation));
-
-					index += 2;
-
-					type = ThBulletType.NOTE_QUARTER_REST;
-
-					add(type, ThBulletColor.BLACK, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.RED, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.PURPLE, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.BLUE, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.CYAN, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.GREEN, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.YELLOW, getTexture(texture, chunkHeight, chunkWidth, index++));
-					add(type, ThBulletColor.WHITE, getTexture(texture, chunkHeight, chunkWidth, index++));
-				}
-
-				{
-					final String file = "sprites/bullets/item.png";
-
-					Game.getGame().assets.load(file, Texture.class);
-					Game.getGame().assets.finishLoading();
-
-					Texture texture = Game.getGame().assets.get(file);
-
-					int chunkHeight = 64;
-					int chunkWidth = 64;
-
-					int index = 1;
-
-					type = ThBulletType.POWER_LARGE;
-
-					add(type, null, getTexture(texture, chunkHeight, chunkWidth, index++));
-
-					type = ThBulletType.ONEUP_SECTION;
-
-					add(type, null, getTexture(texture, chunkHeight, chunkWidth, index++));
-
-					type = ThBulletType.ONEUP;
-
-					add(type, null, getTexture(texture, chunkHeight, chunkWidth, index++));
-
-					type = ThBulletType.BOMB_SECTION;
-
-					add(type, null, getTexture(texture, chunkHeight, chunkWidth, index++));
-
-					type = ThBulletType.BOMB;
-
-					add(type, null, getTexture(texture, chunkHeight, chunkWidth, index++));
-
-					type = ThBulletType.FULL_POWER;
-
-					add(type, null, getTexture(texture, chunkHeight, chunkWidth, index++));
-				}
-
-				{
-					Texture texture = Game.getGame().assets.get("sprites/bullets/item.png");
-
-					add(ThBulletType.POWER_SMALL, null, getSubImage(texture, 384, 4, 32, 32));
-					add(ThBulletType.POINT_SMALL, null, getSubImage(texture, 416, 4, 32, 32));
-					add(ThBulletType.POWER_MEDIUM, null, getSubImage(texture, 450, 2, 44, 44));
-					add(ThBulletType.POINT_MEDIUM, null, getSubImage(texture, 416, 96, 32, 32));
-
-					add(ThBulletType.GRAZE_LARGE, null, getSubImage(texture, 384, 96, 32, 32));
-					add(ThBulletType.GRAZE_MEDIUM, null, getSubImage(texture, 416, 64, 32, 32));
-					add(ThBulletType.GRAZE_SMALL, null, getSubImage(texture, 384, 64, 32, 32));
-				}
-
-				long end = System.currentTimeMillis();
-
-				System.out.println("[BulletLoader] Done!" + (end - start) + "ms");
-				
-				// After this, it saves the now made bullets onto the new format.
-				// Saved to "bullets/TYPE/COLOR/"
-				// Since they're technically animations, the frames are saved with number.png, ie. 1.png, 2.png, 3.png.
-				// Data for the bullet is stored in the frame number.json, ie. 1.json, 2.json, 3.json
-				// This is mostly used to save the hitbox of the bullet.
-				// Uncomment to make it work
-//				if(true)
-//					return;
-				
-				File folder = new File("bullets");
-				
-				if(folder.exists())
-					folder.delete();
-				
-				folder.mkdir();
-				
-				Gson gson = new GsonBuilder().serializeNulls().serializeSpecialFloatingPointValues().setPrettyPrinting().create();
+				TextureAtlas atlas = new TextureAtlas(atlasFile);
 				
 				for(ThBulletType bt : ThBulletType.values())
 					for(ThBulletColor bc : ThBulletColor.values())
 					{
-						BulletDuo duo = new BulletDuo(bt, bc);
+						Array<HitboxSprite> array = new Array<HitboxSprite>();
 						
-						if(map.containsKey(duo))
+						int i = 0;
+						
+						AtlasRegion r = null;
+						
+						boolean hasHitbox = false;
+						boolean singleHitbox = false;
+						Polygon hitbox = null;
+						
+						FileHandle hitboxFile = atlasFile.parent().child("data").child(bt.toString() + ".vertices");
+						
+						if(hitboxFile != null && hitboxFile.exists())
 						{
-							Animation ani = map.get(duo);
+							hasHitbox = true;
+							singleHitbox = true;
 							
-							String dirPath = "bullets/" + bt.toString() + "/" + bc.toString() + "/";
-							File dir = new File(dirPath);
+							Polygon p = HitboxUtil.loadHitbox(hitboxFile);
+							hitbox = p;
+						}
+						else
+						{
+							hitboxFile = atlasFile.parent().child("data").child(bt.toString() + i + ".vertices");
 							
-							if(!dir.exists())
-								dir.mkdirs();
-							
-							int frame = 1;
-							
-							for(TextureRegion r : ani.getKeyFrames())
+							if(hitboxFile.exists())
 							{
-								HitboxSprite s = (HitboxSprite)r;
-								
-								Game.getGame().batch.begin();
-								
-								Gdx.gl.glClearColor(0, 0, 0, 0);
-							    Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-								
-								s.setOriginCenter();
-								s.rotate(180);
-								s.setPosition(10, 10);
-								s.draw(Game.getGame().batch);
-								
-								Game.getGame().batch.end();
-								
-								try
-								{
-									byte[] png = PNG.toPNG(ScreenUtils.getFrameBufferPixmap(0, 0, s.getRegionWidth() + 20, s.getRegionHeight() + 20));
-									
-									File file = new File(dirPath + frame + ".png");
-									
-									if(file.exists())
-										file.delete();
-									
-									file.createNewFile();
-									
-									FileOutputStream out = new FileOutputStream(file);
-									out.write(png);
-									
-									out.close();
-								}
-								catch (IOException e)
-								{
-									e.printStackTrace();
-								}
+								hasHitbox = true;
+							}
+						}
+						
+						System.out.println("BT: " + bt + " - BC: " + bc);
+						System.out.println("HasHitbox? " + hasHitbox + (hasHitbox ? " - Type: " + (singleHitbox ? "Single" : "Ani") : ""));
+						
+						while((r = atlas.findRegion(bt.toString() + "_" + bc.toString() + i)) != null)
+						{
+							final HitboxSprite s = new HitboxSprite(r);
 							
-								frame++;
+							if(hasHitbox)
+							{
+								if(!singleHitbox)
+								{
+									hitboxFile = atlasFile.parent().child("data").child(bt.toString() + i + ".vertices");
+									
+									s.setHitbox(HitboxUtil.loadHitbox(hitboxFile));
+								}
+								else
+								{
+									s.setHitbox(hitbox);
+								}
+								
+								s.setHitboxScaleOffsetModifierX(bt.getOffsetModifierX());
+								s.setHitboxScaleOffsetModifierY(bt.getOffsetModifierY());
 							}
 							
-							System.out.println("Done! " + bt + "  " + bc);
-							
+							array.add(s);
+							i++;
+						}
+						
+						if(array.size > 0)
+						{
+							map.put(new BulletDuo(bt, bc), new Animation(6f, array));
 						}
 					}
+				
+//				if(true)
+//					return;
+//				
+//				
+				long start = System.currentTimeMillis();
+//				
+//				ThBulletType type = null;
+//				
+//				{
+//					final String file = "sprites/bullets/bullet1.png";
+//
+//					TextureParameter param = new TextureParameter();
+//					param.genMipMaps = true;
+//					param.minFilter = TextureFilter.MipMapLinearNearest;
+//					param.magFilter = TextureFilter.Nearest;
+//					
+//					game.assets.load(file, Texture.class, param);
+//					game.assets.finishLoading();
+//	
+//					Texture texture = game.assets.get(file);
+//
+//					int chunkHeight = 32;
+//					int chunkWidth = 32;
+//
+//					int index = 1;
+//
+//					type = ThBulletType.LAZER_STATIONARY;
+//
+//					add(type, ThBulletColor.BLACK, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.RED_DARK, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.RED, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.PURPLE, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.PINK, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.BLUE_DARK, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.BLUE, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.CYAN, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.CYAN_LIGHT, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.GREEN, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.GREEN_LIGHT, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.GREEN_LIGHTER, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.YELLOW, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.YELLOW_LIGHT, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.ORANGE, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.WHITE, getTexture(texture, chunkHeight, chunkWidth, index++));
+//
+//					type = ThBulletType.POINTER;
+//
+//					add(type, ThBulletColor.BLACK, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.RED_DARK, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.RED, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.PURPLE, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.PINK, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.BLUE_DARK, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.BLUE, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.CYAN, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.CYAN_LIGHT, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.GREEN, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.GREEN_LIGHT, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.GREEN_LIGHTER, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.YELLOW, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.YELLOW_LIGHT, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.ORANGE, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.WHITE, getTexture(texture, chunkHeight, chunkWidth, index++));
+//
+//					type = ThBulletType.BALL_1;
+//
+//					add(type, ThBulletColor.BLACK, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.RED_DARK, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.RED, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.PURPLE, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.PINK, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.BLUE_DARK, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.BLUE, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.CYAN, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.CYAN_LIGHT, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.GREEN, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.GREEN_LIGHT, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.GREEN_LIGHTER, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.YELLOW, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.YELLOW_LIGHT, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.ORANGE, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.WHITE, getTexture(texture, chunkHeight, chunkWidth, index++));
+//
+//					type = ThBulletType.BALL_2;
+//
+//					add(type, ThBulletColor.BLACK, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.RED_DARK, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.RED, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.PURPLE, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.PINK, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.BLUE_DARK, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.BLUE, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.CYAN, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.CYAN_LIGHT, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.GREEN, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.GREEN_LIGHT, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.GREEN_LIGHTER, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.YELLOW, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.YELLOW_LIGHT, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.ORANGE, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.WHITE, getTexture(texture, chunkHeight, chunkWidth, index++));
+//
+//					type = ThBulletType.RAIN;
+//
+//					add(type, ThBulletColor.BLACK, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.RED_DARK, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.RED, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.PURPLE, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.PINK, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.BLUE_DARK, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.BLUE, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.CYAN, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.CYAN_LIGHT, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.GREEN, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.GREEN_LIGHT, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.GREEN_LIGHTER, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.YELLOW, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.YELLOW_LIGHT, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.ORANGE, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.WHITE, getTexture(texture, chunkHeight, chunkWidth, index++));
+//
+//					type = ThBulletType.KUNAI;
+//
+//					add(type, ThBulletColor.BLACK, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.RED_DARK, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.RED, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.PURPLE, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.PINK, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.BLUE_DARK, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.BLUE, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.CYAN, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.CYAN_LIGHT, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.GREEN, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.GREEN_LIGHT, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.GREEN_LIGHTER, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.YELLOW, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.YELLOW_LIGHT, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.ORANGE, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.WHITE, getTexture(texture, chunkHeight, chunkWidth, index++));
+//
+//					type = ThBulletType.CRYSTAL;
+//
+//					add(type, ThBulletColor.BLACK, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.RED_DARK, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.RED, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.PURPLE, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.PINK, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.BLUE_DARK, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.BLUE, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.CYAN, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.CYAN_LIGHT, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.GREEN, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.GREEN_LIGHT, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.GREEN_LIGHTER, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.YELLOW, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.YELLOW_LIGHT, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.ORANGE, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.WHITE, getTexture(texture, chunkHeight, chunkWidth, index++));
+//
+//					type = ThBulletType.SEAL;
+//
+//					add(type, ThBulletColor.BLACK, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.RED_DARK, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.RED, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.PURPLE, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.PINK, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.BLUE_DARK, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.BLUE, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.CYAN, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.CYAN_LIGHT, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.GREEN, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.GREEN_LIGHT, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.GREEN_LIGHTER, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.YELLOW, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.YELLOW_LIGHT, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.ORANGE, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.WHITE, getTexture(texture, chunkHeight, chunkWidth, index++));
+//
+//					type = ThBulletType.BULLET;
+//
+//					add(type, ThBulletColor.BLACK, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.RED_DARK, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.RED, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.PURPLE, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.PINK, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.BLUE_DARK, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.BLUE, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.CYAN, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.CYAN_LIGHT, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.GREEN, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.GREEN_LIGHT, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.GREEN_LIGHTER, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.YELLOW, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.YELLOW_LIGHT, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.ORANGE, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.WHITE, getTexture(texture, chunkHeight, chunkWidth, index++));
+//
+//					type = ThBulletType.RICE;
+//
+//					add(type, ThBulletColor.BLACK, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.RED_DARK, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.RED, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.PURPLE, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.PINK, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.BLUE_DARK, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.BLUE, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.CYAN, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.CYAN_LIGHT, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.GREEN, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.GREEN_LIGHT, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.GREEN_LIGHTER, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.YELLOW, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.YELLOW_LIGHT, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.ORANGE, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.WHITE, getTexture(texture, chunkHeight, chunkWidth, index++));
+//
+//					type = ThBulletType.STAR;
+//
+//					add(type, ThBulletColor.BLACK, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.RED_DARK, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.RED, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.PURPLE, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.PINK, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.BLUE_DARK, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.BLUE, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.CYAN, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.CYAN_LIGHT, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.GREEN, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.GREEN_LIGHT, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.GREEN_LIGHTER, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.YELLOW, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.YELLOW_LIGHT, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.ORANGE, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.WHITE, getTexture(texture, chunkHeight, chunkWidth, index++));
+//
+//					type = ThBulletType.BALL_REFLECTING;
+//
+//					add(type, ThBulletColor.BLACK, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.RED_DARK, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.RED, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.PURPLE, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.PINK, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.BLUE_DARK, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.BLUE, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.CYAN, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.CYAN_LIGHT, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.GREEN, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.GREEN_LIGHT, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.GREEN_LIGHTER, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.YELLOW, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.YELLOW_LIGHT, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.ORANGE, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.WHITE, getTexture(texture, chunkHeight, chunkWidth, index++));
+//
+//					index += 13;
+//
+//					type = ThBulletType.DISK;
+//
+//					add(type, ThBulletColor.YELLOW, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.WHITE, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.ORANGE, getTexture(texture, chunkHeight, chunkWidth, index++));
+//
+//					index += 2 * 16;
+//					index += 4;
+//
+//					type = ThBulletType.DOT_MEDIUM;
+//
+//					add(type, ThBulletColor.WHITE, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.RED, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.PURPLE, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.GREEN_LIGHT, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.YELLOW_LIGHT, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.BLACK, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.RED_DARK, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.BLUE, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.GREEN, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.YELLOW, getTexture(texture, chunkHeight, chunkWidth, index++));
+//				}
+//
+//				{
+//					Texture texture = Game.getGame().assets.get("sprites/bullets/bullet1.png");
+//
+//					int chunkHeight = 16;
+//					int chunkWidth = 16;
+//
+//					int index = 1;
+//
+//					type = ThBulletType.DOT_SMALL_FILLED;
+//
+//					index += 2 * 12 * 32;
+//
+//					add(type, ThBulletColor.BLACK, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.RED_DARK, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.RED, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.PURPLE, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.PINK, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.BLUE_DARK, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.BLUE, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.CYAN, getTexture(texture, chunkHeight, chunkWidth, index++));
+//
+//					type = ThBulletType.DOT_SMALL_OUTLINE;
+//
+//					add(type, ThBulletColor.BLACK, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.RED_DARK, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.RED, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.PURPLE, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.PINK, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.BLUE_DARK, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.BLUE, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.CYAN, getTexture(texture, chunkHeight, chunkWidth, index++));
+//
+//					index += 16;
+//
+//					type = ThBulletType.DOT_SMALL_FILLED;
+//
+//					add(type, ThBulletColor.CYAN_LIGHT, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.GREEN, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.GREEN_LIGHT, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.GREEN_LIGHTER, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.YELLOW, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.YELLOW_LIGHT, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.ORANGE, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.WHITE, getTexture(texture, chunkHeight, chunkWidth, index++));
+//
+//					type = ThBulletType.DOT_SMALL_OUTLINE;
+//
+//					add(type, ThBulletColor.CYAN_LIGHT, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.GREEN, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.GREEN_LIGHT, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.GREEN_LIGHTER, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.YELLOW, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.YELLOW_LIGHT, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.ORANGE, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.WHITE, getTexture(texture, chunkHeight, chunkWidth, index++));
+//
+//					index += 16;
+//					index += 4 * 32;
+//
+//					type = ThBulletType.DOT_SMALL_MOON;
+//
+//					add(type, ThBulletColor.BLACK, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.RED_DARK, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.RED, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.PURPLE, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.PINK, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.BLUE_DARK, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.BLUE, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.CYAN, getTexture(texture, chunkHeight, chunkWidth, index++));
+//
+//					index += 24;
+//
+//					type = ThBulletType.DOT_SMALL_MOON;
+//
+//					add(type, ThBulletColor.CYAN_LIGHT, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.GREEN, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.GREEN_LIGHT, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.GREEN_LIGHTER, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.YELLOW, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.YELLOW_LIGHT, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.ORANGE, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.WHITE, getTexture(texture, chunkHeight, chunkWidth, index++));
+//				}
+//
+//				{
+//					final String file = "sprites/bullets/bullet2.png";
+//
+//					TextureParameter param = new TextureParameter();
+//					param.genMipMaps = true;
+//					param.minFilter = TextureFilter.MipMapLinearNearest;
+//					param.magFilter = TextureFilter.Nearest;
+//					
+//					game.assets.load(file, Texture.class, param);
+//					game.assets.finishLoading();
+//	
+//					Texture texture = game.assets.get(file);
+//
+//					int chunkHeight = 64;
+//					int chunkWidth = 64;
+//
+//					int index = 1;
+//
+//					type = ThBulletType.STAR_LARGE;
+//
+//					add(type, ThBulletColor.BLACK, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.RED, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.PURPLE, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.BLUE, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.CYAN, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.GREEN, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.YELLOW, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.WHITE, getTexture(texture, chunkHeight, chunkWidth, index++));
+//
+//					type = ThBulletType.BALL_BIG;
+//
+//					add(type, ThBulletColor.BLACK, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.RED, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.PURPLE, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.BLUE, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.CYAN, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.GREEN, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.YELLOW, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.WHITE, getTexture(texture, chunkHeight, chunkWidth, index++));
+//
+//					type = ThBulletType.BUTTERFLY;
+//
+//					add(type, ThBulletColor.BLACK, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.RED, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.PURPLE, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.BLUE, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.CYAN, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.GREEN, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.YELLOW, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.WHITE, getTexture(texture, chunkHeight, chunkWidth, index++));
+//
+//					type = ThBulletType.KNIFE;
+//
+//					add(type, ThBulletColor.BLACK, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.RED, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.PURPLE, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.BLUE, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.CYAN, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.GREEN, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.YELLOW, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.WHITE, getTexture(texture, chunkHeight, chunkWidth, index++));
+//
+//					type = ThBulletType.RICE_LARGE;
+//
+//					add(type, ThBulletColor.BLACK, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.RED, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.PURPLE, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.BLUE, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.CYAN, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.GREEN, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.YELLOW, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.WHITE, getTexture(texture, chunkHeight, chunkWidth, index++));
+//
+//					type = ThBulletType.ORB_MEDIUM;
+//
+//					add(type, ThBulletColor.BLACK, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.RED, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.PURPLE, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.BLUE, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.CYAN, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.GREEN, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.YELLOW, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.WHITE, getTexture(texture, chunkHeight, chunkWidth, index++));
+//				}
+//
+//				{
+//					Texture texture = Game.getGame().assets.get("sprites/bullets/bullet2.png");
+//
+//					int chunkHeight = 128;
+//					int chunkWidth = 128;
+//
+//					int index = 1;
+//
+//					index += 3 * 4;
+//
+//					type = ThBulletType.BALL_LARGE_HOLLOW;
+//
+//					HitboxSpecification largeOrb = new HitboxSpecification()
+//					{
+//						@Override
+//						public boolean isHitbox(Color color, int x, int y)
+//						{
+//							return color.a > 0 && color.a < 0.5;
+//						}
+//					};
+//
+//					TextureRegion region;
+//					add(type, ThBulletColor.RED, region = getTexture(texture, chunkHeight, chunkWidth, index++), HitboxUtil.makeHitboxFromSprite(region, largeOrb));
+//					add(type, ThBulletColor.BLUE, region = getTexture(texture, chunkHeight, chunkWidth, index++), HitboxUtil.makeHitboxFromSprite(region, largeOrb));
+//					add(type, ThBulletColor.GREEN, region = getTexture(texture, chunkHeight, chunkWidth, index++), HitboxUtil.makeHitboxFromSprite(region, largeOrb));
+//					add(type, ThBulletColor.YELLOW, region = getTexture(texture, chunkHeight, chunkWidth, index++), HitboxUtil.makeHitboxFromSprite(region, largeOrb));
+//				}
+//
+//				{
+//					final String file = "sprites/bullets/bullet3.png";
+//
+//					TextureParameter param = new TextureParameter();
+//					param.genMipMaps = true;
+//					param.minFilter = TextureFilter.MipMapLinearNearest;
+//					param.magFilter = TextureFilter.Nearest;
+//					
+//					game.assets.load(file, Texture.class, param);
+//					game.assets.finishLoading();
+//	
+//					Texture texture = game.assets.get(file);
+//
+//					int chunkHeight = 64;
+//					int chunkWidth = 64;
+//
+//					int index = 1;
+//
+//					type = ThBulletType.HEART;
+//
+//					add(type, ThBulletColor.BLACK, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.RED, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.PURPLE, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.BLUE, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.CYAN, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.GREEN, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.YELLOW, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.WHITE, getTexture(texture, chunkHeight, chunkWidth, index++));
+//
+//					type = ThBulletType.ARROW;
+//
+//					add(type, ThBulletColor.BLACK, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.RED, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.PURPLE, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.BLUE, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.CYAN, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.GREEN, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.YELLOW, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.WHITE, getTexture(texture, chunkHeight, chunkWidth, index++));
+//
+//					type = ThBulletType.ORB;
+//
+//					add(type, ThBulletColor.BLACK, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.RED, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.PURPLE, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.BLUE, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.CYAN, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.GREEN, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.YELLOW, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.WHITE, getTexture(texture, chunkHeight, chunkWidth, index++));
+//
+//					index += 8;
+//
+//					type = ThBulletType.UNKNOWN_1;
+//
+//					Array<TextureRegion> animation = new Array<TextureRegion>();
+//
+//					for(int frameNr = 0; frameNr < 4; frameNr++)
+//					{
+//						TextureRegion frame = getTexture(texture, chunkHeight, chunkWidth, index++);
+//
+//						animation.add(makeFullHitboxSpriteFromTexture(frame));
+//					}
+//
+//					add(type, ThBulletColor.RED, new Animation(1, animation));
+//
+//					animation = new Array<TextureRegion>();
+//
+//					for(int frameNr = 0; frameNr < 4; frameNr++)
+//					{
+//						TextureRegion frame = getTexture(texture, chunkHeight, chunkWidth, index++);
+//
+//						animation.add(makeFullHitboxSpriteFromTexture(frame));
+//					}
+//
+//					add(type, ThBulletColor.PINK, new Animation(1, animation));
+//
+//					animation = new Array<TextureRegion>();
+//
+//					for(int frameNr = 0; frameNr < 4; frameNr++)
+//					{
+//						TextureRegion frame = getTexture(texture, chunkHeight, chunkWidth, index++);
+//
+//						animation.add(makeFullHitboxSpriteFromTexture(frame));
+//					}
+//
+//					add(type, ThBulletColor.PURPLE, new Animation(1, animation));
+//
+//					animation = new Array<TextureRegion>();
+//
+//					for(int frameNr = 0; frameNr < 4; frameNr++)
+//					{
+//						TextureRegion frame = getTexture(texture, chunkHeight, chunkWidth, index++);
+//
+//						animation.add(makeFullHitboxSpriteFromTexture(frame));
+//					}
+//
+//					add(type, ThBulletColor.ORANGE, new Animation(1, animation));
+//
+//					index += 8;
+//
+//					type = ThBulletType.UNKNOWN_2;
+//
+//					add(type, ThBulletColor.BLACK, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.RED, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.PURPLE, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.BLUE, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.CYAN, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.GREEN, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.YELLOW, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.WHITE, getTexture(texture, chunkHeight, chunkWidth, index++));
+//				}
+//
+//				{
+//					Texture texture = Game.getGame().assets.get("sprites/bullets/bullet3.png");
+//
+//					int chunkHeight = 32;
+//					int chunkWidth = 32;
+//
+//					int index = 1;
+//
+//					index += 12 * 16;
+//
+//					type = ThBulletType.UNKNOWN_3;
+//
+//					add(type, ThBulletColor.BLACK, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.RED_DARK, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.RED, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.PURPLE, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.PINK, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.BLUE_DARK, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.BLUE, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.CYAN, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.CYAN_LIGHT, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.GREEN, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.GREEN_LIGHT, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.GREEN_LIGHTER, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.YELLOW, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.YELLOW_LIGHT, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.ORANGE, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.WHITE, getTexture(texture, chunkHeight, chunkWidth, index++));
+//				}
+//
+//				{
+//					final String file = "sprites/bullets/bullet4.png";
+//
+//					TextureParameter param = new TextureParameter();
+//					param.genMipMaps = true;
+//					param.minFilter = TextureFilter.MipMapLinearNearest;
+//					param.magFilter = TextureFilter.Nearest;
+//					
+//					game.assets.load(file, Texture.class, param);
+//					game.assets.finishLoading();
+//	
+//					Texture texture = game.assets.get(file);
+//
+//					int chunkHeight = 128;
+//					int chunkWidth = 128;
+//
+//					int index = 1;
+//
+//					type = ThBulletType.ORB_LARGE;
+//
+//					add(type, ThBulletColor.BLACK, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.RED, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.PURPLE, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.BLUE, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.CYAN, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.GREEN, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.YELLOW, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.WHITE, getTexture(texture, chunkHeight, chunkWidth, index++));
+//				}
+//				
+//				{
+//					final String file = "sprites/bullets/bullet4.png";
+//
+//					Texture texture = Game.getGame().assets.get(file);
+//
+//					int chunkHeight = 64;
+//					int chunkWidth = 64;
+//
+//					type = ThBulletType.ORB_SHADE;
+//
+//					add(type, ThBulletColor.WHITE, new TextureRegion(texture, 448, 448, chunkHeight, chunkWidth));
+//				}
+//
+//				{
+//					final String file = "sprites/bullets/bullet5.png";
+//
+//					TextureParameter param = new TextureParameter();
+//					param.genMipMaps = true;
+//					param.minFilter = TextureFilter.MipMapLinearNearest;
+//					param.magFilter = TextureFilter.Nearest;
+//					
+//					game.assets.load(file, Texture.class, param);
+//					game.assets.finishLoading();
+//	
+//					Texture texture = game.assets.get(file);
+//
+//					int chunkHeight = 64;
+//					int chunkWidth = 64;
+//
+//					int index = 1;
+//
+//					type = ThBulletType.NOTE_EIGHT;
+//
+//					Array<TextureRegion> animation = new Array<TextureRegion>();
+//
+//					for(int frameNr = 0; frameNr < 3; frameNr++)
+//					{
+//						TextureRegion frame = getTexture(texture, chunkHeight, chunkWidth, index++);
+//
+//						animation.add(makeFullHitboxSpriteFromTexture(frame));
+//					}
+//
+//					add(type, ThBulletColor.RED, new Animation(1, animation));
+//
+//					animation = new Array<TextureRegion>();
+//
+//					for(int frameNr = 0; frameNr < 3; frameNr++)
+//					{
+//						TextureRegion frame = getTexture(texture, chunkHeight, chunkWidth, index++);
+//
+//						animation.add(makeFullHitboxSpriteFromTexture(frame));
+//					}
+//
+//					add(type, ThBulletColor.BLUE, new Animation(1, animation));
+//
+//					index += 2;
+//
+//					animation = new Array<TextureRegion>();
+//
+//					for(int frameNr = 0; frameNr < 3; frameNr++)
+//					{
+//						TextureRegion frame = getTexture(texture, chunkHeight, chunkWidth, index++);
+//
+//						animation.add(makeFullHitboxSpriteFromTexture(frame));
+//					}
+//
+//					add(type, ThBulletColor.YELLOW, new Animation(1, animation));
+//
+//					animation = new Array<TextureRegion>();
+//
+//					for(int frameNr = 0; frameNr < 3; frameNr++)
+//					{
+//						TextureRegion frame = getTexture(texture, chunkHeight, chunkWidth, index++);
+//
+//						animation.add(makeFullHitboxSpriteFromTexture(frame));
+//					}
+//
+//					add(type, ThBulletColor.PURPLE, new Animation(1, animation));
+//
+//					index += 2;
+//
+//					type = ThBulletType.NOTE_QUARTER_REST;
+//
+//					add(type, ThBulletColor.BLACK, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.RED, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.PURPLE, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.BLUE, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.CYAN, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.GREEN, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.YELLOW, getTexture(texture, chunkHeight, chunkWidth, index++));
+//					add(type, ThBulletColor.WHITE, getTexture(texture, chunkHeight, chunkWidth, index++));
+//				}
+//
+//				{
+//					final String file = "sprites/bullets/item.png";
+//
+//					TextureParameter param = new TextureParameter();
+//					param.genMipMaps = true;
+//					param.minFilter = TextureFilter.MipMapLinearNearest;
+//					param.magFilter = TextureFilter.Nearest;
+//					
+//					game.assets.load(file, Texture.class, param);
+//					game.assets.finishLoading();
+//	
+//					Texture texture = game.assets.get(file);
+//
+//					int chunkHeight = 64;
+//					int chunkWidth = 64;
+//
+//					int index = 1;
+//
+//					type = ThBulletType.POWER_LARGE;
+//
+//					add(type, null, getTexture(texture, chunkHeight, chunkWidth, index++));
+//
+//					type = ThBulletType.ONEUP_SECTION;
+//
+//					add(type, null, getTexture(texture, chunkHeight, chunkWidth, index++));
+//
+//					type = ThBulletType.ONEUP;
+//
+//					add(type, null, getTexture(texture, chunkHeight, chunkWidth, index++));
+//
+//					type = ThBulletType.BOMB_SECTION;
+//
+//					add(type, null, getTexture(texture, chunkHeight, chunkWidth, index++));
+//
+//					type = ThBulletType.BOMB;
+//
+//					add(type, null, getTexture(texture, chunkHeight, chunkWidth, index++));
+//
+//					type = ThBulletType.FULL_POWER;
+//
+//					add(type, null, getTexture(texture, chunkHeight, chunkWidth, index++));
+//				}
+//
+//				{
+//					Texture texture = Game.getGame().assets.get("sprites/bullets/item.png");
+//
+//					add(ThBulletType.POWER_SMALL, null, getSubImage(texture, 384, 4, 32, 32));
+//					add(ThBulletType.POINT_SMALL, null, getSubImage(texture, 416, 4, 32, 32));
+//					add(ThBulletType.POWER_MEDIUM, null, getSubImage(texture, 450, 2, 44, 44));
+//					add(ThBulletType.POINT_MEDIUM, null, getSubImage(texture, 416, 96, 32, 32));
+//
+//					add(ThBulletType.GRAZE_LARGE, null, getSubImage(texture, 384, 96, 32, 32));
+//					add(ThBulletType.GRAZE_MEDIUM, null, getSubImage(texture, 416, 64, 32, 32));
+//					add(ThBulletType.GRAZE_SMALL, null, getSubImage(texture, 384, 64, 32, 32));
+//				}
+//
+				long end = System.currentTimeMillis();
+
+				System.out.println("[BulletLoader] Done!" + (end - start) + "ms");
+//				
+//				TextureAtlasBuilder b = new TextureAtlasBuilder();
+//				
+//				for(ThBulletType bt : ThBulletType.values())
+//					for(ThBulletColor bc : ThBulletColor.values())
+//					{
+//						BulletDuo duo = new BulletDuo(bt, bc);
+//						
+//						if(map.containsKey(duo))
+//						{
+//							Animation ani = map.get(duo);
+//						
+//							b.atlas(duo.type.toString() + "_" + duo.color.toString(),  ani);
+//						}
+//					}
+//				
+//				b.saveAtlas(Gdx.files.local("bin/sprites/bullets/bullets.atlas"));
+//				
+//				// After this, it saves the now made bullets onto the new format.
+//				// Saved to "bullets/TYPE/COLOR/"
+//				// Since they're technically animations, the frames are saved with number.png, ie. 1.png, 2.png, 3.png.
+//				// Data for the bullet is stored in the frame number.json, ie. 1.json, 2.json, 3.json
+//				// This is mostly used to save the hitbox of the bullet.
+//				// Uncomment to make it work
+//				if(true)
+//					return;
+//				
+//				File folder = new File("bullets");
+//				
+//				if(folder.exists())
+//					folder.delete();
+//				
+//				folder.mkdir();
+//				
+//				Gson gson = new GsonBuilder().serializeNulls().serializeSpecialFloatingPointValues().setPrettyPrinting().create();
+//				
+//				for(ThBulletType bt : ThBulletType.values())
+//					for(ThBulletColor bc : ThBulletColor.values())
+//					{
+//						BulletDuo duo = new BulletDuo(bt, bc);
+//						
+//						if(map.containsKey(duo))
+//						{
+//							Animation ani = map.get(duo);
+//							
+//							String dirPath = "bullets/" + bt.toString() + "/" + bc.toString() + "/";
+//							File dir = new File(dirPath);
+//							
+//							if(!dir.exists())
+//								dir.mkdirs();
+//							
+//							int frame = 1;
+//							
+//							for(TextureRegion r : ani.getKeyFrames())
+//							{
+//								HitboxSprite s = (HitboxSprite)r;
+//								
+//								Game.getGame().batch.begin();
+//								
+//								Gdx.gl.glClearColor(0, 0, 0, 0);
+//							    Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+//								
+//								s.setOriginCenter();
+//								s.rotate(180);
+//								s.setPosition(10, 10);
+//								s.draw(Game.getGame().batch);
+//								
+//								Game.getGame().batch.end();
+//								
+//								try
+//								{
+//									byte[] png = PNG.toPNG(ScreenUtils.getFrameBufferPixmap(0, 0, s.getRegionWidth() + 20, s.getRegionHeight() + 20));
+//									
+//									File file = new File(dirPath + frame + ".png");
+//									
+//									if(file.exists())
+//										file.delete();
+//									
+//									file.createNewFile();
+//									
+//									FileOutputStream out = new FileOutputStream(file);
+//									out.write(png);
+//									
+//									out.close();
+//								}
+//								catch (IOException e)
+//								{
+//									e.printStackTrace();
+//								}
+//							
+//								frame++;
+//							}
+//							
+//							System.out.println("Done! " + bt + "  " + bc);
+//							
+//						}
+//					}
 			}
-		}.run();
+		}, 0);
+	}
+	
+	static TextureRegion makeFullHitboxSpriteFromTexture(TextureRegion frame)
+	{
+		return new HitboxSprite(frame);
 	}
 
 	static TextureRegion getSubImage(Texture image, int x, int y, int width, int height)
@@ -968,7 +1088,7 @@ public class LegacyTouhouBulletMaker extends J2hObject
 	
 	static void add(ThBulletType type, ThBulletColor color, TextureRegion texture)
 	{
-		Polygon gon = HitboxUtil.makeHitboxFromSprite(texture, HitboxUtil.StandardBulletSpecification.get());
+		Polygon gon = null;//HitboxUtil.makeHitboxFromSprite(texture, HitboxUtil.StandardBulletSpecification.get());
 		
 		add(type, color, texture, gon);
 	}
@@ -992,14 +1112,6 @@ public class LegacyTouhouBulletMaker extends J2hObject
 		sprite.setHitboxScaleOffsetModifier(0.5F);
 		
 		return sprite;
-	}
-
-	static HitboxSprite makeFullHitboxSpriteFromTexture(TextureRegion texture)
-	{
-		Polygon gon = HitboxUtil.makeHitboxFromSprite(texture, HitboxUtil.StandardBulletSpecification.get());
-		texture.getTexture().setFilter(TextureFilter.MipMapLinearNearest, TextureFilter.Nearest);
-		
-		return makeHitboxSpriteFromTexture(texture, gon);
 	}
 	
 	public static Animation getSchematic(ThBulletType type, ThBulletColor color)

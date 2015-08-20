@@ -17,6 +17,7 @@ import java2hu.object.DrawObject;
 import java2hu.object.StageObject;
 import java2hu.object.bullet.Bullet;
 import java2hu.object.bullet.LaserDrawer;
+import java2hu.object.bullet.phase.ScaleAlphaPhaseAnimation;
 import java2hu.object.enemy.greater.Boss;
 import java2hu.object.player.Player;
 import java2hu.object.ui.CircleHealthBar;
@@ -44,7 +45,6 @@ import java2hu.util.SchemeUtil;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.g2d.Animation;
@@ -569,19 +569,6 @@ public class Raiko extends AllStarBoss
 				{
 					return owner.isOnStage();
 				}
-				
-				@Override
-				public void applyGl20Changes()
-				{
-					Gdx.graphics.getGL20().glBlendEquation(GL20.GL_FUNC_ADD);
-//					Gdx.graphics.getGL20().glBlendFunc(GL20.GL_DST_COLOR, GL20.GL_SRC_COLOR);
-				}
-				
-				@Override
-				public void removeGl20Changes()
-				{
-					Gdx.graphics.getGL20().glBlendEquationSeparate(GL20.GL_FUNC_ADD, GL20.GL_FUNC_ADD);
-				}
 			};
 			
 			this.bge = bge;
@@ -711,7 +698,7 @@ public class Raiko extends AllStarBoss
 						{
 							try
 							{
-								Bullet rain = new Bullet(new Animation(1, new HitboxSprite(drum)), getOwner().getX(), getOwner().getY())
+								Bullet drumBullet = new Bullet(new Animation(1, new HitboxSprite(drum)), getOwner().getX(), getOwner().getY())
 								{
 									boolean sentToPlayer = false;
 									
@@ -828,13 +815,21 @@ public class Raiko extends AllStarBoss
 									}
 								};
 								
-								rain.setZIndex(rain.getZIndex() + finalI);
-								rain.setDirectionRadsTick((float) Math.toRadians(finalI), 4F);
-								rain.setRotationDeg(finalI);
+								drumBullet.setZIndex(drumBullet.getZIndex() + finalI);
+								drumBullet.setDirectionRadsTick((float) Math.toRadians(finalI), 4F);
+								drumBullet.setRotationDeg(finalI);
+								drumBullet.useDeathAnimation(false);
+								
+								final ScaleAlphaPhaseAnimation ani = new ScaleAlphaPhaseAnimation(drumBullet);
+								
+								ani.setTime(Duration.seconds(0.5f));
+								ani.setAddedScale(3f);
+								
+								drumBullet.spawn = ani;
 //								rain.getSpawnAnimation().setAddedScale(3f);
 //								rain.getSpawnAnimation().setTime(20);
 								
-								Game.getGame().spawn(rain);
+								Game.getGame().spawn(drumBullet);
 							}
 							catch(Exception e)
 							{

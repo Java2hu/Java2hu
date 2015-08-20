@@ -22,8 +22,9 @@ public class SimpleTouhouBossPath extends Path
 	public static final int BARRIER_HEIGHT = 100;
 	
 	/**
-	 * Creates the default rectangle, centered at the middle of the screen for width.
+	 * Creates the default rectangle, with specified width.
 	 * And expanding down from the top of the screen - {@value #BARRIER} for height.
+	 * This path will follow the player's x coordinate.
 	 */
 	public SimpleTouhouBossPath(StageObject obj, float width, float height)
 	{
@@ -48,6 +49,29 @@ public class SimpleTouhouBossPath extends Path
 	{
 		super(obj, 200f);
 		this.bounds = rect;
+		
+		double targetX = bounds.x + (Math.random() * bounds.width);
+		double targetY = bounds.y + (Math.random() * bounds.height);
+		
+		addPosition(new Position(targetX, targetY));
+		
+		recalculate();
+	}
+	
+	
+	/**
+	 * Create a simple boss path with a fixed movement rectangle centered around a point
+	 */
+	public SimpleTouhouBossPath(StageObject obj, Position center, float width, float height)
+	{
+		super(obj, 200f);
+		
+		float minX = center.getX() - (width / 2f);
+		float minY = center.getY() - (height / 2f);
+		
+		Rectangle r = new Rectangle(minX, minY, width, height);
+		
+		this.bounds = r;
 		
 		double targetX = bounds.x + (Math.random() * bounds.width);
 		double targetY = bounds.y + (Math.random() * bounds.height);

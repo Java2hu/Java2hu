@@ -3,7 +3,7 @@ package java2hu.allstar.spellcards;
 import java2hu.Game;
 import java2hu.J2hGame;
 import java2hu.background.BackgroundBossAura;
-import java2hu.object.DrawObject;
+import java2hu.object.FreeStageObject;
 import java2hu.object.StageObject;
 import java2hu.object.enemy.greater.Boss;
 import java2hu.object.player.Player;
@@ -41,11 +41,11 @@ public class YouAreTheBoss extends Spellcard
 				@Override
 				public void update(Boss object, long tick)
 				{
-					InputUtil.handleMovementArrowKeys(object, 5f, 2.5f);
+					InputUtil.handleMovementArrowKeys(object, 20f, 10f);
 				}
 			});
 			
-			DrawObject obj = BossUtil.spellcardCircle(boss, this);
+			FreeStageObject obj = BossUtil.spellcardCircle(boss, this);
 			obj.setZIndex(-100);
 			obj.setFrameBuffer(aura.getBackgroundBuffer());
 		}

@@ -4,11 +4,16 @@ import java2hu.Game;
 import java2hu.allstar.AllStarStageScheme;
 import java2hu.object.BGMPlayer;
 import java2hu.object.enemy.greater.Boss;
+import java2hu.util.AnimationUtil;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Disposable;
 
@@ -47,6 +52,88 @@ public abstract class AllStarBoss extends Boss
 				bgm.dispose();
 			}
 		});
+	}
+	
+	TextureAtlas atlas = new TextureAtlas();
+	
+	/**
+	 * Use format: String TextureRegion|Animation for bulk usage.
+	 * @param objects
+	 */
+	public void atlas(Object... objects)
+	{
+		for(int i = 0; i < objects.length; i += 2)
+		{
+			String id = (String) objects[i];
+			Object o = objects[i + 1];
+			
+			if(o instanceof TextureRegion)
+				atlas(id, (TextureRegion)o);
+			
+			if(o instanceof Animation)
+				atlas(id, (Animation)o);
+		}
+	}
+	
+	public void atlas(String id, TextureRegion reg)
+	{
+		AtlasRegion r = atlas.addRegion(id, reg);
+		r.flip(reg.isFlipX(), reg.isFlipY());
+	}
+	
+	public void atlas(String id, Animation ani)
+	{
+		AnimationUtil.toAtlas(atlas, ani, id);
+	}
+	
+	public void saveAtlas(FileHandle handle)
+	{
+		String nl = "\n";
+		
+		String s = handle.name() + nl;
+		
+		s += "format: RGBA8888" + nl;
+		s += "filter: MipMapLinearNearest,Nearest" + nl;
+		s += "repeat: xy" + nl;
+		
+		for(AtlasRegion r : atlas.getRegions())
+		{
+			s += r.name + nl;
+			s += "rotate: " + r.rotate + nl;
+			
+			int regionX = r.getRegionX();
+			int regionY = r.getRegionY();
+			int packedWidth = r.packedWidth;
+			int packedHeight = r.packedHeight;
+			int originalWidth = packedWidth;
+			int originalHeight = packedHeight;
+			
+			s += "xy: " + regionX + ", " + regionY + nl;
+			s += "size: " + packedWidth + ", " + packedHeight + nl;
+			s += "orig: " + originalWidth + ", " + originalHeight + nl;
+			s += "offset: " + ((int)r.offsetX) + ", " + ((int)r.offsetY) + nl;
+			s += "index: " + r.index + nl;
+		}
+		
+		handle = handle.sibling(handle.nameWithoutExtension() + ".atlas");
+		handle = Gdx.files.local(handle.path());
+		
+		handle.writeString(s, false);
+	}
+	
+	public TextureAtlas loadAtlas(FileHandle handle)
+	{
+		handle = handle.sibling(handle.nameWithoutExtension() + ".atlas");
+		handle = Gdx.files.local(handle.path());
+		
+		atlas = new TextureAtlas(handle);
+		
+		return atlas;
+	}
+	
+	public TextureAtlas getAtlas()
+	{
+		return atlas;
 	}
 	
 	public boolean isPC98()

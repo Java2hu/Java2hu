@@ -37,6 +37,11 @@ public class MovementAnimation extends StartupLoopAnimation
 		this(new Array<TextureRegion>(wind.getKeyFrames()), new Array<TextureRegion>(loop.getKeyFrames()), flip(wind), timePerFrame);
 	}
 	
+	public Array<TextureRegion> getEndFrames()
+	{
+		return endFrames;
+	}
+	
 	private static Array<TextureRegion> flip(Animation ani)
 	{
 		Array<TextureRegion> end = new Array<TextureRegion>();

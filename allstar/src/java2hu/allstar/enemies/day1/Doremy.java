@@ -349,7 +349,9 @@ public class Doremy extends AllStarBoss
 			
 			tick -= waitPeriod;
 			
-			if(tick % 900 < 700)
+			final float fullRotationTicks = 700f;
+			
+			if(tick % 900 < (fullRotationTicks - 10))
 			{
 				if(tick % 900 == 0)
 				{
@@ -363,10 +365,8 @@ public class Doremy extends AllStarBoss
 					TouhouSounds.Enemy.RELEASE_1.play(0.3f);
 				}
 
-				if(rotationTick % 6 == 0)
+				if(rotationTick % 5 == 0)
 				{
-					final float fullRotationTicks = 700f;
-
 					float rotationMul = ((rotationTick % fullRotationTicks / fullRotationTicks)) * 4f;
 
 					ThBulletColor color = ThBulletColor.PURPLE;
@@ -376,6 +376,8 @@ public class Doremy extends AllStarBoss
 						rotationMul = 4f - rotationMul;
 						color = ThBulletColor.BLUE;
 					}
+					
+					float revertRotationMul = 4f - rotationMul;
 
 					final float offsetAngle = rotationMul * 360f * 2f;
 
@@ -392,13 +394,13 @@ public class Doremy extends AllStarBoss
 
 							float finalAngleMul = offsetAngle / 360f / 2f;
 
-							Bullet bullet = new Bullet(new ThBullet(ThBulletType.ORB_LARGE, color), (float) (boss.getX() + (Math.cos(finalRad) * (50 + (100 * rotationMul)))), (float) (boss.getY() + (Math.sin(finalRad) * (50 + (100 * rotationMul)))));
+							Bullet bullet = new Bullet(new ThBullet(ThBulletType.BALL_BIG, color), (float) (boss.getX() + (Math.cos(finalRad) * (50 + (100 * rotationMul)))), (float) (boss.getY() + (Math.sin(finalRad) * (50 + (100 * rotationMul)))));
 
 							bullet.setZIndex((int) (bullet.getZIndex() + rotationTick));
 							
-							bullet.setScale(0.5f);
+							bullet.setScale(0.4f + (revertRotationMul * 0.15f));
 							
-							bullet.setGlowing();
+//							bullet.setGlowing();
 							
 							float speed = (200f + (200f * rotationMul));
 

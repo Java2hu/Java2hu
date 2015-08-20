@@ -3,18 +3,16 @@ package java2hu.object.bullet.phase;
 import java2hu.Game;
 import java2hu.J2hGame;
 import java2hu.object.StageObject;
-import java2hu.object.UpdateObject;
 import java2hu.object.bullet.Bullet;
 import java2hu.util.Duration;
 import java2hu.util.Getter;
-import java2hu.util.MathUtil;
 
 import com.badlogic.gdx.graphics.g2d.Sprite;
 
 /**
  * A phase animation that scales up or down and turns alpha over a specific time
  */
-public class ScaleAlphaPhaseAnimation extends UpdateObject implements PhaseAnimation
+public class ScaleAlphaPhaseAnimation extends StageObject implements PhaseAnimation
 {
 	public ScaleAlphaPhaseAnimation(final Bullet bullet)
 	{
@@ -30,6 +28,7 @@ public class ScaleAlphaPhaseAnimation extends UpdateObject implements PhaseAnima
 	
 	public ScaleAlphaPhaseAnimation(Getter<Sprite> getter, StageObject owner)
 	{
+		super(owner.getX(), owner.getY());
 		this.getter = getter;
 		this.owner = owner;
 		
@@ -61,7 +60,7 @@ public class ScaleAlphaPhaseAnimation extends UpdateObject implements PhaseAnima
 		
 		scaleDecreaseX = (targetScaleX - scaleX) / time;
 		scaleDecreaseY = (targetScaleY - scaleY) / time;
-		alphaIncrease = (float) (MathUtil.getDifference(alpha, targetAlpha) / time);
+		alphaIncrease = (targetAlpha - alpha) / time;
 		
 		createTick = game.getTick();
 		
@@ -78,8 +77,6 @@ public class ScaleAlphaPhaseAnimation extends UpdateObject implements PhaseAnima
 	@Override
 	public void onDraw()
 	{
-		game.batch.setBlendFunction(getBlendFuncSrc(), getBlendFuncDst());
-		
 		J2hGame g = Game.getGame();
 		
 		Sprite s = getter.get();
@@ -91,8 +88,6 @@ public class ScaleAlphaPhaseAnimation extends UpdateObject implements PhaseAnima
 		current.setAlpha(Math.min(Math.max(alpha, 0), 1));
 
 		current.draw(g.batch);
-		
-		game.batch.setBlendFunction(owner.getBlendFuncSrc(), owner.getBlendFuncDst());
 	}
 
 	@Override
@@ -248,5 +243,17 @@ public class ScaleAlphaPhaseAnimation extends UpdateObject implements PhaseAnima
 	public boolean hasHitbox()
 	{
 		return hasHitbox;
+	}
+
+	@Override
+	public float getWidth()
+	{
+		return getter.get().getWidth();
+	}
+
+	@Override
+	public float getHeight()
+	{
+		return getter.get().getHeight();
 	}
 }

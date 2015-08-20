@@ -206,33 +206,28 @@ public abstract class StageObject extends J2hObject implements IPosition
 			{ 
 				Iterator<Disposable> it = disposables.iterator();
 				
+				int i = 0;
+				
 				while(it.hasNext())
 				{
-					Disposable disp = it.next();
+					final Disposable disp = it.next();
 					
-					try
+					Game.getGame().addTask(new Runnable()
 					{
-						disp.dispose();
-						
-						it.remove();
-					}
-					catch(Exception e)
-					{
-						// If an error has presented itself, don't remove it from the list and dispose of this in the main thread instead.
-					}
-				}
-				
-				Game.getGame().addTask(new Runnable()
-				{
-					@Override
-					public void run()
-					{
-						for(Disposable disp : disposables)
+						@Override
+						public void run()
 						{
-							disp.dispose();
+							try
+							{
+								disp.dispose();
+							}
+							catch(Exception e)
+							{
+								e.printStackTrace();
+							}
 						}
-					}
-				}, 0);
+					}, i + 2);
+				}
 			}
 		});
 	}
@@ -641,9 +636,6 @@ public abstract class StageObject extends J2hObject implements IPosition
 		if(!isOnStage())
 			return;
 		
-		if(getOwnedBy() == null)
-			game.batch.setBlendFunction(SRC, DST);
-		
 		for(Entry<StageObject, OwnedObjectData> owned : ownedObjects.entrySet())
 		{
 			if(owned.getValue().drawAfter)
@@ -661,9 +653,6 @@ public abstract class StageObject extends J2hObject implements IPosition
 			
 			owned.getKey().draw();
 		}
-		
-		if(getOwnedBy() == null)
-			game.batch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
 	}
 	
 	/**

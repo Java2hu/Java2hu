@@ -189,7 +189,7 @@ public class Seiran extends AllStarBoss
 				double x = Math.cos(rad) * (number * spreadSpeed);
 				double y = Math.sin(rad) * (number * spreadSpeed);
 				
-				final Bullet bullet = new ReflectingBullet(new ThBullet(ThBulletType.BULLET, color).getAnimation(), color.getColor(), (float)(this.getX() + x), (float)(this.getY() + y), reflectTimes)
+				final Bullet bullet = new ReflectingBullet(new ThBullet(ThBulletType.BULLET, color).getAnimation(), color.getColor(), (float)(this.getX() + x - 50), (float)(this.getY() + y + 40), reflectTimes)
 				{
 					{
 						this.setBullet(type);

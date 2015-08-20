@@ -159,7 +159,7 @@ public class BackgroundBossAura extends DrawObject
 				getShader().setUniformf("pos" + (i + 1), set);
 			}
 			
-			getShader().setUniformf("time", game.getElapsedTime() * 0.3f);
+			getShader().setUniformf("time", game.getTotalElapsedTime() * 0.3f);
 		}
 		
 		game.batch.flush();

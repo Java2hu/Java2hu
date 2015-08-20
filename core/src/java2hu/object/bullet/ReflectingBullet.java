@@ -35,6 +35,13 @@ public class ReflectingBullet extends Bullet
 		
 		setMaxReflectTimes(maxReflectTimes);
 	}
+	
+	public ReflectingBullet(IBulletType type, float x, float y, int maxReflectTimes)
+	{
+		super(type, x, y);
+		
+		setMaxReflectTimes(maxReflectTimes);
+	}
 
 	public int getReflectTimes()
 	{

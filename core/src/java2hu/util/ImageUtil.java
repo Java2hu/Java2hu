@@ -8,6 +8,9 @@ import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.ScreenUtils;
 
@@ -53,5 +56,27 @@ public class ImageUtil extends J2hObject
 		final Sprite screen = new Sprite(new Texture(captureScreenPixmap(b)));
 
 		return screen;
+	}
+	
+	/**
+	 * Adds an image to the specified TextureAtlas, while reserving flip.
+	 */
+	public static void addToTextureAtlas(TextureAtlas atlas, String name, TextureRegion r)
+	{
+		AtlasRegion reg = atlas.addRegion(name, r);
+		
+		if(r.isFlipX())
+		{
+			reg.offsetX += reg.originalWidth;
+			reg.originalWidth = -reg.originalWidth;
+			reg.packedWidth = reg.originalWidth;
+		}
+		
+		if(r.isFlipY())
+		{
+			reg.offsetY += reg.originalHeight;
+			reg.originalHeight = -reg.originalHeight;
+			reg.packedHeight = reg.originalHeight;
+		}
 	}
 }

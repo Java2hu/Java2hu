@@ -704,7 +704,7 @@ public class Sekibanki extends AllStarBoss
 								if(!atBoss)
 									newModifier = 0.0001f;
 								
-								setDirectionDegTick((float) (direction + Math.sin((((game.getElapsedTime() % 10f) - 5) / 5f) * Math.PI * 2) * newModifier * 20f), speed);
+								setDirectionDegTick((float) (direction + Math.sin((((game.getTotalElapsedTime() % 10f) - 5) / 5f) * Math.PI * 2) * newModifier * 20f), speed);
 							}
 							
 							@Override

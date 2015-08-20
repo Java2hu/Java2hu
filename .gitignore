@@ -42,6 +42,7 @@ allstar/3d scenes/*
 allstar/src/music/*
 */bin/*
 core/assets/*
+core/assets/sprites/bullets/bullet1.png
 
 # Intellij IDEA (see https://intellij-support.jetbrains.com/entries/23393067)
 .idea/workspace.xml

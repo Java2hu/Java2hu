@@ -743,19 +743,6 @@ public class Wakasagihime extends AllStarBoss
 							public void onDraw()
 							{
 								super.onDraw();
-								
-//								if(hasHitbox())
-//								{
-//									Game.getGame().batch.end();
-//									
-//									Game.getGame().shape.begin(ShapeType.Line);
-//									
-//									HitboxUtil.drawHitbox(getCurrentSprite().getHitbox());
-//									
-//									Game.getGame().shape.end();
-//									
-//									Game.getGame().batch.begin();
-//								}
 							}
 							
 							@Override
@@ -770,7 +757,7 @@ public class Wakasagihime extends AllStarBoss
 							@Override
 							public boolean doDelete()
 							{
-								if(color < 0)
+								if(color < 0 || getTicksAlive() < 100)
 									return false;
 								
 								return super.doDelete();

@@ -159,7 +159,7 @@ public class Gengetsu extends AllStarBoss
 		if(lastX != x || lastY != y)
 		{
 			if(!warp)
-				warpStartTime = game.getElapsedTime();
+				warpStartTime = game.getTotalElapsedTime();
 			
 			warp = true;
 		}
@@ -197,7 +197,7 @@ public class Gengetsu extends AllStarBoss
 
 			game.batch.setShader(prog);
 			
-			float deltaT = (game.getElapsedTime() - warpStartTime) / 3f;
+			float deltaT = (game.getTotalElapsedTime() - warpStartTime) / 3f;
 
 			System.out.println(deltaT);
 			

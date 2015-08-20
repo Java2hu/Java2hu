@@ -40,6 +40,7 @@ import java2hu.util.Setter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
@@ -89,7 +90,7 @@ public class Ringo extends AllStarBoss
 		bgm.setLooping(true);
 		
 		setAuraColor(AllStarUtil.from255RGB(104, 19, 52).mul(6f));
-		setBgAuraColor(AllStarUtil.from255RGB(40, 40, 40));
+		setBgAuraColor(Color.RED);
 		
 		set(nameTag, bgm);
 		set(fbs, idle, left, right, special);

@@ -1,39 +1,42 @@
 package java2hu.object.bullet.phase;
 
 import java2hu.object.bullet.Bullet;
+import java2hu.system.SaveableObject;
 import java2hu.touhou.bullet.ThBullet;
 import java2hu.touhou.bullet.ThBulletColor;
 import java2hu.touhou.bullet.ThBulletType;
 import java2hu.util.Duration;
-import java2hu.util.Duration.Unit;
 import java2hu.util.Getter;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Sprite;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Polygon;
 import com.badlogic.gdx.math.Rectangle;
 
 public class TouhouSpawnAnimation extends AnimationPhaseAnimation
 {
-	private static Animation getAnimation(Color color)
+	private static Animation getAnimation(Bullet bullet)
 	{
-		Animation ani = new ThBullet(ThBulletType.ORB_MEDIUM, ThBulletColor.WHITE).getAnimation();
-		
-		for(TextureRegion r : ani.getKeyFrames())
+		if(bullet.getType() instanceof ThBullet)
 		{
-			Sprite s = (Sprite)r;
-			
-			s.setColor(color);
+			Animation ani = new ThBullet(ThBulletType.ORB_MEDIUM, ((ThBullet)bullet.getType()).getBulletColor().getBreakAnimationColor()).getAnimation();
+
+			return ani;
 		}
-		
-		return ani;
+		else
+		{
+			Animation ani = new ThBullet(ThBulletType.ORB_MEDIUM, ThBulletColor.getClosest(ThBulletColor.POSSIBLE_SPAWN, bullet.getType().getEffectColor())).getAnimation();
+
+			return ani;
+		}
 	}
 	
 	public TouhouSpawnAnimation(Bullet bullet)
 	{
-		super(bullet, getAnimation(bullet.getDeletionColor()), Duration.seconds(0.3f));
+		super(bullet, getAnimation(bullet), Duration.seconds(0.25f));
+		
+		setBlendFunc(bullet.getBlendFuncSrc(), bullet.getBlendFuncDst());
 	}
 	
 	@Override
@@ -43,9 +46,11 @@ public class TouhouSpawnAnimation extends AnimationPhaseAnimation
 		
 		data.drawAfter = true;
 		
-		animationPlaying = false;
+		if(bullet.getTicksAlive() < 20)
+			animationPlaying = true;
 		
 		createTick = game.getTick();
+		
 		bullet.addOwnedObject(this, data);
 		
 		final Sprite current = (Sprite) this.ani.getKeyFrame(getTicksAlive());
@@ -53,36 +58,58 @@ public class TouhouSpawnAnimation extends AnimationPhaseAnimation
 		Polygon hitbox = bullet.getHitbox();
 		Rectangle rect = hitbox != null ? hitbox.getBoundingRectangle() : current.getBoundingRectangle();
 
-		final float modifier = 2f;
+		final float modifier = 3f;
 		float width = rect.getWidth() * modifier;
 		float height = rect.getHeight() * modifier;
 		
-		float scaleX = width / current.getWidth();
-		float scaleY = height / current.getHeight();
+		final float scaleX = width / current.getWidth();
+		final float scaleY = height / current.getHeight();
 		
-//		current.setBounds(bullet.getX() - width / 2f, bullet.getY() - height / 2f, width, height);
 		current.setScale(scaleX, scaleY);
+		current.setRotation(bullet.getRotationDeg());
 		
 		current.setOriginCenter();
-		current.setColor(bullet.getDeletionColor().cpy().mul(2f));
+		
+		Color c = bullet.getDeletionColor().cpy();
+		
+		float min = Math.min(c.g, Math.min(c.r, c.b));
+		c.r -= min;
+		c.g -= min;
+		c.b -= min;
+		
+		float mul = 0.8f;
+		float start = (1f - mul) + 0.3f;
+		
+		Color color = new Color(start + (c.r * mul), start + (c.g * mul), start + (c.b * mul), 0f);
+		
+		current.setColor(color);
 		current.setAlpha(1f);
 		
-		ScaleAlphaPhaseAnimation ani = new ScaleAlphaPhaseAnimation(new Getter<Sprite>()
+		final SaveableObject<ScaleAlphaPhaseAnimation> sani = new SaveableObject<ScaleAlphaPhaseAnimation>();
+		
+		Getter<Sprite> getter = new Getter<Sprite>()
 		{
 			@Override
 			public Sprite get()
 			{
-				int min = 2;
+				Sprite current = (Sprite) ani.getKeyFrame(getTicksAlive());
 				
-				double mul = 1f * ((getTicksAlive() - min) / time.getValue(Unit.TICK));
+				int over = 5;
 				
-				if(getTicksAlive() <= min)
+				int ticks = (int) ((time.toTicks() - over) - getTicksAlive());
+				
+				double mul = 1f - (ticks <= 0 ? -(float)ticks / over : 0f);
+				
+				ScaleAlphaPhaseAnimation ani = sani.getObject();
+				
+				if(ani == null)
+					return current;
+				
+				if(ticks <= 0)
 				{
-					mul = 0f;
+					animationPlaying = false;
+					ani.setAlpha((float) Math.max(0, mul));
 				}
-				
-//				current.setAlpha((float) (targetAlpha - (targetAlpha * mul)));
-				bullet.setAlpha(targetAlpha * (float) mul);
 				
 				current.setPosition(bullet.getX() - current.getWidth() / 2f, bullet.getY() - current.getHeight() / 2f);
 				
@@ -92,14 +119,19 @@ public class TouhouSpawnAnimation extends AnimationPhaseAnimation
 				
 				return current;
 			}
-		}, bullet);
+		};
 		
-		ani.setGlowing();
+		final ScaleAlphaPhaseAnimation ani = new ScaleAlphaPhaseAnimation(getter, bullet);
+		
+		sani.setObject(ani);
 		
 		ani.setTime(time);
-		ani.setAddedScale(2f);
-		ani.setAlpha(0f);
+		ani.setAddedScale(scaleX * 3f, scaleY * 3f);
+		ani.setAlpha(-0.1f);
 		ani.start();
+		
+		bullet.removeOwnedObject(ani);
+		bullet.addOwnedObject(ani, data);
 	}
 	
 	@Override

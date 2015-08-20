@@ -18,8 +18,6 @@ import com.badlogic.gdx.graphics.VertexAttribute;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g3d.utils.MeshBuilder;
-import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder.VertexInfo;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Matrix4;
@@ -146,7 +144,13 @@ public class LaserDrawer extends Bullet
 	@Override
 	public void deleteAnimation()
 	{
-
+		for(Position p : getPoints())
+		{
+			if(Float.isNaN(p.getX()) || Float.isNaN(p.getY()))
+				continue;
+			
+			spawnSwirl(p, false);
+		}
 	}
 	
 	@Deprecated
@@ -181,7 +185,7 @@ public class LaserDrawer extends Bullet
 
 			Texture texture = textures.getCurrentTexture(Game.getGame().getTick());
 
-			texture.setFilter(TextureFilter.MipMapLinearNearest, TextureFilter.Nearest);
+			texture.setFilter(TextureFilter.Nearest, TextureFilter.Nearest);
 
 			Matrix4 combined = new Matrix4().set(Game.getGame().camera.camera.combined);
 
@@ -194,7 +198,7 @@ public class LaserDrawer extends Bullet
 			Gdx.graphics.getGL20().glEnable(GL20.GL_TEXTURE_2D);
 			Gdx.graphics.getGL20().glActiveTexture(GL20.GL_TEXTURE0);
 
-			mesh.render(sp, GL20.GL_TRIANGLES);
+			mesh.render(sp, 7 /* Quads */);
 
 			sp.end();
 
@@ -330,7 +334,30 @@ public class LaserDrawer extends Bullet
 		return mesh;
 	}
 	
-	private MeshBuilder meshBuilder = new MeshBuilder();
+	private class MeshData
+	{
+		public double x;
+		public double y;
+		
+		public double u;
+		public double v;
+		
+		public MeshData setPos(double x, double y)
+		{
+			this.x = x;
+			this.y = y;
+			
+			return this;
+		}
+		
+		public MeshData setUV(double u, double v)
+		{
+			this.u = u;
+			this.v = v;
+			
+			return this;
+		}
+	}
 	
 	public LaserData makeLaserMeshVertices()
 	{
@@ -363,8 +390,8 @@ public class LaserDrawer extends Bullet
 		
 		for(ArrayList<Position> sectionPoints : laserSections)
 		{
-			float totalDistance = 0;
-			float currentDistance = 0;
+			double totalDistance = 0;
+			double currentDistance = 0;
 			
 			for(int i = 0; i < sectionPoints.size() - 1; i++)
 			{
@@ -376,15 +403,17 @@ public class LaserDrawer extends Bullet
 				totalDistance += distance;
 			}
 			
-			VertexInfo lastP11 = null;
-			VertexInfo lastP10 = null;
+			MeshData lastP11 = null;
+			MeshData lastP10 = null;
 			
-			VertexInfo lastH11 = null;
-			VertexInfo lastH10 = null;
+			MeshData lastH11 = null;
+			MeshData lastH10 = null;
 			
 			// Cant make a section that's so small...
 			if(sectionPoints.size() < 2)
 				continue;
+			
+			double lastAngle = 0;
 			
 			for(int i = 0; i < sectionPoints.size() - 1; i++)
 			{
@@ -394,6 +423,17 @@ public class LaserDrawer extends Bullet
 				double distance = MathUtil.getDistance(p1, p2);
 				
 				double angle = MathUtil.getAngle(p1, p2);
+				
+				if(Double.isNaN(angle))
+				{
+					angle = lastAngle;
+					distance = 0;
+				}
+				else
+				{
+					lastAngle = angle;
+				}
+				
 				double angleLeft = angle + 90f;
 				double angleRight = angle - 90f;
 
@@ -403,81 +443,80 @@ public class LaserDrawer extends Bullet
 				double sinLeft = fastSin(angleLeft);
 				double sinRight = fastSin(angleRight);
 				
-				float U1 = currentDistance / totalDistance;
-				float U2 = (float) ((currentDistance + distance) / totalDistance);
+				double U1 = currentDistance / totalDistance;
+				double U2 = ((currentDistance + distance) / totalDistance);
 
-				VertexInfo p00 = null;
+				MeshData p00 = null;
 				
 				if(lastP10 == null)
-					p00 = new VertexInfo().setPos((float) (p1.getX() + cosLeft * getThickness()), 0, (float) (p1.getY() + sinLeft * getThickness())).setUV(U1, 0);
+					p00 = new MeshData().setPos((p1.getX() + cosLeft * getThickness()), (p1.getY() + sinLeft * getThickness())).setUV(U1, 0);
 				else
 					p00 = lastP10.setUV(U1, 0);
 				
-				VertexInfo p01 = null;
+				MeshData p01 = null;
 				
 				if(lastP11 == null)
-					p01 = new VertexInfo().setPos((float) (p1.getX() + cosRight * getThickness()), 0, (float) (p1.getY() + sinRight * getThickness())).setUV(U1, 1);
+					p01 = new MeshData().setPos((p1.getX() + cosRight * getThickness()), (p1.getY() + sinRight * getThickness())).setUV(U1, 1);
 				else
 					p01 = lastP11.setUV(U1, 1);
 				
-				VertexInfo p11 = new VertexInfo().setPos((float) (p2.getX() + cosRight * getThickness()), 0, (float) (p2.getY() + sinRight * getThickness())).setUV(U2, 1);
-				VertexInfo p10 = new VertexInfo().setPos((float) (p2.getX() + cosLeft * getThickness()), 0, (float) (p2.getY() + sinLeft * getThickness())).setUV(U2, 0);
+				MeshData p11 = new MeshData().setPos((p2.getX() + cosRight * getThickness()), (p2.getY() + sinRight * getThickness())).setUV(U2, 1);
+				MeshData p10 = new MeshData().setPos((p2.getX() + cosLeft * getThickness()), (p2.getY() + sinLeft * getThickness())).setUV(U2, 0);
 
 				lastP11 = p11;
 				lastP10 = p10;
 				
-				VertexInfo h00 = null;
+				MeshData h00 = null;
 				
 				if(lastH10 == null)
-					h00 = new VertexInfo().setPos((float) (p1.getX() + cosLeft * getHitboxThickness()), 0, (float) (p1.getY() + sinLeft * getHitboxThickness()));
+					h00 = new MeshData().setPos((p1.getX() + cosLeft * getHitboxThickness()), (p1.getY() + sinLeft * getHitboxThickness()));
 				else
 					h00 = lastH10;
 				
-				VertexInfo h01 = null;
+				MeshData h01 = null;
 				
 				if(lastH11 == null)
-					h01 = new VertexInfo().setPos((float) (p1.getX() + cosRight * getHitboxThickness()), 0, (float) (p1.getY() + sinRight * getHitboxThickness()));
+					h01 = new MeshData().setPos((p1.getX() + cosRight * getHitboxThickness()), (p1.getY() + sinRight * getHitboxThickness()));
 				else
 					h01 = lastH11;
 				
-				VertexInfo h11 = new VertexInfo().setPos((float) (p2.getX() + cosRight * getHitboxThickness()), 0, (float) (p2.getY() + sinRight * getHitboxThickness()));
-				VertexInfo h10 = new VertexInfo().setPos((float) (p2.getX() + cosLeft * getHitboxThickness()), 0, (float) (p2.getY() + sinLeft * getHitboxThickness()));
+				MeshData h11 = new MeshData().setPos((p2.getX() + cosRight * getHitboxThickness()), (p2.getY() + sinRight * getHitboxThickness()));
+				MeshData h10 = new MeshData().setPos((p2.getX() + cosLeft * getHitboxThickness()), (p2.getY() + sinLeft * getHitboxThickness()));
 
 				lastH11 = h11;
 				lastH10 = h10;
 				
-				VertexInfo[] info = { 
-						p00, p01, p11, // Triangle 1
-						p11, p10, p00, // Triangle 2
+				MeshData[] info = { 
+						p00, p01, p11, p10, // Quad
 						};
 				
-				VertexInfo[] forward = { 
+				MeshData[] forward = { 
 						h00, h10
 						};
 				
-				VertexInfo[] back = { 
+				MeshData[] back = { 
 						h01, h11
 						};
 				
-				for(VertexInfo v : info)
+				for(MeshData v : info)
 				{
-					mesh.add(v.position.x);
-					mesh.add(v.position.z);
+					mesh.add((float) v.x);
+					mesh.add((float) v.y);
 					
 					mesh.add(color.toFloatBits());
 					
-					mesh.add(v.uv.y);
-					mesh.add(v.uv.x);
+					mesh.add((float) v.v);
+					mesh.add((float) v.u);
 				}
 				
-				for(VertexInfo h : forward)
+				for(MeshData h : forward)
 				{
-					hitboxForward.add(new Position(h.position.x, h.position.z));
+					hitboxForward.add(new Position(h.x, h.y));
 				}
 				
-				for(VertexInfo h : back)
+				for(MeshData h : back)
 				{
-					hitboxBackward.add(new Position(h.position.x, h.position.z));
+					hitboxBackward.add(new Position(h.x, h.y));
 				}
 				
 				currentDistance += distance;
@@ -533,12 +572,22 @@ public class LaserDrawer extends Bullet
 	
 	public double fastSin(double degree)
 	{
-		return MathUtil.fastSin(degree);
+		boolean fast = true;
+		
+		if(fast)
+			return MathUtil.fastSin(degree);
+		
+		return Math.sin(Math.toRadians(degree));
 	}
 	
 	public double fastCos(double degree)
 	{
-		return MathUtil.fastCos(degree);
+		boolean fast = true;
+		
+		if(fast)
+			return MathUtil.fastCos(degree);
+		
+		return Math.cos(Math.toRadians(degree));
 	}
 	
 	public float getHitboxThickness()

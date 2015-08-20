@@ -7,6 +7,7 @@ import java2hu.object.bullet.LaserDrawer.LaserAnimation;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.utils.Array;
@@ -101,6 +102,12 @@ public class ThLaser implements ILaserType
 	public float getHitboxThickness()
 	{
 		return type.getHitboxThickness();
+	}
+
+	@Override
+	public Color getColor()
+	{
+		return color.getColor();
 	}
 	
 }

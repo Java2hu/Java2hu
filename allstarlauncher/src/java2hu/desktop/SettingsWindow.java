@@ -317,7 +317,6 @@ public class SettingsWindow extends JFrame
 		panel_2.add(samplesField);
 		
 		JLabel lblSamplesIsThe = new JLabel("Samples is the amount of anti aliasing will be done, 4x is recommended.");
-		lblSamplesIsThe.setEnabled(false);
 		lblSamplesIsThe.setFont(new Font("Calibri", Font.BOLD, 12));
 		panel_2.add(lblSamplesIsThe);
 		
@@ -439,6 +438,15 @@ public class SettingsWindow extends JFrame
 		
 		JButton btnReset = new JButton("RESET");
 		btnReset.setToolTipText(viewportMessage);
+		btnReset.addActionListener(new ActionListener()
+		{
+			@Override
+			public void actionPerformed(ActionEvent arg0)
+			{
+				viewportWidth.setText("1280");
+				viewportHeight.setText("960");
+			}
+		});
 		panel_4.add(btnReset);
 		
 		JPanel panel_5 = new JPanel();
@@ -559,10 +567,15 @@ public class SettingsWindow extends JFrame
 		settings.height = Integer.parseInt(heightField.getText());
 		settings.viewportWidth = Integer.parseInt(viewportWidth.getText());
 		settings.viewportHeight = Integer.parseInt(viewportHeight.getText());
-		settings.samples = 0;//Integer.parseInt(samplesField.getText());
+		settings.samples = Integer.parseInt(samplesField.getText());
 		settings.fullScreen = fullScreenCheckBox.isSelected();
 		settings.showAtStartup = showOnStartCheckBox.isSelected();
 		settings.fps = Integer.parseInt(fpsField.getText());
+		
+		if(settings.fps < 60)
+		{
+			JOptionPane.showMessageDialog(null, "The game requires at least 60 fps to work correctly, any less and the game will skip updates and look very laggy.");
+		}
 		
 		String json = gson.toJson(settings);
 		
@@ -594,10 +607,11 @@ public class SettingsWindow extends JFrame
 		config.vSyncEnabled = false;
 		config.backgroundFPS = 60;
 		config.foregroundFPS = Integer.parseInt(fpsField.getText());
+		config.allowSoftwareMode = true;
 		
 		System.out.println("Starting game with \n Width: " + config.width + " - Height: " + config.height + " (" + config.width + "x" + config.height + " @ " + viewportWidth.getText() + "x" + viewportHeight.getText() + "\n Samples: " + config.samples + "x  -  Fullscreen: " + config.fullscreen);
 		
-		config.audioDeviceSimultaneousSources = 1000000;
+		config.audioDeviceSimultaneousSources = 1000;
 		
 		new LwjglApplication(new AllStarGame(Integer.parseInt(viewportWidth.getText()), Integer.parseInt(viewportHeight.getText()))
 		{

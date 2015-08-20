@@ -38,7 +38,10 @@ import java2hu.spellcard.Spellcard;
 import java2hu.touhou.font.TouhouFont;
 import java2hu.touhou.sounds.TouhouSounds;
 import java2hu.util.Duration;
+import java2hu.util.Duration.Unit;
 import java2hu.util.HitboxUtil;
+import java2hu.util.InfluencableNumber;
+import java2hu.util.InfluencableNumber.Manipulator;
 import java2hu.util.MathUtil;
 import java2hu.util.Scheduler;
 import java2hu.util.Setter;
@@ -52,6 +55,7 @@ import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.BitmapFont.TextBounds;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -354,6 +358,12 @@ public class J2hGame extends ApplicationAdapter implements InputProcessor
 	}
 	
 	private RenderSet<Bullet> bullets = new RenderSet<Bullet>();
+	
+	/**
+	 * Bullet cap, no bullets get spawned beyond this count.
+	 * This is to ensure performance.
+	 */
+	public static final int BULLET_CAP = 2000;
 	
 	public void spawn(Bullet object)
 	{
@@ -859,6 +869,13 @@ public class J2hGame extends ApplicationAdapter implements InputProcessor
 	private boolean canSpawn(StageObject obj)
 	{
 		ObjectSpawnEvent event = new ObjectSpawnEvent(obj);
+		
+		if(obj instanceof Bullet)
+		{
+			if(bullets.size() > BULLET_CAP)
+				event.setCancelled(true);
+		}
+		
 		callEvent(event);
 		
 		boolean allowed = !event.isCancelled();
@@ -899,8 +916,8 @@ public class J2hGame extends ApplicationAdapter implements InputProcessor
 	private long tick = 0; // Game ticker
 	private long pauseTick = 0; // Pause ticker
 	
-	private float elapsedTime = 0; // Elapsed game time
-	private float pauseElapsedTime = 0; // Elapsed pause time
+	private float totalElapsedTime = 0; // Elapsed game time
+	private float totalPauseElapsedTime = 0; // Elapsed pause time
 	
 	private long internalTick = 0; // Pause ticker
 	private float internalElapsedTime = 0; // Elapsed pause time
@@ -1188,27 +1205,39 @@ public class J2hGame extends ApplicationAdapter implements InputProcessor
 		return TickType.GAME;
 	}
 	
-	public float getElapsedTime()
+	public float getTotalElapsedTime()
+	{
+		return totalElapsedTime;
+	}
+	
+	public float getTotalPauseElapsedTime()
+	{
+		return totalPauseElapsedTime;
+	}
+	
+	/**
+	 * While paused: Returns total elapsed pause time
+	 * While not paused: Returns total elapsed game time
+	 * @return
+	 */
+	public float getTotalActiveElapsedTime()
+	{
+		if(isPaused())
+			return getTotalPauseElapsedTime();
+		
+		return getTotalElapsedTime();
+	}
+	
+	private float elapsedTime;
+	
+	public float getDeltaTime()
 	{
 		return elapsedTime;
 	}
 	
-	public float getPauseElapsedTime()
+	public void setDeltaTime(float elapsedTime)
 	{
-		return pauseElapsedTime;
-	}
-	
-	/**
-	 * While paused: Returns elapsed pause time
-	 * While not paused: Returns elapsed game time
-	 * @return
-	 */
-	public float getActiveElapsedTime()
-	{
-		if(isPaused())
-			return getPauseElapsedTime();
-		
-		return getElapsedTime();
+		this.elapsedTime = elapsedTime;
 	}
 	
 	private boolean debugMode = false;
@@ -1243,7 +1272,7 @@ public class J2hGame extends ApplicationAdapter implements InputProcessor
 		if(!paused)
 		{
 			pauseTick = 0;
-			pauseElapsedTime = 0;
+			totalPauseElapsedTime = 0;
 
 			UnPauseGameEvent event = new UnPauseGameEvent();
 			callEvent(event);
@@ -1307,12 +1336,12 @@ public class J2hGame extends ApplicationAdapter implements InputProcessor
 		Game.singleton = this;
 		J2hObject.game = this;
 		
-		batch = new SpriteBatch();
+		batch = new SpriteBatch(500);
 		modelBatch = new ModelBatch();
 		
 		font = TouhouFont.get(16);
 		timerFont = TouhouFont.get(40);
-		shape = new ShapeRenderer(2000000);
+		shape = new ShapeRenderer(5000);
 		assets = new AssetManager();
 		asyncThread.start();
 		
@@ -1322,6 +1351,8 @@ public class J2hGame extends ApplicationAdapter implements InputProcessor
 		onLoadStart();
 		
 		Gdx.input.setInputProcessor(this);
+		
+		Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
 		
 		created = true;
 		
@@ -1462,7 +1493,7 @@ public class J2hGame extends ApplicationAdapter implements InputProcessor
 					startTime = System.nanoTime();
 
 				if(!isPaused() || object.isActiveDuringPause())
-					object.update(Gdx.graphics.getDeltaTime());
+					object.update(getDeltaTime());
 
 				if(profiling)
 					updateTimes.put(object, System.nanoTime() - startTime);
@@ -1486,7 +1517,7 @@ public class J2hGame extends ApplicationAdapter implements InputProcessor
 					startTime = System.nanoTime();
 
 				if(!isPaused() || bullet.isActiveDuringPause())
-					bullet.update(Gdx.graphics.getDeltaTime());
+					bullet.update(getDeltaTime());
 
 				if(profiling)
 					updateTimes.put(bullet, System.nanoTime() - startTime);
@@ -1730,7 +1761,7 @@ public class J2hGame extends ApplicationAdapter implements InputProcessor
 	public void drawStage()
 	{
 		if(transformation != null)
-			transformation.set(Gdx.graphics.getDeltaTime());
+			transformation.set(getDeltaTime());
 
 		ArrayList<StageObject> objects = new ArrayList<StageObject>();
 		objects.addAll(stageObjects);
@@ -1770,6 +1801,9 @@ public class J2hGame extends ApplicationAdapter implements InputProcessor
 		ShaderProgram shader = null;
 		FrameBuffer buffer = null;
 		
+		int SRC = GL20.GL_SRC_ALPHA;
+		int DST = GL20.GL_ONE_MINUS_SRC_ALPHA;
+		
 		FrameBuffer.unbind();
 		
 		for(StageObject object : objects)
@@ -1807,12 +1841,24 @@ public class J2hGame extends ApplicationAdapter implements InputProcessor
 					shader = newShader;
 				}
 				
+				boolean changeBlendFunc = object.getBlendFuncSrc() != SRC || object.getBlendFuncDst() != DST;
+				
+				if(changeBlendFunc)
+				{
+					SRC = object.getBlendFuncSrc();
+					DST = object.getBlendFuncDst();
+					
+					batch.setBlendFunction(SRC, DST);
+				}
+				
 				object.draw();
 
 				if(profiling)
 					drawTimes.put(object, System.nanoTime() - startTime);
 			}
 		}
+		
+		batch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
 		
 		batch.flush();
 		
@@ -2053,9 +2099,9 @@ public class J2hGame extends ApplicationAdapter implements InputProcessor
 	public static int currentTPS = 60;
 	
 	/**
-	 * Ticks per second while the user is holding down L-Control, used to speed up the game.
+	 * Time multiplier while the user is holding down L-Control, used to speed up the game.
 	 */
-	public static final int SPEED_LOGIC_TPS = 140;
+	public static final float SPEED_MULTIPLIER = 2f;
 	
 	/**
 	 * Default TPS
@@ -2064,12 +2110,31 @@ public class J2hGame extends ApplicationAdapter implements InputProcessor
 	
 	private float nextTick = 0; 
 	private float deltaSkip = 0;
+	
+	private InfluencableNumber<Double> timeMultiplier = new InfluencableNumber<Double>(1d);
+	
+	public InfluencableNumber<Double> getTimeMultiplier()
+	{
+		return timeMultiplier;
+	}
+	
+	{
+		timeMultiplier.manipulate(new Manipulator()
+		{
+			@Override
+			public Number manipulate(Number num)
+			{
+				if(!Gdx.input.isKeyPressed(Keys.CONTROL_LEFT))
+					return num;
+				
+				return num.doubleValue() * SPEED_MULTIPLIER;
+			}
+		});
+	}
 
 	@Override
 	public void render()
 	{
-//		currentTPS = Gdx.input.isKeyPressed(Keys.CONTROL_LEFT) ? SPEED_LOGIC_TPS : DEFAULT_LOGIC_TPS;
-	
 		if(profiling)
 		{
 			profilingOutput = new ArrayList<String>();
@@ -2091,16 +2156,20 @@ public class J2hGame extends ApplicationAdapter implements InputProcessor
 		batch.setProjectionMatrix(camera.camera.combined);
 		shape.setProjectionMatrix(camera.camera.combined);
 
+		final float deltaTime = Gdx.graphics.getDeltaTime() * timeMultiplier.floatValue();
+		
+		setDeltaTime(deltaTime);
+		
 		if(!isPaused())
 		{
-			elapsedTime += Gdx.graphics.getDeltaTime();
+			totalElapsedTime += deltaTime;
 		}
 		else
 		{
-			pauseElapsedTime += Gdx.graphics.getDeltaTime();
+			totalPauseElapsedTime += deltaTime;
 		}
 
-		internalElapsedTime += Gdx.graphics.getDeltaTime();
+		internalElapsedTime += deltaTime;
 
 		{
 			if(standardProjectionMatrix == null)
@@ -2128,7 +2197,7 @@ public class J2hGame extends ApplicationAdapter implements InputProcessor
 				drawDebugData();
 			}
 			
-			float secondsPerTick = 1f/currentTPS;
+			float secondsPerTick = (1f/currentTPS);
 			boolean updateLogic = false;
 			
 			if(internalElapsedTime > nextTick)
@@ -2138,7 +2207,7 @@ public class J2hGame extends ApplicationAdapter implements InputProcessor
 			else
 			{
 				double diff = MathUtil.getDifference(internalElapsedTime, nextTick);
-				double diffNext = MathUtil.getDifference(nextTick, internalElapsedTime + Gdx.graphics.getDeltaTime());
+				double diffNext = MathUtil.getDifference(nextTick, internalElapsedTime + deltaTime);
 				
 				if(diff < diffNext)
 				{
@@ -2146,42 +2215,52 @@ public class J2hGame extends ApplicationAdapter implements InputProcessor
 				}
 			}
 			
+			boolean skipDelta = false;
+			
 			if(updateLogic)
 			{
 				nextTick = nextTick + secondsPerTick;
 				
+				int ticks = 1;
+				
 				while(nextTick <= internalElapsedTime)
 				{
-					
-//					System.out.println("Frame skip!");
 					nextTick += secondsPerTick; // Skip frame
-					deltaSkip += secondsPerTick;
+					skipDelta = true;
+					ticks++;
 				}
 				
-				if(deltaSkip <= 0)
 				{
-					if(!isPaused())
-					{
-						tick++;
-					}
-					else
-					{
-						pauseTick++;
-					}
+					for(int i = 0; i < ticks; i++)
+					{	
+						if(!isPaused())
+						{
+							tick++;
+						}
+						else
+						{
+							pauseTick++;
+						}
 
-					internalTick++;
-					
-					updateStageLogic();
+						internalTick++;
+						
+						if(i != ticks - 1)
+						{
+							Duration dur = Duration.ticks(ticks - i);
+
+							for(StageObject obj : getStageObjects())
+							{
+								if(!isPaused() || obj.isActiveDuringPause())
+									obj.update((float)dur.getValue(Unit.SECOND));
+							}
+						}
+
+						updateStageLogic();
+					}
 				}
 			}
 			
-			if(deltaSkip > 0)
-			{
-				deltaSkip -= Gdx.graphics.getDeltaTime();
-				deltaSkip = Math.max(0, deltaSkip);
-			}
-			else
-				updateStageDelta();
+			updateStageDelta();
 
 			if(profiling && !isOutOfGame() && !isPaused())
 			{
@@ -2240,8 +2319,6 @@ public class J2hGame extends ApplicationAdapter implements InputProcessor
 			{
 				if(pauseMenu == null || pauseMenu != null && pauseMenu.canGoBackToGame())
 				{
-					System.out.println("Her");
-					
 					long diff = System.currentTimeMillis() - lastPause;
 					
 					if(diff > 100)
@@ -2465,8 +2542,6 @@ public class J2hGame extends ApplicationAdapter implements InputProcessor
 
 			if(Event.class.isAssignableFrom(clazz))
 			{
-				System.out.println(clazz);
-				
 				m.setAccessible(true);
 
 				if(!data.methodMap.containsKey(clazz))

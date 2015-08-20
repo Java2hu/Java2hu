@@ -1,0 +1,165 @@
+anm.png
+format: RGBA8888
+filter: MipMapLinearNearest,Nearest
+repeat: xy
+idle0
+rotate: false
+xy: 0, 0
+size: 128, 160
+orig: 128, 160
+offset: 0, 0
+index: -1
+idle1
+rotate: false
+xy: 128, 0
+size: 128, 160
+orig: 128, 160
+offset: 0, 0
+index: -1
+idle2
+rotate: false
+xy: 256, 0
+size: 128, 160
+orig: 128, 160
+offset: 0, 0
+index: -1
+idle3
+rotate: false
+xy: 384, 0
+size: 128, 160
+orig: 128, 160
+offset: 0, 0
+index: -1
+left_start0
+rotate: false
+xy: 0, 160
+size: 128, 160
+orig: 128, 160
+offset: 0, 0
+index: -1
+left_start1
+rotate: false
+xy: 128, 160
+size: 128, 160
+orig: 128, 160
+offset: 0, 0
+index: -1
+left_start2
+rotate: false
+xy: 256, 160
+size: 128, 160
+orig: 128, 160
+offset: 0, 0
+index: -1
+left_loop0
+rotate: false
+xy: 384, 160
+size: 128, 160
+orig: 128, 160
+offset: 0, 0
+index: -1
+left_end0
+rotate: false
+xy: 256, 160
+size: 128, 160
+orig: 128, 160
+offset: 0, 0
+index: -1
+left_end1
+rotate: false
+xy: 128, 160
+size: 128, 160
+orig: 128, 160
+offset: 0, 0
+index: -1
+left_end2
+rotate: false
+xy: 0, 160
+size: 128, 160
+orig: 128, 160
+offset: 0, 0
+index: -1
+right_start0
+rotate: false
+xy: 128, 160
+size: -128, 160
+orig: -128, 160
+offset: 128, 0
+index: -1
+right_start1
+rotate: false
+xy: 256, 160
+size: -128, 160
+orig: -128, 160
+offset: 128, 0
+index: -1
+right_start2
+rotate: false
+xy: 384, 160
+size: -128, 160
+orig: -128, 160
+offset: 128, 0
+index: -1
+right_loop0
+rotate: false
+xy: 512, 160
+size: -128, 160
+orig: -128, 160
+offset: 128, 0
+index: -1
+right_end0
+rotate: false
+xy: 384, 160
+size: -128, 160
+orig: -128, 160
+offset: 128, 0
+index: -1
+right_end1
+rotate: false
+xy: 256, 160
+size: -128, 160
+orig: -128, 160
+offset: 128, 0
+index: -1
+right_end2
+rotate: false
+xy: 128, 160
+size: -128, 160
+orig: -128, 160
+offset: 128, 0
+index: -1
+special0
+rotate: false
+xy: 0, 320
+size: 128, 160
+orig: 128, 160
+offset: 0, 0
+index: -1
+special1
+rotate: false
+xy: 128, 320
+size: 128, 160
+orig: 128, 160
+offset: 0, 0
+index: -1
+special2
+rotate: false
+xy: 256, 320
+size: 128, 160
+orig: 128, 160
+offset: 0, 0
+index: -1
+special3
+rotate: false
+xy: 128, 320
+size: 128, 160
+orig: 128, 160
+offset: 0, 0
+index: -1
+special4
+rotate: false
+xy: 0, 320
+size: 128, 160
+orig: 128, 160
+offset: 0, 0
+index: -1

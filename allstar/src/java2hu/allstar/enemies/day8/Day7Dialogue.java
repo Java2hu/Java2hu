@@ -22,7 +22,7 @@ import java2hu.util.PathUtil;
 
 import com.badlogic.gdx.Gdx;
 
-public class Day7Dialogue extends Getter<SpecialFlowScheme>
+public class Day7Dialogue implements Getter<SpecialFlowScheme>
 {
 	@Override
 	public SpecialFlowScheme get()
@@ -125,7 +125,7 @@ public class Day7Dialogue extends Getter<SpecialFlowScheme>
 
 				scheme.waitTicks(60);
 
-				game.addTaskGame(new Runnable()
+				Game.getGame().addTaskGame(new Runnable()
 				{
 					@Override
 					public void run()

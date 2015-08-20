@@ -162,7 +162,7 @@ public class Mokou extends AllStarBoss
 						phoenix.draw(game.batch);
 						
 						final float pulseTimeSeconds = 0.6f;
-						final float scaler = ((game.getElapsedTime() % pulseTimeSeconds) / pulseTimeSeconds) * 1.5f;
+						final float scaler = ((game.getTotalElapsedTime() % pulseTimeSeconds) / pulseTimeSeconds) * 1.5f;
 						float alpha = ((scaler > 1.25f ? (scaler - 1.25f) / 0.25f : 0f) * 1f);
 						
 						phoenix.setColor(2f, 0.5f, 0.5f, 0.5f + (alpha * -0.5f));

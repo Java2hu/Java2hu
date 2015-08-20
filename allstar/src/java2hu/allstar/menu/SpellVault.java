@@ -197,6 +197,15 @@ public class SpellVault extends AllStarMenu
 				};
 			}
 		});
+		
+//		addCard("Blaze it", new Getter<GameFlowScheme>()
+//		{
+//			@Override
+//			public GameFlowScheme get()
+//			{
+//				return new BlazeItScheme();
+//			}
+//		});
 			
 		TextBounds bound = botFont.getBounds("Exit");
 		

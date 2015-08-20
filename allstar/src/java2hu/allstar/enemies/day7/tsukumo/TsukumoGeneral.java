@@ -10,7 +10,7 @@ import java2hu.gameflow.GameFlowScheme.ReturnSyncTask;
 import java2hu.gameflow.GameFlowScheme.WaitConditioner;
 import java2hu.gameflow.SpecialFlowScheme;
 import java2hu.object.BGMPlayer;
-import java2hu.object.DrawObject;
+import java2hu.object.FreeStageObject;
 import java2hu.object.StageObject;
 import java2hu.object.bullet.Bullet;
 import java2hu.object.bullet.Laser;
@@ -191,8 +191,8 @@ public class TsukumoGeneral implements SpecialFlowScheme<AllStarStageScheme>
 		boss1.setHealth(boss1.getMaxHealth());
 		boss2.setHealth(boss2.getMaxHealth());
 		
-		final SaveableObject<DrawObject> circle1 = new SaveableObject<DrawObject>();
-		final SaveableObject<DrawObject> circle2 = new SaveableObject<DrawObject>();
+		final SaveableObject<FreeStageObject> circle1 = new SaveableObject<FreeStageObject>();
+		final SaveableObject<FreeStageObject> circle2 = new SaveableObject<FreeStageObject>();
 
 		Game.getGame().addTaskGame(new Runnable()
 		{
@@ -242,7 +242,7 @@ public class TsukumoGeneral implements SpecialFlowScheme<AllStarStageScheme>
 		});
 		
 		final AllStarBoss bossAlive = boss == boss1 ? boss2 : boss1;
-		final SaveableObject<DrawObject> circleDead = boss == boss2 ? circle2 : circle1;
+		final SaveableObject<FreeStageObject> circleDead = boss == boss2 ? circle2 : circle1;
 		final SaveableObject<CircleHealthBar> barDead = boss == boss2 ? barBoss2 : barBoss1;
 		
 		SchemeUtil.deathAnimation(scheme, boss, boss.getAuraColor());
@@ -597,7 +597,7 @@ public class TsukumoGeneral implements SpecialFlowScheme<AllStarStageScheme>
 				
 				for(int i = -10; i <= 10; i += 2)
 				{
-					Bullet bullet = new Bullet(new ThBullet(ThBulletType.NOTE_EIGHT, ThBulletColor.GREEN), yatsuhashi.getX(), yatsuhashi.getY());
+					Bullet bullet = new Bullet(new ThBullet(ThBulletType.NOTE_EIGHT, ThBulletColor.YELLOW), yatsuhashi.getX(), yatsuhashi.getY());
 					bullet.setDirectionDegTick(angle + i, 5f);
 					bullet.setZIndex(bullet.getZIndex() + i);
 					

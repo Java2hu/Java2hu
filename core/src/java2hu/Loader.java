@@ -64,7 +64,7 @@ public class Loader extends J2hObject
 			
 			standard.useMipMap = true;
 			standard.min = TextureFilter.MipMapLinearNearest;
-			standard.max = TextureFilter.MipMapLinearNearest;
+			standard.max = TextureFilter.Nearest;
 			
 			standard.u = TextureWrap.Repeat;
 			standard.v = TextureWrap.Repeat;

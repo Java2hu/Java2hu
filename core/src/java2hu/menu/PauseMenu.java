@@ -15,6 +15,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.ScreenUtils;
 
@@ -67,15 +68,21 @@ public class PauseMenu extends Menu
 		
 		final Sprite bgText = new Sprite(ScreenUtils.getFrameBufferTexture((int)(xOffset + b.x), (int)(yOffset + b.y), (int)(b.width * xMul), (int)(b.height * yMul)));
 		
-		bgText.setAlpha(0f);
+		bgText.setColor(1f, 1f, 1f, 0f);
 		
 		fakeBg = new DrawObject()
 		{
 			@Override
 			public void onDraw()
 			{
+				Matrix4 proj = game.batch.getProjectionMatrix();
+				
+				game.batch.setProjectionMatrix(game.standardProjectionMatrix);
+
 				bgText.setBounds(b.x, b.y, b.width, b.height);
 				bgText.draw(Game.getGame().batch);
+				
+				game.batch.setProjectionMatrix(proj);
 			}
 			
 			@Override
@@ -85,14 +92,15 @@ public class PauseMenu extends Menu
 			}
 			
 			@Override
-			public void onUpdateDelta(float delta)
+			public void onUpdate(long tick)
 			{
 				if(bgText.getColor().a >= 1)
 					return;
 				
-				final float newAlpha = Math.min(1, bgText.getColor().a + (1f * delta));
-
-				bgText.setAlpha(newAlpha);
+				float newAlpha = Math.min(1, bgText.getColor().a + (0.05f));
+				float newColor = Math.max(0.5f, bgText.getColor().r - (0.01f));
+				
+				bgText.setColor(newColor, newColor, newColor, newAlpha);
 			}
 		};
 		

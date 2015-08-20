@@ -45,6 +45,7 @@ import java2hu.util.Setter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.g2d.Animation;
@@ -227,6 +228,8 @@ public class Sukuna extends AllStarBoss
 									return Sukuna.this.isOnStage();
 								}
 							};
+							
+							bge.setBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_DST_ALPHA);
 
 							Game.getGame().spawn(bge);
 						}
@@ -614,7 +617,6 @@ public class Sukuna extends AllStarBoss
 		{
 			super(new ThBullet(ThBulletType.RICE_LARGE, color), x, y);
 			
-			useSpawnAnimation(false);
 			setGlowing();
 			
 			for(TextureRegion r : getAnimation().getKeyFrames())
@@ -685,7 +687,7 @@ public class Sukuna extends AllStarBoss
 		@Override
 		public void onDelete()
 		{
-			
+			super.onDelete();
 		}
 		
 		@Override
@@ -717,6 +719,8 @@ public class Sukuna extends AllStarBoss
 
 				boolean delete = g.getMinX() + getX() < g.getMinX() - bufferRate || g.getMinY() + getY() < g.getMinY() - bufferRate || getX() > g.getMaxX() + bufferRate || getY() > g.getMaxY() + bufferRate;
 
+				useDeathAnimation(false);
+				
 				if(delete)
 					g.delete(this);
 			}

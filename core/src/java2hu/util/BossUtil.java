@@ -10,8 +10,9 @@ import java2hu.Position;
 import java2hu.SmartTimer;
 import java2hu.background.BackgroundBossAura;
 import java2hu.object.DrawObject;
+import java2hu.object.FreeStageObject;
 import java2hu.object.StageObject;
-import java2hu.object.bullet.Bullet;
+import java2hu.object.VelocityObject;
 import java2hu.object.bullet.phase.ScaleAlphaPhaseAnimation;
 import java2hu.object.enemy.greater.Boss;
 import java2hu.overwrite.J2hObject;
@@ -37,6 +38,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector2;
 
 /**
  * Simple Util to help with boss movement & effects
@@ -696,6 +698,8 @@ public class BossUtil extends J2hObject
 			
 			if(game.getTick() % 1 == 0)
 			{
+				final float mul = 1f;
+				
 				game.spawn(new DrawObject()
 				{
 					{
@@ -706,10 +710,13 @@ public class BossUtil extends J2hObject
 					
 					Animation aura = AnimationUtil.copyAnimation(ba.aura);
 					
-					float xMod = Math.random() > 0.5 ? -1 : 1;
-					float yMod = Math.random() > 0.5 ? -1 : 1;
-					float x = (float) (xMod * 150 * Math.cos(Math.toRadians(Math.random() * 360)));
-					float y = (float) (yMod * 150 * Math.sin(Math.toRadians(Math.random() * 360)));
+					float xMod = (Math.random() > 0.5 ? -1 : 1);
+					float yMod = (Math.random() > 0.5 ? -1 : 1);
+					
+					float angle = (float) (Math.random() * 360f);
+					
+					float x = (float) (xMod * (20 + (20f * mul)) * Math.cos(Math.toRadians(angle)));
+					float y = (float) (yMod * (20 + (20f * mul)) * Math.sin(Math.toRadians(angle)));
 					
 					float velX = 0;
 					float velY = 0;
@@ -721,8 +728,9 @@ public class BossUtil extends J2hObject
 					{
 						Sprite currentAura = AnimationUtil.getCurrentSprite(aura, true);
 						currentAura.setPosition(boss.getX() + x - currentAura.getWidth() / 2, boss.getY() + y - currentAura.getHeight() / 2);
-						currentAura.setAlpha(distance > 40 ? 0 : 1 - (distance - 10) / 30f);
-						currentAura.setScale(0.8f);
+						currentAura.setAlpha(getTicksAlive() < 30 ? getTicksAlive() / 30f : 1f);
+						currentAura.setScale(0.3f + (0.5f * mul));
+						currentAura.setRotation(angle);
 						currentAura.draw(game.batch);
 					}
 					
@@ -852,11 +860,14 @@ public class BossUtil extends J2hObject
 		    						+ "varying vec4 v_color;         \n"
 		    						+ "varying vec2 v_texCoords;     \n"
 		    						+ "uniform mat4 u_projTrans;     \n"
+		    						+ "uniform vec2 offset;          \n"
 		                            + "void main()                   \n"
 		                            + "{                             \n"
 		                            + "   v_color = a_color;         \n"
 		                            + "   v_texCoords = a_texCoords; \n"
-		                            + "   gl_Position = u_projTrans * a_position;  \n"
+		                            + "   vec4 newPos = a_position; \n"
+		                            + "   newPos.xy += offset;   \n"
+		                            + "   gl_Position = u_projTrans * newPos;  \n"
 		                            + "}                             \n";
 		 
 		        // this one tells it what goes in between the points (i.e
@@ -887,10 +898,13 @@ public class BossUtil extends J2hObject
 		        					+ "attribute vec4 a_color;       \n"
 		    						+ "varying vec4 v_color;         \n"
 		    						+ "uniform mat4 u_projTrans;     \n"
+		    						+ "uniform vec2 offset;          \n"
 		                            + "void main()                   \n"
 		                            + "{                             \n"
 		                            + "   v_color = a_color;         \n"
-		                            + "   gl_Position = u_projTrans * a_position;  \n"
+		                            + "   vec4 newPos = a_position; \n"
+		                            + "   newPos.xy += offset;   \n"
+		                            + "   gl_Position = u_projTrans * newPos;  \n"
 		                            + "}                             \n";
 		 
 		        // this one tells it what goes in between the points (i.e
@@ -930,16 +944,8 @@ public class BossUtil extends J2hObject
 			
 			float rotation = 0;
 			
-			@Override
-			public void onDraw()
 			{
-				Game.getGame().batch.end();
-				
-				float xMod = timerX;
-				
-				float yMod = 1f;
-				
-				float[] vertices = createAuraMesh(boss.getX(), boss.getY(), size);
+				float[] vertices = createAuraMesh(0, 0, size);
 				
 				if(auraMesh == null)
 				{
@@ -951,6 +957,12 @@ public class BossUtil extends J2hObject
 				}
 				
 				auraMesh.setVertices(vertices);
+			}
+			
+			@Override
+			public void onDraw()
+			{
+				Game.getGame().batch.end();
 				
 				auraShader.begin();
 			
@@ -958,30 +970,19 @@ public class BossUtil extends J2hObject
 				Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
 				
 				auraShader.setUniformMatrix("u_projTrans", game.camera.camera.combined);
+				auraShader.setUniformf("offset", new Vector2(boss.getX(), boss.getY()));
 				auraMesh.render(auraShader, GL20.GL_TRIANGLES);
 				
 				auraShader.end();
 				
 				if(useMagicSquare)
 				{
-					vertices = createMagicSquareMesh(boss.getX(), boss.getY(), 230 * scale, rotation, xMod, yMod);
-					
-					if(magicSquareMesh == null)
-					{
-						magicSquareMesh = new Mesh(false, vertices.length, 0, 
-				    			new VertexAttribute(Usage.Position, 2, "a_position"),
-				    			new VertexAttribute(Usage.TextureCoordinates, 2, "a_texCoords"),
-				    			new VertexAttribute(Usage.ColorPacked, 4, "a_color"));
-						
-						addDisposable(magicSquareMesh);
-					}
-					
-					magicSquareMesh.setVertices(vertices);
-
 					magicSquareShader.begin();
 
 					magicSquareShader.setUniformMatrix("u_projTrans", Game.getGame().camera.camera.combined);
+					magicSquareShader.setUniformf("offset", new Vector2(boss.getX(), boss.getY()));
 					magicSquareShader.setUniformi("u_texture", 0);
+					
 					texture.setFilter(TextureFilter.MipMapLinearNearest, TextureFilter.Nearest);
 
 					Gdx.gl.glEnable(GL20.GL_BLEND);
@@ -1063,6 +1064,26 @@ public class BossUtil extends J2hObject
 				{
 					ticksFast = 0;
 				}
+				
+				if(useMagicSquare)
+				{
+					float xMod = timerX;
+					float yMod = 1f;
+					
+					float[] vertices = createMagicSquareMesh(0, 0, 230 * scale, rotation, xMod, yMod);
+					
+					if(magicSquareMesh == null)
+					{
+						magicSquareMesh = new Mesh(false, vertices.length, 0, 
+				    			new VertexAttribute(Usage.Position, 2, "a_position"),
+				    			new VertexAttribute(Usage.TextureCoordinates, 2, "a_texCoords"),
+				    			new VertexAttribute(Usage.ColorPacked, 4, "a_color"));
+						
+						addDisposable(magicSquareMesh);
+					}
+					
+					magicSquareMesh.setVertices(vertices);
+				}
 			}
 			
 			public float[] createMagicSquareMesh(float x, float y, float radius, float rotation, float xMultiplier, float yMultiplier)
@@ -1070,7 +1091,7 @@ public class BossUtil extends J2hObject
 				xMultiplier = 1/xMultiplier;
 				yMultiplier = 1/yMultiplier;
 				
-				int size = 700; // How much triangles make up this mesh.
+				int size = 30; // How much triangles make up this mesh.
 				
 				Color color = Color.WHITE.cpy();
 				color.a = 0.4f;
@@ -1088,7 +1109,7 @@ public class BossUtil extends J2hObject
 		        float textureOffsetY = 0.5f;
 		        
 		        // For every section one triangle starting from the middle to the ends.
-		        for(float deg = 0; deg < 360 - increment; deg += increment)
+		        for(float deg = 0; deg <= 360 - increment; deg += increment)
 		        {
 			        double rad1 = Math.toRadians(deg);
 			        double sin1 = Math.sin(rad1);
@@ -1143,15 +1164,15 @@ public class BossUtil extends J2hObject
 			
 			public float[] createAuraMesh(float x, float y, float radius)
 			{
-				int size = 130; // How much triangles make up this mesh.
+				int size = 10; // How much triangles make up this mesh.
 				
 				Color inner = color.cpy();
-				inner.a = 0.6f;
+				inner.a = 1f;
 				
 				Color middle = color.cpy();
-				middle.a = 0.2f;
+				middle.a = 0.4f;
 				
-				float middleMultiplier = 0.7f; // Between 0 and 1
+				float middleMultiplier = 0.1f; // Between 0 and 1
 
 				Color outer = color.cpy();
 				outer.a = 0.0f;
@@ -1164,7 +1185,7 @@ public class BossUtil extends J2hObject
 		        float increment = 360f / size;
 		        
 		        // For every section one triangle starting from the middle to the ends.
-		        for(float deg = 0; deg < 360 - increment; deg += increment)
+		        for(float deg = 0; deg <= 360 - increment; deg += increment)
 		        {
 			        double rad1 = Math.toRadians(deg);
 			        double sin1 = Math.sin(rad1);
@@ -1194,7 +1215,7 @@ public class BossUtil extends J2hObject
 		        }
 		        
 		        // For every section one triangle starting from the middle to the ends.
-		        for(float deg = 0; deg < 360 - increment; deg += increment)
+		        for(float deg = 0; deg <= 360 - increment; deg += increment)
 		        {
 		        	// Triangle 1
 		        	
@@ -1226,7 +1247,7 @@ public class BossUtil extends J2hObject
 		        }
 		        
 		        // For every section one triangle starting from the middle to the ends.
-		        for(float deg = 0; deg < 360 - increment; deg += increment)
+		        for(float deg = 0; deg <= 360 - increment; deg += increment)
 		        {
 		        	// Triangle 2
 		        	
@@ -1306,9 +1327,9 @@ public class BossUtil extends J2hObject
 	 * Places a circle around the boss, that decreases how long the spellcard has left.
 	 * Also binds the object to a boss aura instance, which will distort it.
 	 */
-	public static DrawObject spellcardCircle(final Boss boss, final Spellcard card, BackgroundBossAura aura)
+	public static FreeStageObject spellcardCircle(final Boss boss, final Spellcard card, BackgroundBossAura aura)
 	{
-		DrawObject obj = spellcardCircle(boss, card);
+		FreeStageObject obj = spellcardCircle(boss, card);
 		obj.setFrameBuffer(aura.getBackgroundBuffer());
 		obj.setZIndex(aura.getZIndex() - 1);
 		
@@ -1318,11 +1339,11 @@ public class BossUtil extends J2hObject
 	/**
 	 * Places a circle around the boss, that decreases how long the spellcard has left.
 	 */
-	public static DrawObject spellcardCircle(final Boss boss, final Spellcard card)
+	public static FreeStageObject spellcardCircle(final Boss boss, final Spellcard card)
 	{
 		final Texture text = Loader.texture(Gdx.files.internal("sprites/eff_line.png"));
 	
-		DrawObject obj = new DrawObject()
+		FreeStageObject obj = new FreeStageObject(boss.getX(), boss.getY())
 		{
 			{
 				addDisposable(text);
@@ -1343,23 +1364,6 @@ public class BossUtil extends J2hObject
 			@Override
 			public void onDraw()
 			{
-				float[] vertices = makeVertices();
-				
-				boolean createNewMesh = mesh == null || mesh.getMaxVertices() < vertices.length;
-				
-				if(createNewMesh)
-				{
-					if(mesh != null)
-						mesh.dispose();
-					
-					mesh = new Mesh(false, vertices.length, 0,
-			                new VertexAttribute(Usage.Position, 2, "a_position"),
-			                new VertexAttribute(Usage.TextureCoordinates, 2, "a_texCoord0"),
-			                new VertexAttribute(Usage.ColorPacked, 4, "a_color"));
-				}
-				
-				mesh.setVertices(vertices);
-				
 				if(mesh != null)
 				{
 					game.batch.end();
@@ -1382,7 +1386,7 @@ public class BossUtil extends J2hObject
 			}
 			
 			float size = 400;
-			float speed = 350;
+			float speed = 550;
 			
 			float width = 30;
 			
@@ -1424,6 +1428,46 @@ public class BossUtil extends J2hObject
 					sizeMinRight = Math.min(size - width, sizeMinRight);
 					sizeMinLeft = Math.min(size - width, sizeMinLeft);
 				}
+				
+				float distance = MathUtil.getDistance(getX(), getY(), boss.getX(), boss.getY());
+				
+				if(Float.isNaN(distance) || distance < 10)
+					return;
+
+				float x = (getX() - boss.getX()) / distance;
+				float y = (getY() - boss.getY()) / distance;
+				
+				if(Float.isNaN(x) || Float.isNaN(y))
+					return;
+				
+				float speed = 10f + (150f * Math.min(4, distance / 100f));
+				
+				x *= speed * delta;
+				y *= speed * delta;
+				
+				setX(getX() - (x));
+				setY(getY() - (y));
+			}
+			
+			@Override
+			public void onUpdate(long tick)
+			{
+				float[] vertices = makeVertices();
+				
+				boolean createNewMesh = mesh == null || mesh.getMaxVertices() < vertices.length;
+				
+				if(createNewMesh)
+				{
+					if(mesh != null)
+						mesh.dispose();
+					
+					mesh = new Mesh(false, vertices.length, 0,
+			                new VertexAttribute(Usage.Position, 2, "a_position"),
+			                new VertexAttribute(Usage.TextureCoordinates, 2, "a_texCoord0"),
+			                new VertexAttribute(Usage.ColorPacked, 4, "a_color"));
+				}
+				
+				mesh.setVertices(vertices);	
 			}
 			
 			public float[] makeVertices()
@@ -1434,8 +1478,8 @@ public class BossUtil extends J2hObject
 				
 		        ArrayList<Float> verticesList = new ArrayList<Float>();
 		        
-		        float centerX = boss.getX();
-		        float centerY = boss.getY();
+		        float centerX = getX();
+		        float centerY = getY();
 		        
 		        float increment = 360f / sections;
 		        
@@ -1552,6 +1596,18 @@ public class BossUtil extends J2hObject
 			{
 				return true; // Disposes itself.
 			}
+
+			@Override
+			public float getWidth()
+			{
+				return 0;
+			}
+
+			@Override
+			public float getHeight()
+			{
+				return 0;
+			}
 		};
 		
 		obj.setZIndex(boss.getZIndex() - 15);
@@ -1638,7 +1694,7 @@ public class BossUtil extends J2hObject
 			pos.setY((float) (pos.getY() + Math.sin(rad) * offsetVertical));
 
 			Cloud cloud = new Cloud(pos.getX(), pos.getY(), to, startAngle, clockWise);
-			cloud.setSpeed((float) (10f + 5f * Math.random()));
+//			cloud.setSpeed((float) (200f + 100f * Math.random()));
 			cloud.getCurrentSprite().setColor(Color.BLACK.cpy());
 
 			boolean firstBefore = Math.random() > 0.5f;
@@ -1659,7 +1715,7 @@ public class BossUtil extends J2hObject
 			pos.setY((float) (pos.getY() + Math.sin(rad) * offsetVertical));
 
 			cloud = new Cloud(pos.getX(), pos.getY(), to, startAngle, clockWise);
-			cloud.setSpeed((float) (10f + 5f * Math.random()));
+//			cloud.setSpeed((float) (200f + 100f * Math.random()));
 			cloud.getCurrentSprite().setColor(Math.random() > 0.5f ? color1 : color2);
 
 			cloud.setZIndex(firstBefore ? second : first);
@@ -1928,7 +1984,7 @@ public class BossUtil extends J2hObject
 	 * Arches towards a specified position from a starting angle.
 	 * If the starting angle is 0, it will not curve and go straight to the destination.
 	 */
-	public static class Cloud extends Bullet
+	public static class Cloud extends VelocityObject
 	{
 		private IPosition pos;
 		
@@ -1944,6 +2000,9 @@ public class BossUtil extends J2hObject
 			texture = new Texture("sprites/enemy/enemy_aura.png");
 		}
 		
+		private HitboxSprite sprite;
+		private ScaleAlphaPhaseAnimation scaleAni;
+		
 		/**
 		 * 
 		 * @param x
@@ -1954,46 +2013,43 @@ public class BossUtil extends J2hObject
 		 */
 		public Cloud(float x, float y, IPosition posGetter, float startAngle, boolean clockwise)
 		{
-			super((Animation)null, x, y);
+			super(x, y);
 			
 			this.clockwise = clockwise;
 			
-			HitboxSprite sprite = new HitboxSprite(new Sprite(texture, 0, 0, 46, 46));
+			sprite = new HitboxSprite(new Sprite(texture, 0, 0, 46, 46));
 
 			sprite.setRotation((float) (Math.random() * 360f));
-			
-			setBullet(new Animation(1f, sprite));
 			
 			this.pos = posGetter;
 			
 			this.startAngle = startAngle;
 			angle = MathUtil.getAngle(x, y, pos.getX(), pos.getY()) - startAngle;
 			
-			setScale((float) (0.3f + 0.7f * Math.random()));
+			sprite.setScale((float) (0.3f + 0.7f * Math.random()));
 			
-			useDeathAnimation(false);
+//			setGlowing();
 			
-			ScaleAlphaPhaseAnimation s = new ScaleAlphaPhaseAnimation(this);
+			scaleAni = new ScaleAlphaPhaseAnimation(new Getter<Sprite>()
+			{
+				@Override
+				public Sprite get()
+				{
+					return sprite;
+				}
+			}, this);
 			
-			setSpawnAnimation(s);
+			scaleAni.setAddedScale(1f);
+			scaleAni.setTime(60);
+			scaleAni.setAlpha(-0.2f);
+			scaleAni.setGlowing();
 			
-			s.setAddedScale(0f);
-			s.setTime(60);
-			s.setAlpha(0.2f);
-			
-			setGlowing();
+			scaleAni.start();
 		}
 		
-		@Override
-		public void checkCollision()
+		public HitboxSprite getCurrentSprite()
 		{
-		
-		}
-		
-		@Override
-		public boolean doDelete()
-		{
-			return false;
+			return sprite;
 		}
 		
 		float scale = 1f;
@@ -2002,16 +2058,21 @@ public class BossUtil extends J2hObject
 		@Override
 		public void onDraw()
 		{
+			if(scaleAni.isPlaying())
+				return;
+			
 			if(scale < 1f)
-				getCurrentSprite().setScale(scale);
+				sprite.setScale(scale);
 			
 			if(alpha < 1f)
-				getCurrentSprite().setAlpha(alpha);
+				sprite.setAlpha(alpha);
 			
-			super.onDraw();
+			sprite.setPosition(getX() - (getWidth() / 2f), getY() - (getHeight() / 2f));
+			
+			sprite.draw(game.batch);
 		}
 		
-		private float speed = 13f;
+		private float speed = 800f;
 		
 		public float getSpeed()
 		{
@@ -2019,7 +2080,6 @@ public class BossUtil extends J2hObject
 		}
 		
 		/**
-		 * Default = 13f
 		 * Updating speed will make the whole start angle and start position different for the same effect.
 		 * @param speed
 		 */
@@ -2031,8 +2091,6 @@ public class BossUtil extends J2hObject
 		@Override
 		public void onUpdate(long tick)
 		{
-			super.onUpdate(tick);
-			
 			int modifier = clockwise ? 1 : -1;
 			@Deprecated
 			float dist = MathUtil.getDistance(this, pos);
@@ -2042,8 +2100,7 @@ public class BossUtil extends J2hObject
 //				if(alpha > 0.5f)
 //					alpha = 0.5f;
 				
-				setDirectionDegTick(0, 0);
-				
+				haltMovement();
 				scale -= 0.05f;
 				alpha -= 0.05f;
 				
@@ -2063,8 +2120,31 @@ public class BossUtil extends J2hObject
 			double add = diff;
 			
 			this.angle += add;
-		
-			setDirectionDegTick(this.angle, this.speed);
+			
+			float speed = this.speed;
+			
+			int time = 30;
+			float section = 0.5f;
+			
+			if(getTicksAlive() < time)
+			{
+				speed = (getTicksAlive() / (float)time) * section * speed;
+				speed += (1 - section) * speed;
+			}
+			
+			setDirectionDeg(this.angle, speed);
+		}
+
+		@Override
+		public float getWidth()
+		{
+			return sprite.getWidth();
+		}
+
+		@Override
+		public float getHeight()
+		{
+			return sprite.getHeight();
 		}
 	}
 }

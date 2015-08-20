@@ -13,7 +13,7 @@ public class MathUtil extends J2hObject
 		if(a == null || b == null)
 			return 0;
 		
-		return getAngle((int)a.getX(), (int)a.getY(), (int)b.getX(), (int)b.getY());
+		return getAngle(a.getX(), a.getY(), b.getX(), b.getY());
 	}
 
 	public static float getAngle(float xa, float ya, float xb, float yb)
@@ -61,15 +61,8 @@ public class MathUtil extends J2hObject
 	 * @return
 	 */
 	public static float normalizeDegree(float angle)
-	{
-		if(angle < 0)
-			angle += 360;
-		
-		// reduce the angle  
-		angle =  angle % 360; 
-
-		// force it to be the positive remainder, so that 0 <= angle < 360  
-		angle = (angle + 360) % 360;  
+	{  
+		angle = ((angle % 360) + 360) % 360;
 		
 		return angle;
 	}
@@ -106,7 +99,7 @@ public class MathUtil extends J2hObject
 			
 			sin = new double[modulus];
 			
-		    for (float i = 0; i < 360; i += 1f / precision)
+		    for (double i = 0; i < 360; i += 1f / precision)
 		    {
 		        sin[toArrayPosition(i)]=Math.sin(Math.toRadians(i));
 		    }
@@ -117,6 +110,9 @@ public class MathUtil extends J2hObject
 			degree = normalizeDegree((float) degree);
 			
 			int pos = (int) Math.round(degree * precision);
+			
+			if(pos == sin.length)
+				pos = 0;
 			
 			return pos;
 		}
@@ -138,7 +134,7 @@ public class MathUtil extends J2hObject
 		}
 	}
 	
-	private static SinCosTable table = new SinCosTable(2);
+	private static SinCosTable table = new SinCosTable(3);
 	
 	public static double fastSin(double degree)
 	{

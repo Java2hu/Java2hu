@@ -84,6 +84,12 @@ public abstract class Boss extends LivingObject
 		this.left = left;
 		this.right = right;
 		this.special = special;
+		
+		addDisposable(fullBodySprite);
+		addDisposable(idle);
+		addDisposable(left);
+		addDisposable(right);
+		addDisposable(special);
 	}
 	
 	public void playSpecial(boolean bool)
@@ -148,23 +154,30 @@ public abstract class Boss extends LivingObject
 		float drawX = getDrawX();
 		float drawY = getDrawY();
 		
-		if(special != null && playSpecial)
-		{
-			HitboxSprite current = (HitboxSprite) special.getKeyFrame(getSpecialAnimationTime());
-			current.setPosition(drawX - current.getWidth() / 2, drawY - current.getHeight() / 2);
-			current.draw(g.batch);
-			
-			lastAnimation = special;
-		}
-		else
 		{
 			boolean left = getLastX() - getX() > 0;
 			boolean right = getLastX() - getX() < 0;
 			
-			Animation selected = left ? this.left : right ? this.right : this.idle;
+			Animation selected = left ? this.left : right ? this.right : null;
 			
 			if(selected == null)
-				selected = this.idle;
+			{
+				if(special != null && playSpecial)
+				{
+					HitboxSprite current = (HitboxSprite) special.getKeyFrame(getSpecialAnimationTime());
+					current.setPosition(drawX - current.getWidth() / 2, drawY - current.getHeight() / 2);
+					current.draw(g.batch);
+					
+					lastAnimation = special;
+					return;
+				}
+				else
+					selected = this.idle;
+			}
+			else
+			{
+				specialTimer = 0;
+			}
 			
 			if(selected instanceof StartupLoopAnimation)
 			{

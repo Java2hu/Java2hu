@@ -79,7 +79,7 @@ public class CircleHealthBar extends StageObject
 		setZIndex(J2hGame.GUI_Z_ORDER - 2);
 	}
 	
-	private float[] makePartialCircleMesh(float posX, float posY, float segments, float radiusStart, float radiusEnd, float percentage, Color color)
+	private float[] makePartialCircleMesh(float posX, float posY, float segments, float radiusStart, float radiusEnd, float percentage, Color inner, Color outer)
 	{
 		ArrayList<Float> verticesList = new ArrayList<Float>();
 		
@@ -90,41 +90,49 @@ public class CircleHealthBar extends StageObject
 		
         for(float deg = 90; deg < max + 90; deg += increment)
         {
+        	float end = deg + increment;
+			boolean last = !(end < max + 90);
+        	
+        	if(last)
+        	{
+        		end = max + 90;
+        	}
+        	
         	// Triangle 1
         	
         	// Left top
         	verticesList.add((float) (Math.cos(Math.toRadians(deg)) * radiusEnd) + posX);
         	verticesList.add((float) (Math.sin(Math.toRadians(deg)) * radiusEnd) + posY);
-        	verticesList.add(color.toFloatBits());
+        	verticesList.add(outer.toFloatBits());
         	
         	// left bot
         	verticesList.add((float) (Math.cos(Math.toRadians(deg)) * radiusStart) + posX);
         	verticesList.add((float) (Math.sin(Math.toRadians(deg)) * radiusStart) + posY);
-        	verticesList.add(color.toFloatBits());
+        	verticesList.add(inner.toFloatBits());
         	
         	// Right bot
-        	verticesList.add((float) (Math.cos(Math.toRadians(deg + increment)) * radiusStart) + posX);
-        	verticesList.add((float) (Math.sin(Math.toRadians(deg + increment)) * radiusStart) + posY);
-        	verticesList.add(color.toFloatBits());
+        	verticesList.add((float) (Math.cos(Math.toRadians(end)) * radiusStart) + posX);
+        	verticesList.add((float) (Math.sin(Math.toRadians(end)) * radiusStart) + posY);
+        	verticesList.add(inner.toFloatBits());
 
         	// Triangle 2
         	
         	// Right top
-        	verticesList.add((float) (Math.cos(Math.toRadians(deg + increment)) * radiusEnd) + posX);
-        	verticesList.add((float) (Math.sin(Math.toRadians(deg + increment)) * radiusEnd) + posY);
-        	verticesList.add(color.toFloatBits());
+        	verticesList.add((float) (Math.cos(Math.toRadians(end)) * radiusEnd) + posX);
+        	verticesList.add((float) (Math.sin(Math.toRadians(end)) * radiusEnd) + posY);
+        	verticesList.add(outer.toFloatBits());
         	
         	// Left top
         	verticesList.add((float) (Math.cos(Math.toRadians(deg)) * radiusEnd) + posX);
         	verticesList.add((float) (Math.sin(Math.toRadians(deg)) * radiusEnd) + posY);
-        	verticesList.add(color.toFloatBits());
+        	verticesList.add(outer.toFloatBits());
         	
         	// Right bot
-        	verticesList.add((float) (Math.cos(Math.toRadians(deg + increment)) * radiusStart) + posX);
-        	verticesList.add((float) (Math.sin(Math.toRadians(deg + increment)) * radiusStart) + posY);
-        	verticesList.add(color.toFloatBits());
+        	verticesList.add((float) (Math.cos(Math.toRadians(end)) * radiusStart) + posX);
+        	verticesList.add((float) (Math.sin(Math.toRadians(end)) * radiusStart) + posY);
+        	verticesList.add(inner.toFloatBits());
         	
-        	if(deg + increment > max + 90)
+        	if(end > max + 90)
         		increment = max + 90 - deg;
         }
 		
@@ -140,7 +148,7 @@ public class CircleHealthBar extends StageObject
 		return vertices;
 	}
 	
-	private float[] makeCircleMesh(float posX, float posY, float segments, float radiusStart, float radiusEnd, Color color)
+	private float[] makeCircleMesh(float posX, float posY, float segments, float radiusStart, float radiusEnd, Color inner, Color outer)
 	{
 		ArrayList<Float> verticesList = new ArrayList<Float>();
 		
@@ -155,17 +163,17 @@ public class CircleHealthBar extends StageObject
         	// Left top
         	verticesList.add((float) (Math.sin(Math.toRadians(deg)) * radiusEnd) + posX);
         	verticesList.add((float) (Math.cos(Math.toRadians(deg)) * radiusEnd) + posY);
-        	verticesList.add(color.toFloatBits());
+        	verticesList.add(outer.toFloatBits());
         	
         	// left bot
         	verticesList.add((float) (Math.sin(Math.toRadians(deg)) * radiusStart) + posX);
         	verticesList.add((float) (Math.cos(Math.toRadians(deg)) * radiusStart) + posY);
-        	verticesList.add(color.toFloatBits());
+        	verticesList.add(inner.toFloatBits());
         	
         	// Right bot
         	verticesList.add((float) (Math.sin(Math.toRadians(deg + increment)) * radiusStart) + posX);
         	verticesList.add((float) (Math.cos(Math.toRadians(deg + increment)) * radiusStart) + posY);
-        	verticesList.add(color.toFloatBits());
+        	verticesList.add(inner.toFloatBits());
         }
         
         // For every section one triangle starting from the middle to the ends.
@@ -176,17 +184,17 @@ public class CircleHealthBar extends StageObject
         	// Right top
         	verticesList.add((float) (Math.sin(Math.toRadians(deg + increment)) * radiusEnd) + posX);
         	verticesList.add((float) (Math.cos(Math.toRadians(deg + increment)) * radiusEnd) + posY);
-        	verticesList.add(color.toFloatBits());
+        	verticesList.add(outer.toFloatBits());
         	
         	// Left top
         	verticesList.add((float) (Math.sin(Math.toRadians(deg)) * radiusEnd) + posX);
         	verticesList.add((float) (Math.cos(Math.toRadians(deg)) * radiusEnd) + posY);
-        	verticesList.add(color.toFloatBits());
+        	verticesList.add(outer.toFloatBits());
         	
         	// Right bot
         	verticesList.add((float) (Math.sin(Math.toRadians(deg + increment)) * radiusStart) + posX);
         	verticesList.add((float) (Math.cos(Math.toRadians(deg + increment)) * radiusStart) + posY);
-        	verticesList.add(color.toFloatBits());
+        	verticesList.add(inner.toFloatBits());
         }
 
 		float[] vertices = new float[verticesList.size()];
@@ -205,6 +213,13 @@ public class CircleHealthBar extends StageObject
 	{
 		ArrayList<Float> verticesList = new ArrayList<Float>();
 		
+		float radiusStartBegin = radiusStart;
+		float radiusEndBegin = radiusEnd;
+		
+		radiusEnd = radiusStart + ((radiusEndBegin - radiusStartBegin) / 2f);
+		
+		Color white = Color.WHITE;
+		
 		// Quad 1 - Consists of 2 triangles, colored by variable color.
 		{
 			float size = 3f;
@@ -215,7 +230,7 @@ public class CircleHealthBar extends StageObject
 			// Left top
 			verticesList.add((float) (Math.cos(Math.toRadians(deg)) * radiusEnd) + posX);
 			verticesList.add((float) (Math.sin(Math.toRadians(deg)) * radiusEnd) + posY);
-			verticesList.add(color.toFloatBits());
+			verticesList.add(white.toFloatBits());
 
 			// left bot
 			verticesList.add((float) (Math.cos(Math.toRadians(deg)) * radiusStart) + posX);
@@ -232,6 +247,49 @@ public class CircleHealthBar extends StageObject
 			// Right top
 			verticesList.add((float) (Math.cos(Math.toRadians(deg + size)) * radiusEnd) + posX);
 			verticesList.add((float) (Math.sin(Math.toRadians(deg + size)) * radiusEnd) + posY);
+			verticesList.add(white.toFloatBits());
+
+			// Left top
+			verticesList.add((float) (Math.cos(Math.toRadians(deg)) * radiusEnd) + posX);
+			verticesList.add((float) (Math.sin(Math.toRadians(deg)) * radiusEnd) + posY);
+			verticesList.add(white.toFloatBits());
+
+			// Right bot
+			verticesList.add((float) (Math.cos(Math.toRadians(deg + size)) * radiusStart) + posX);
+			verticesList.add((float) (Math.sin(Math.toRadians(deg + size)) * radiusStart) + posY);
+			verticesList.add(color.toFloatBits());
+		}
+		
+		radiusStart = radiusStart + ((radiusEndBegin - radiusStartBegin) / 2f);
+		radiusEnd = radiusEndBegin + 0.1f;
+		
+		// Quad 1 - Consists of 2 triangles, colored by variable color.
+		{
+			float size = 3f;
+			float deg = 90 - 360 * percentage - size / 2;
+			
+			// Triangle 1
+
+			// Left top
+			verticesList.add((float) (Math.cos(Math.toRadians(deg)) * radiusEnd) + posX);
+			verticesList.add((float) (Math.sin(Math.toRadians(deg)) * radiusEnd) + posY);
+			verticesList.add(color.toFloatBits());
+
+			// left bot
+			verticesList.add((float) (Math.cos(Math.toRadians(deg)) * radiusStart) + posX);
+			verticesList.add((float) (Math.sin(Math.toRadians(deg)) * radiusStart) + posY);
+			verticesList.add(white.toFloatBits());
+
+			// Right bot
+			verticesList.add((float) (Math.cos(Math.toRadians(deg + size)) * radiusStart) + posX);
+			verticesList.add((float) (Math.sin(Math.toRadians(deg + size)) * radiusStart) + posY);
+			verticesList.add(white.toFloatBits());
+
+			// Triangle 2
+
+			// Right top
+			verticesList.add((float) (Math.cos(Math.toRadians(deg + size)) * radiusEnd) + posX);
+			verticesList.add((float) (Math.sin(Math.toRadians(deg + size)) * radiusEnd) + posY);
 			verticesList.add(color.toFloatBits());
 
 			// Left top
@@ -242,8 +300,10 @@ public class CircleHealthBar extends StageObject
 			// Right bot
 			verticesList.add((float) (Math.cos(Math.toRadians(deg + size)) * radiusStart) + posX);
 			verticesList.add((float) (Math.sin(Math.toRadians(deg + size)) * radiusStart) + posY);
-			verticesList.add(color.toFloatBits());
+			verticesList.add(white.toFloatBits());
 		}
+		
+		radiusStart = radiusStartBegin;
 		
 		radiusEnd -= 2f;
 		radiusStart += 2f;
@@ -314,6 +374,19 @@ public class CircleHealthBar extends StageObject
 		return closest;
 	}
 	
+	private Mesh mesh(float[] vertices)
+	{
+		Mesh mesh = new Mesh(false, vertices.length, 0,
+                new VertexAttribute(Usage.Position, 2, "a_position"),
+                new VertexAttribute(Usage.ColorPacked, 4, "a_color"));
+		
+		mesh.setVertices(vertices);
+		
+		meshes.add(mesh);
+		
+		return mesh;
+	}
+	
 	public void generateNewMeshes(float percentage)
 	{
 		ArrayList<Float> splits = (ArrayList<Float>) this.splits.clone();
@@ -331,58 +404,69 @@ public class CircleHealthBar extends StageObject
 			}
 		}
 
-		int size = 360; // Roughness of the circle, the more the smoother, but more intensive
+		int size = 40; // Roughness of the circle, the more the smoother, but more intensive
 
 		float startRadius = getRadius();
 		
 		final float posX = getX();//((source.getX() / Game.getGame().getWidth()f) * 2) - 1;
 		final float posY = getY();//(((source.getY() / Game.getGame().getHeight()f) * 2) - 1) / yCorrection;
 		
-		boolean drawNonHealth = getNoHealthColor() != null;
-
-		if(meshes.size() != 3 + splits.size() + (drawNonHealth ? 1 : 0))
+		for(Mesh m : meshes)
 		{
-			for(Mesh mesh : meshes)
-			{
-				mesh.dispose();
-			}
-			
-			meshes.clear();
-			
-			for(int i = 0; i < 3 + splits.size(); i++)
-			{
-				Mesh mesh = new Mesh(false, 10000, 0,
-		                new VertexAttribute(Usage.Position, 2, "a_position"),
-		                new VertexAttribute(Usage.ColorPacked, 4, "a_color"));
-				
-				meshes.add(mesh);
-			}
+			m.dispose();
 		}
+		
+		meshes.clear();
+		
+		boolean drawNonHealth = getNoHealthColor() != null;
 		
 		int i = 0;
 		
-		meshes.get(i).setVertices(makeCircleMesh(posX, posY, size, startRadius, startRadius + 1f, ringColor)); // Inner Ring
-
+		float borderWidth = 4.4f;
+		float gap = -1.8f;
+		float middleWidth = 6f;
+		
+		Color trans = new Color(0, 0, 0, 0f);
+		
+		mesh(makeCircleMesh(posX, posY, size, startRadius, startRadius + borderWidth * 0.5f, trans, ringColor)); // Inner rings
+		mesh(makeCircleMesh(posX, posY, size, startRadius + borderWidth * 0.5f, startRadius + borderWidth, ringColor, trans)); // Inner rings
+		
+		startRadius += borderWidth + gap;
+		
 		i++;
 		
+		float outer = 0.25f;
+		
+		float beginMiddle = startRadius;
+		
 		if(drawNonHealth)
-		{
-			meshes.get(i).setVertices(makeCircleMesh(posX, posY, size, startRadius + 1.1f, startRadius + 5f, noHealthColor)); // Inner Ring
-
+		{	
+			mesh(makeCircleMesh(posX, posY, size, startRadius, startRadius + (middleWidth * outer), ringColor, noHealthColor)); // Inner Ring
+			mesh(makeCircleMesh(posX, posY, size, startRadius + (middleWidth * outer), startRadius + (middleWidth * (1f - outer)), noHealthColor, noHealthColor)); // Inner Ring
+			mesh(makeCircleMesh(posX, posY, size, startRadius + (middleWidth * (1f - outer)), startRadius + middleWidth, noHealthColor, ringColor)); // Inner Ring
+			
 			i++;
 		}
 		
-		meshes.get(i).setVertices(makePartialCircleMesh(posX, posY, size, startRadius + 1.1f, startRadius + 5f, percentage, healthColor)); // Health 'bar'
+		mesh(makePartialCircleMesh(posX, posY, size, startRadius, startRadius + (middleWidth * outer), percentage, ringColor, healthColor)); // Inner Ring
+		mesh(makePartialCircleMesh(posX, posY, size, startRadius + (middleWidth * outer), startRadius + (middleWidth * (1f - outer)), percentage, healthColor, healthColor)); // Inner Ring
+		mesh(makePartialCircleMesh(posX, posY, size, startRadius + (middleWidth * (1f - outer)), startRadius + middleWidth, percentage, healthColor, ringColor)); // Inner Ring
 
+		startRadius += middleWidth + gap;
+		
 		i++;
 		
-		meshes.get(i).setVertices(makeCircleMesh(posX, posY, size, startRadius + 5.5f, startRadius + 6.5f, ringColor)); // Outer ring
+		mesh(makeCircleMesh(posX, posY, size, startRadius, startRadius + borderWidth * 0.5f, trans, ringColor)); // Outer rings
+		mesh(makeCircleMesh(posX, posY, size, startRadius + borderWidth * 0.5f, startRadius + borderWidth, ringColor, trans)); // Outer rings
+		
+		startRadius += borderWidth;
 		
 		i++;
 		
 		for(Float split : splits)
 		{
-			meshes.get(i).setVertices(makeSectionIndicator(posX, posY, 1, startRadius - 5f, startRadius + 10f, getIndicatorColor(), split)); // Section indicator
+			float overflow = 5f;
+			mesh(makeSectionIndicator(posX, posY, 1, beginMiddle - overflow, startRadius - 2f + overflow, getIndicatorColor(), split)); // Section indicator
 			i++;
 		}
 	}
@@ -390,12 +474,6 @@ public class CircleHealthBar extends StageObject
 	@Override
 	public void onDraw()
 	{
-		float fullHealth = source.getMaxHealth();
-		float partHealth = source.getHealth();
-		float percentage = partHealth / fullHealth;
-		
-		generateNewMeshes(percentage);
-		
 		J2hGame g = Game.getGame();
 		
 		Game.getGame().batch.end();
@@ -410,6 +488,10 @@ public class CircleHealthBar extends StageObject
 
 		sp.setUniformMatrix("u_projTrans", combined);
 		
+//		for(int i = meshes.size() - 1; i >= 0; i--)
+//		{
+//			Mesh mesh = meshes.get(i);
+			
 		for(Mesh mesh : meshes)
 		{
 			mesh.render(sp, GL20.GL_TRIANGLES);
@@ -424,6 +506,12 @@ public class CircleHealthBar extends StageObject
 	public void onUpdate(long tick)
 	{
 		setPositionUpdate();
+		
+		float fullHealth = source.getMaxHealth();
+		float partHealth = source.getHealth();
+		float percentage = partHealth / fullHealth;
+		
+		generateNewMeshes(percentage);
 	}
 	
 	/**
