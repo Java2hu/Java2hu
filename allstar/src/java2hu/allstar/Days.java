@@ -26,6 +26,7 @@ import java2hu.allstar.enemies.day6.Sekibanki;
 import java2hu.allstar.enemies.day7.Junko;
 import java2hu.allstar.enemies.day7.Raiko;
 import java2hu.allstar.enemies.day7.Ringo;
+import java2hu.allstar.enemies.day7.Sagume;
 import java2hu.allstar.enemies.day7.Seija;
 import java2hu.allstar.enemies.day7.Sukuna;
 import java2hu.allstar.enemies.day7.tsukumo.TsukumoGeneral;
@@ -125,6 +126,7 @@ public class Days extends J2hObject
 			});
 			
 			// Tewi
+			// Reisen
 
 			addCharacter(day, type, "Fujiwara No Mokou", new Getter<AllStarBoss>()
 			{
@@ -134,6 +136,9 @@ public class Days extends J2hObject
 					return new Mokou(startHP, startX, startY);
 				}
 			});
+			
+			// Kaguya
+			// Eirin
 		}
 		
 		day++;
@@ -304,10 +309,18 @@ public class Days extends J2hObject
 			});
 			
 			// Rei'sen (Reisen 2)
-			// Reisen
 			// Watatsuki's
-			// Eirin
-			// Kaguya
+			
+			addCharacter(day, type, "Sagume", new Getter<AllStarBoss>()
+			{
+				@Override
+				public AllStarBoss get()
+				{
+					final Sagume boss = new Sagume(startHP, startX, startY);
+
+					return boss;
+				}
+			});
 			
 			addCharacter(day, type, "Junko", new Getter<AllStarBoss>()
 			{

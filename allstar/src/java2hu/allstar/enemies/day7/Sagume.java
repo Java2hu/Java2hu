@@ -1,4 +1,4 @@
-package java2hu.allstar.enemies.template;
+package java2hu.allstar.enemies.day7;
 
 import java2hu.Game;
 import java2hu.J2hGame;
@@ -8,16 +8,17 @@ import java2hu.MovementAnimation;
 import java2hu.allstar.AllStarStageScheme;
 import java2hu.allstar.enemies.AllStarBoss;
 import java2hu.allstar.util.AllStarUtil;
+import java2hu.background.Background;
 import java2hu.background.BackgroundBossAura;
+import java2hu.background.ClearBackground;
+import java2hu.background.SwirlingBackground;
 import java2hu.gameflow.GameFlowScheme.WaitConditioner;
 import java2hu.object.player.Player;
 import java2hu.object.ui.CircleHealthBar;
 import java2hu.overwrite.J2hMusic;
 import java2hu.spellcard.BossSpellcard;
 import java2hu.system.SaveableObject;
-import java2hu.util.AnimationUtil;
 import java2hu.util.BossUtil;
-import java2hu.util.Duration;
 import java2hu.util.ImageSplitter;
 import java2hu.util.InputUtil;
 import java2hu.util.ObjectUtil;
@@ -28,6 +29,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.g2d.Animation;
@@ -38,16 +40,16 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 /**
  * Simple boss, should be used as a template for other bosses instead of constant copying.
  */
-public class SimpleBoss extends AllStarBoss
+public class Sagume extends AllStarBoss
 {
-	public final static String FULL_NAME = "";
-	public final static String DATA_NAME = "";
+	public final static String FULL_NAME = "Sagume Kishin";
+	public final static String DATA_NAME = "sagume";
 	public final static FileHandle FOLDER = Gdx.files.internal("enemy/" + DATA_NAME + "/");
 	
 	/**
 	 * Spell Card Name
 	 */
-	final static String SPELLCARD_NAME = "";
+	final static String SPELLCARD_NAME = "Calm Expanding Circle Danmaku";
 	
 	private Setter<BackgroundBossAura> backgroundSpawner;
 	
@@ -62,12 +64,12 @@ public class SimpleBoss extends AllStarBoss
 	 * If the boss has inconsistent frame size, you need to replace every seperately.
 	 * If the boss has seperate movement frames, overwrite left and right.
 	 */
-	public SimpleBoss(float maxHealth, float x, float y)
+	public Sagume(float maxHealth, float x, float y)
 	{
 		super(maxHealth, x, y);
 		
-		int chunkHeight = 0;
-		int chunkWidth = 0;
+		int chunkHeight = 192;
+		int chunkWidth = 128;
 
 		Texture sprite = Loader.texture(FOLDER.child("anm.png"));
 		sprite.setFilter(TextureFilter.MipMapLinearNearest, TextureFilter.Nearest);
@@ -77,28 +79,19 @@ public class SimpleBoss extends AllStarBoss
 
 		TextureRegion nameTag = new TextureRegion(Loader.texture(FOLDER.child("nametag.png")));
 
-		Animation idle = ImageSplitter.getAnimationFromSprite(sprite, chunkHeight, chunkWidth, 8F, 0);
+		Animation idle = ImageSplitter.getAnimationFromSprite(sprite, chunkHeight, chunkWidth, 8F, 1,2,3,4,5,6);
 		idle.setPlayMode(PlayMode.LOOP);
 		
-		boolean faceLeft = false; // Is the character moving left on the sprite.
-		
-		Animation dir1 = new MovementAnimation(ImageSplitter.getAnimationFromSprite(sprite, chunkHeight, chunkWidth, 8F, 0), ImageSplitter.getAnimationFromSprite(sprite, chunkHeight, chunkWidth, 8F, 0), 8F);
-		Animation dir2 = AnimationUtil.copyAnimation(dir1);
-		
-		Animation left = faceLeft ? dir1 : dir2; 
-		Animation right = faceLeft ? dir2 : dir1;
+		Animation left = new MovementAnimation(ImageSplitter.getAnimationFromSprite(sprite, chunkHeight, chunkWidth, 8F, 17,18), ImageSplitter.getAnimationFromSprite(sprite, chunkHeight, chunkWidth, 8F, 19,20,21), 8F);
+		Animation right = new MovementAnimation(ImageSplitter.getAnimationFromSprite(sprite, chunkHeight, chunkWidth, 8F, 9,10), ImageSplitter.getAnimationFromSprite(sprite, chunkHeight, chunkWidth, 8F, 11,12,13), 8F);
 
-		for(TextureRegion reg : dir2.getKeyFrames())
-			reg.flip(true, false);
-
-		Animation special = ImageSplitter.getAnimationFromSprite(sprite, chunkHeight, chunkWidth, 8F, 0);
+		Animation special = ImageSplitter.getAnimationFromSprite(sprite, chunkHeight, chunkWidth, 8F, 25,26,27,28,29,30,31,32);
 		special.setPlayMode(PlayMode.NORMAL);
 	
 		Music bgm = new J2hMusic(Gdx.audio.newMusic(FOLDER.child("bgm.mp3")));
 		bgm.setLooping(true);
 		
-		setAuraColor(AllStarUtil.from255RGB(0, 0, 0));
-		setBgAuraColor(AllStarUtil.from255RGB(0, 0, 0));
+		setBgAuraColor(AllStarUtil.from255RGB(72, 56, 255));
 		
 		set(nameTag, bgm);
 		set(fbs, idle, left, right, special);
@@ -111,12 +104,77 @@ public class SimpleBoss extends AllStarBoss
 				Texture bg1t = Loader.texture(FOLDER.child("bg1.png"));
 				Texture bg2t = Loader.texture(FOLDER.child("bg2.png"));
 				
-				Sprite bg1 = new Sprite(bg1t);
-				Sprite bg2 = new Sprite(bg2t);
+				SwirlingBackground bg = new SwirlingBackground(bg1t)
+				{
+					float timer = 0;
+
+					{
+						setFrameBuffer(t.getBackgroundBuffer());
+						
+						setZIndex(-5);
+					}
+
+					@Override
+					public float getTimer()
+					{
+						return timer;
+					}
+
+					@Override
+					public void updateTimer()
+					{
+						setBlendFunc(GL20.GL_ONE, GL20.GL_ZERO);
+						
+						timer += 0.002f;
+
+						timer %= 1;
+					}
+
+					@Override
+					public boolean isPersistant()
+					{
+						return Sagume.this.isOnStage();
+					}
+				};
 				
-				// Set backgrounds sprite to the framebuffer of the boss aura to make use of the background bubbles.
+				bg.setBlendFunc(GL20.GL_ZERO, GL20.GL_ONE);
+				
+				game.spawn(bg);
+				
+				bg.setZIndex(bg.getZIndex() - 2);
+				
+				Background bg2 = new Background(bg2t)
+				{
+					@Override
+					public void onDraw()
+					{
+						setBlendFunc(GL20.GL_DST_COLOR, GL20.GL_ZERO);
+						
+						super.onDraw();
+					}
+				};
+				
+				bg2.setBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+				
+				bg2.setZIndex(bg.getZIndex() + 1);
+				bg2.setFrameBuffer(t.getBackgroundBuffer());
+				
+				game.spawn(bg2);
+				
+				
+				ClearBackground clear = new ClearBackground(bg.getZIndex() - 5);
+				
+				clear.setFrameBuffer(t.getBackgroundBuffer());
+				
+				game.spawn(clear);
 			}
 		};
+	}
+	
+	@Override
+	public float getDrawX()
+	{
+		return super.getDrawX() - 15;
 	}
 	
 	@Override
@@ -139,7 +197,7 @@ public class SimpleBoss extends AllStarBoss
 	public void executeFight(final AllStarStageScheme scheme)
 	{
 		final J2hGame g = Game.getGame();
-		final SimpleBoss boss = this;
+		final Sagume boss = this;
 		
 		final SaveableObject<CircleHealthBar> bar = new SaveableObject<CircleHealthBar>();
 		
@@ -238,32 +296,30 @@ public class SimpleBoss extends AllStarBoss
 		scheme.waitTicks(10); // Prevent concurrency issues.
 	}
 	
-	public static class NonSpell extends BossSpellcard<SimpleBoss>
+	public static class NonSpell extends BossSpellcard<Sagume>
 	{	
-		public NonSpell(SimpleBoss owner)
+		public NonSpell(Sagume owner)
 		{
 			super(owner);
-			setSpellcardTime(Duration.seconds(25));
 		}
 
 		@Override
-		public void tick(int tick, J2hGame game, SimpleBoss boss)
+		public void tick(int tick, J2hGame game, Sagume boss)
 		{
 			final Player player = game.getPlayer();
 			
 		}
 	}
 
-	public static class Spell extends BossSpellcard<SimpleBoss>
+	public static class Spell extends BossSpellcard<Sagume>
 	{
-		public Spell(SimpleBoss owner)
+		public Spell(Sagume owner)
 		{
 			super(owner);
-			setSpellcardTime(Duration.seconds(50));
 		}
 
 		@Override
-		public void tick(int tick, J2hGame game, SimpleBoss boss)
+		public void tick(int tick, J2hGame game, Sagume boss)
 		{
 			final Player player = game.getPlayer();
 			

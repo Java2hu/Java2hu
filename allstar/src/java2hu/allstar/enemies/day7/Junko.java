@@ -17,6 +17,8 @@ import java2hu.background.BackgroundBossAura;
 import java2hu.background.ClearBackground;
 import java2hu.background.SwirlingBackground;
 import java2hu.gameflow.GameFlowScheme.WaitConditioner;
+import java2hu.object.DrawObject;
+import java2hu.object.StageObject;
 import java2hu.object.bullet.Bullet;
 import java2hu.object.bullet.Laser;
 import java2hu.object.bullet.ReflectingBullet;
@@ -39,6 +41,7 @@ import java2hu.touhou.sounds.TouhouSounds;
 import java2hu.util.AnimationUtil;
 import java2hu.util.BossUtil;
 import java2hu.util.Duration;
+import java2hu.util.Getter;
 import java2hu.util.ImageSplitter;
 import java2hu.util.MathUtil;
 import java2hu.util.ObjectUtil;
@@ -48,6 +51,7 @@ import java2hu.util.Setter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
@@ -68,6 +72,7 @@ public class Junko extends AllStarBoss
 	final static String SPELLCARD_NAME = "\"Pure Path in a Twisted World\"";
 	
 	private Setter<BackgroundBossAura> backgroundSpawner;
+	private Getter<StageObject> auraSpawner;
 	
 	/**
 	 * How to set up:
@@ -182,6 +187,92 @@ public class Junko extends AllStarBoss
 				game.spawn(clear);
 			}
 		};
+		
+		auraSpawner = new Getter<StageObject>()
+		{
+			@Override
+			public StageObject get()
+			{
+				Texture leaf = Loader.texture(FOLDER.child("aura.png"));
+				final Junko boss = Junko.this;
+				
+				final DrawObject obj = new DrawObject()
+				{
+					private Sprite sprite = new Sprite(leaf);
+					
+					@Override
+					public void onDraw()
+					{
+						float centerX = boss.getX();
+						float centerY = boss.getY() - 30;
+						
+						sprite.setPosition(centerX, centerY);
+						
+						sprite.setOrigin(0, sprite.getHeight() / 2f);
+						
+						sprite.setRotation(170);
+						sprite.setScale(2f);
+						
+						int amount = 5;
+						int index = 2;
+						
+						int wait = 40;
+						
+						final float single = 30;
+						
+						final float totalTime = single * (index + 1);
+						int ticksAlive = (int) (getTicksAlive() % (totalTime + wait));
+						
+						boolean doWait = ticksAlive >= totalTime;
+						
+						final float total = (ticksAlive % totalTime) /  totalTime;
+						int target = (int) ((total * (index + 1)));
+
+						for(int leaves = 0; leaves < amount; leaves++)
+						{
+							int leaveIndex = Math.abs(leaves - index);
+							
+							sprite.setColor(Color.PURPLE.cpy().add(0.4f, 0.3f, 0f, 0f));
+							
+							sprite.draw(game.batch);
+							
+							if(leaveIndex == target && !doWait)
+							{
+								float t = ((ticksAlive % single) / single);
+								float tSize = t * 140;
+								
+								sprite.setPosition((float)(centerX + (Math.cos(Math.toRadians(sprite.getRotation())) * tSize)), (float) (centerY + (Math.sin(Math.toRadians(sprite.getRotation())) * tSize)));
+								sprite.setAlpha(1f - t);
+								sprite.setScale(2f + (t * 0.8f), 2f - (0.5f * (t > 0.25f ? (t * 2f) - 0.5f : 0f)));
+								
+								sprite.draw(game.batch);
+								sprite.setAlpha(1f);
+								sprite.setScale(2f);
+								
+								sprite.setPosition(centerX, centerY);
+							}
+
+							sprite.rotate(-40);
+						}
+					}
+				};
+				
+				obj.setGlowing();
+				
+				obj.setZIndex(boss.getZIndex() - 5);
+				
+				game.spawn(obj);
+				
+				boss.addChild(obj);
+				
+				return obj;
+			}
+		};
+	}
+	
+	public StageObject spawnAura()
+	{
+		return auraSpawner.get();
 	}
 	
 	@Override
@@ -411,6 +502,7 @@ public class Junko extends AllStarBoss
 			setSpellcardTime(Duration.seconds(50));
 			owner.playSpecial(false);
 			owner.setDamageModifier(0.30f);
+			owner.spawnAura();
 		}
 
 		@Override
@@ -419,7 +511,7 @@ public class Junko extends AllStarBoss
 			final Player player = game.getPlayer();
 			
 			if(tick == 0)
-				boss.getPathing().path(new SinglePositionPath(boss, new Position(game.getCenterX(), game.getCenterY() + 300), Duration.ticks(60)));
+				boss.getPathing().path(new SinglePositionPath(boss, new Position(game.getCenterX(), game.getCenterY() + 200), Duration.ticks(60)));
 			
 			if(tick == 90)
 				BossUtil.chargeExplosion(boss, boss.getAuraColor());

@@ -1,0 +1,2923 @@
+bullet4.png
+format: RGBA8888
+filter: MipMapLinearNearest,Nearest
+repeat: xy
+ORB_LARGE_BLACK0
+rotate: false
+xy: 0, 0
+size: 128, 128
+orig: 128, 128
+offset: 0, 0
+index: -1
+ORB_LARGE_RED0
+rotate: false
+xy: 128, 0
+size: 128, 128
+orig: 128, 128
+offset: 0, 0
+index: -1
+ORB_LARGE_PURPLE0
+rotate: false
+xy: 256, 0
+size: 128, 128
+orig: 128, 128
+offset: 0, 0
+index: -1
+ORB_LARGE_BLUE0
+rotate: false
+xy: 384, 0
+size: 128, 128
+orig: 128, 128
+offset: 0, 0
+index: -1
+ORB_LARGE_CYAN0
+rotate: false
+xy: 0, 128
+size: 128, 128
+orig: 128, 128
+offset: 0, 0
+index: -1
+ORB_LARGE_GREEN0
+rotate: false
+xy: 128, 128
+size: 128, 128
+orig: 128, 128
+offset: 0, 0
+index: -1
+ORB_LARGE_YELLOW0
+rotate: false
+xy: 256, 128
+size: 128, 128
+orig: 128, 128
+offset: 0, 0
+index: -1
+ORB_LARGE_WHITE0
+rotate: false
+xy: 384, 128
+size: 128, 128
+orig: 128, 128
+offset: 0, 0
+index: -1
+ORB_SHADE_WHITE0
+rotate: false
+xy: 448, 448
+size: 64, 64
+orig: 64, 64
+offset: 0, 0
+index: -1
+
+bullet1.png
+format: RGBA8888
+filter: MipMapLinearNearest,Nearest
+repeat: xy
+LAZER_STATIONARY_BLACK0
+rotate: false
+xy: 0, 0
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+LAZER_STATIONARY_RED_DARK0
+rotate: false
+xy: 32, 0
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+LAZER_STATIONARY_RED0
+rotate: false
+xy: 64, 0
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+LAZER_STATIONARY_PURPLE0
+rotate: false
+xy: 96, 0
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+LAZER_STATIONARY_PINK0
+rotate: false
+xy: 128, 0
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+LAZER_STATIONARY_BLUE_DARK0
+rotate: false
+xy: 160, 0
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+LAZER_STATIONARY_BLUE0
+rotate: false
+xy: 192, 0
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+LAZER_STATIONARY_CYAN0
+rotate: false
+xy: 224, 0
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+LAZER_STATIONARY_CYAN_LIGHT0
+rotate: false
+xy: 256, 0
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+LAZER_STATIONARY_GREEN0
+rotate: false
+xy: 288, 0
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+LAZER_STATIONARY_GREEN_LIGHT0
+rotate: false
+xy: 320, 0
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+LAZER_STATIONARY_GREEN_LIGHTER0
+rotate: false
+xy: 352, 0
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+LAZER_STATIONARY_YELLOW0
+rotate: false
+xy: 384, 0
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+LAZER_STATIONARY_YELLOW_LIGHT0
+rotate: false
+xy: 416, 0
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+LAZER_STATIONARY_ORANGE0
+rotate: false
+xy: 448, 0
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+LAZER_STATIONARY_WHITE0
+rotate: false
+xy: 480, 0
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+POINTER_BLACK0
+rotate: false
+xy: 0, 32
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+POINTER_RED_DARK0
+rotate: false
+xy: 32, 32
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+POINTER_RED0
+rotate: false
+xy: 64, 32
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+POINTER_PURPLE0
+rotate: false
+xy: 96, 32
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+POINTER_PINK0
+rotate: false
+xy: 128, 32
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+POINTER_BLUE_DARK0
+rotate: false
+xy: 160, 32
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+POINTER_BLUE0
+rotate: false
+xy: 192, 32
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+POINTER_CYAN0
+rotate: false
+xy: 224, 32
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+POINTER_CYAN_LIGHT0
+rotate: false
+xy: 256, 32
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+POINTER_GREEN0
+rotate: false
+xy: 288, 32
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+POINTER_GREEN_LIGHT0
+rotate: false
+xy: 320, 32
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+POINTER_GREEN_LIGHTER0
+rotate: false
+xy: 352, 32
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+POINTER_YELLOW0
+rotate: false
+xy: 384, 32
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+POINTER_YELLOW_LIGHT0
+rotate: false
+xy: 416, 32
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+POINTER_ORANGE0
+rotate: false
+xy: 448, 32
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+POINTER_WHITE0
+rotate: false
+xy: 480, 32
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+BALL_1_BLACK0
+rotate: false
+xy: 0, 64
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+BALL_1_RED_DARK0
+rotate: false
+xy: 32, 64
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+BALL_1_RED0
+rotate: false
+xy: 64, 64
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+BALL_1_PURPLE0
+rotate: false
+xy: 96, 64
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+BALL_1_PINK0
+rotate: false
+xy: 128, 64
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+BALL_1_BLUE_DARK0
+rotate: false
+xy: 160, 64
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+BALL_1_BLUE0
+rotate: false
+xy: 192, 64
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+BALL_1_CYAN0
+rotate: false
+xy: 224, 64
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+BALL_1_CYAN_LIGHT0
+rotate: false
+xy: 256, 64
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+BALL_1_GREEN0
+rotate: false
+xy: 288, 64
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+BALL_1_GREEN_LIGHT0
+rotate: false
+xy: 320, 64
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+BALL_1_GREEN_LIGHTER0
+rotate: false
+xy: 352, 64
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+BALL_1_YELLOW0
+rotate: false
+xy: 384, 64
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+BALL_1_YELLOW_LIGHT0
+rotate: false
+xy: 416, 64
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+BALL_1_ORANGE0
+rotate: false
+xy: 448, 64
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+BALL_1_WHITE0
+rotate: false
+xy: 480, 64
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+BALL_2_BLACK0
+rotate: false
+xy: 0, 96
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+BALL_2_RED_DARK0
+rotate: false
+xy: 32, 96
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+BALL_2_RED0
+rotate: false
+xy: 64, 96
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+BALL_2_PURPLE0
+rotate: false
+xy: 96, 96
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+BALL_2_PINK0
+rotate: false
+xy: 128, 96
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+BALL_2_BLUE_DARK0
+rotate: false
+xy: 160, 96
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+BALL_2_BLUE0
+rotate: false
+xy: 192, 96
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+BALL_2_CYAN0
+rotate: false
+xy: 224, 96
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+BALL_2_CYAN_LIGHT0
+rotate: false
+xy: 256, 96
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+BALL_2_GREEN0
+rotate: false
+xy: 288, 96
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+BALL_2_GREEN_LIGHT0
+rotate: false
+xy: 320, 96
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+BALL_2_GREEN_LIGHTER0
+rotate: false
+xy: 352, 96
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+BALL_2_YELLOW0
+rotate: false
+xy: 384, 96
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+BALL_2_YELLOW_LIGHT0
+rotate: false
+xy: 416, 96
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+BALL_2_ORANGE0
+rotate: false
+xy: 448, 96
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+BALL_2_WHITE0
+rotate: false
+xy: 480, 96
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+BALL_REFLECTING_BLACK0
+rotate: false
+xy: 0, 352
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+BALL_REFLECTING_RED_DARK0
+rotate: false
+xy: 32, 352
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+BALL_REFLECTING_RED0
+rotate: false
+xy: 64, 352
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+BALL_REFLECTING_PURPLE0
+rotate: false
+xy: 96, 352
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+BALL_REFLECTING_PINK0
+rotate: false
+xy: 128, 352
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+BALL_REFLECTING_BLUE_DARK0
+rotate: false
+xy: 160, 352
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+BALL_REFLECTING_BLUE0
+rotate: false
+xy: 192, 352
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+BALL_REFLECTING_CYAN0
+rotate: false
+xy: 224, 352
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+BALL_REFLECTING_CYAN_LIGHT0
+rotate: false
+xy: 256, 352
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+BALL_REFLECTING_GREEN0
+rotate: false
+xy: 288, 352
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+BALL_REFLECTING_GREEN_LIGHT0
+rotate: false
+xy: 320, 352
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+BALL_REFLECTING_GREEN_LIGHTER0
+rotate: false
+xy: 352, 352
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+BALL_REFLECTING_YELLOW0
+rotate: false
+xy: 384, 352
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+BALL_REFLECTING_YELLOW_LIGHT0
+rotate: false
+xy: 416, 352
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+BALL_REFLECTING_ORANGE0
+rotate: false
+xy: 448, 352
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+BALL_REFLECTING_WHITE0
+rotate: false
+xy: 480, 352
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+DISK_YELLOW0
+rotate: false
+xy: 416, 384
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+DISK_ORANGE0
+rotate: false
+xy: 480, 384
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+DISK_WHITE0
+rotate: false
+xy: 448, 384
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+DOT_SMALL_MOON_BLACK0
+rotate: false
+xy: 0, 480
+size: 16, 16
+orig: 16, 16
+offset: 0, 0
+index: -1
+DOT_SMALL_MOON_RED_DARK0
+rotate: false
+xy: 16, 480
+size: 16, 16
+orig: 16, 16
+offset: 0, 0
+index: -1
+DOT_SMALL_MOON_RED0
+rotate: false
+xy: 32, 480
+size: 16, 16
+orig: 16, 16
+offset: 0, 0
+index: -1
+DOT_SMALL_MOON_PURPLE0
+rotate: false
+xy: 48, 480
+size: 16, 16
+orig: 16, 16
+offset: 0, 0
+index: -1
+DOT_SMALL_MOON_PINK0
+rotate: false
+xy: 64, 480
+size: 16, 16
+orig: 16, 16
+offset: 0, 0
+index: -1
+DOT_SMALL_MOON_BLUE_DARK0
+rotate: false
+xy: 80, 480
+size: 16, 16
+orig: 16, 16
+offset: 0, 0
+index: -1
+DOT_SMALL_MOON_BLUE0
+rotate: false
+xy: 96, 480
+size: 16, 16
+orig: 16, 16
+offset: 0, 0
+index: -1
+DOT_SMALL_MOON_CYAN0
+rotate: false
+xy: 112, 480
+size: 16, 16
+orig: 16, 16
+offset: 0, 0
+index: -1
+DOT_SMALL_MOON_CYAN_LIGHT0
+rotate: false
+xy: 0, 496
+size: 16, 16
+orig: 16, 16
+offset: 0, 0
+index: -1
+DOT_SMALL_MOON_GREEN0
+rotate: false
+xy: 16, 496
+size: 16, 16
+orig: 16, 16
+offset: 0, 0
+index: -1
+DOT_SMALL_MOON_GREEN_LIGHT0
+rotate: false
+xy: 32, 496
+size: 16, 16
+orig: 16, 16
+offset: 0, 0
+index: -1
+DOT_SMALL_MOON_GREEN_LIGHTER0
+rotate: false
+xy: 48, 496
+size: 16, 16
+orig: 16, 16
+offset: 0, 0
+index: -1
+DOT_SMALL_MOON_YELLOW0
+rotate: false
+xy: 64, 496
+size: 16, 16
+orig: 16, 16
+offset: 0, 0
+index: -1
+DOT_SMALL_MOON_YELLOW_LIGHT0
+rotate: false
+xy: 80, 496
+size: 16, 16
+orig: 16, 16
+offset: 0, 0
+index: -1
+DOT_SMALL_MOON_ORANGE0
+rotate: false
+xy: 96, 496
+size: 16, 16
+orig: 16, 16
+offset: 0, 0
+index: -1
+DOT_SMALL_MOON_WHITE0
+rotate: false
+xy: 112, 496
+size: 16, 16
+orig: 16, 16
+offset: 0, 0
+index: -1
+DOT_SMALL_OUTLINE_BLACK0
+rotate: false
+xy: 128, 384
+size: 16, 16
+orig: 16, 16
+offset: 0, 0
+index: -1
+DOT_SMALL_OUTLINE_RED_DARK0
+rotate: false
+xy: 144, 384
+size: 16, 16
+orig: 16, 16
+offset: 0, 0
+index: -1
+DOT_SMALL_OUTLINE_RED0
+rotate: false
+xy: 160, 384
+size: 16, 16
+orig: 16, 16
+offset: 0, 0
+index: -1
+DOT_SMALL_OUTLINE_PURPLE0
+rotate: false
+xy: 176, 384
+size: 16, 16
+orig: 16, 16
+offset: 0, 0
+index: -1
+DOT_SMALL_OUTLINE_PINK0
+rotate: false
+xy: 192, 384
+size: 16, 16
+orig: 16, 16
+offset: 0, 0
+index: -1
+DOT_SMALL_OUTLINE_BLUE_DARK0
+rotate: false
+xy: 208, 384
+size: 16, 16
+orig: 16, 16
+offset: 0, 0
+index: -1
+DOT_SMALL_OUTLINE_BLUE0
+rotate: false
+xy: 224, 384
+size: 16, 16
+orig: 16, 16
+offset: 0, 0
+index: -1
+DOT_SMALL_OUTLINE_CYAN0
+rotate: false
+xy: 240, 384
+size: 16, 16
+orig: 16, 16
+offset: 0, 0
+index: -1
+DOT_SMALL_OUTLINE_CYAN_LIGHT0
+rotate: false
+xy: 128, 400
+size: 16, 16
+orig: 16, 16
+offset: 0, 0
+index: -1
+DOT_SMALL_OUTLINE_GREEN0
+rotate: false
+xy: 144, 400
+size: 16, 16
+orig: 16, 16
+offset: 0, 0
+index: -1
+DOT_SMALL_OUTLINE_GREEN_LIGHT0
+rotate: false
+xy: 160, 400
+size: 16, 16
+orig: 16, 16
+offset: 0, 0
+index: -1
+DOT_SMALL_OUTLINE_GREEN_LIGHTER0
+rotate: false
+xy: 176, 400
+size: 16, 16
+orig: 16, 16
+offset: 0, 0
+index: -1
+DOT_SMALL_OUTLINE_YELLOW0
+rotate: false
+xy: 192, 400
+size: 16, 16
+orig: 16, 16
+offset: 0, 0
+index: -1
+DOT_SMALL_OUTLINE_YELLOW_LIGHT0
+rotate: false
+xy: 208, 400
+size: 16, 16
+orig: 16, 16
+offset: 0, 0
+index: -1
+DOT_SMALL_OUTLINE_ORANGE0
+rotate: false
+xy: 224, 400
+size: 16, 16
+orig: 16, 16
+offset: 0, 0
+index: -1
+DOT_SMALL_OUTLINE_WHITE0
+rotate: false
+xy: 240, 400
+size: 16, 16
+orig: 16, 16
+offset: 0, 0
+index: -1
+DOT_SMALL_FILLED_BLACK0
+rotate: false
+xy: 0, 384
+size: 16, 16
+orig: 16, 16
+offset: 0, 0
+index: -1
+DOT_SMALL_FILLED_RED_DARK0
+rotate: false
+xy: 16, 384
+size: 16, 16
+orig: 16, 16
+offset: 0, 0
+index: -1
+DOT_SMALL_FILLED_RED0
+rotate: false
+xy: 32, 384
+size: 16, 16
+orig: 16, 16
+offset: 0, 0
+index: -1
+DOT_SMALL_FILLED_PURPLE0
+rotate: false
+xy: 48, 384
+size: 16, 16
+orig: 16, 16
+offset: 0, 0
+index: -1
+DOT_SMALL_FILLED_PINK0
+rotate: false
+xy: 64, 384
+size: 16, 16
+orig: 16, 16
+offset: 0, 0
+index: -1
+DOT_SMALL_FILLED_BLUE_DARK0
+rotate: false
+xy: 80, 384
+size: 16, 16
+orig: 16, 16
+offset: 0, 0
+index: -1
+DOT_SMALL_FILLED_BLUE0
+rotate: false
+xy: 96, 384
+size: 16, 16
+orig: 16, 16
+offset: 0, 0
+index: -1
+DOT_SMALL_FILLED_CYAN0
+rotate: false
+xy: 112, 384
+size: 16, 16
+orig: 16, 16
+offset: 0, 0
+index: -1
+DOT_SMALL_FILLED_CYAN_LIGHT0
+rotate: false
+xy: 0, 400
+size: 16, 16
+orig: 16, 16
+offset: 0, 0
+index: -1
+DOT_SMALL_FILLED_GREEN0
+rotate: false
+xy: 16, 400
+size: 16, 16
+orig: 16, 16
+offset: 0, 0
+index: -1
+DOT_SMALL_FILLED_GREEN_LIGHT0
+rotate: false
+xy: 32, 400
+size: 16, 16
+orig: 16, 16
+offset: 0, 0
+index: -1
+DOT_SMALL_FILLED_GREEN_LIGHTER0
+rotate: false
+xy: 48, 400
+size: 16, 16
+orig: 16, 16
+offset: 0, 0
+index: -1
+DOT_SMALL_FILLED_YELLOW0
+rotate: false
+xy: 64, 400
+size: 16, 16
+orig: 16, 16
+offset: 0, 0
+index: -1
+DOT_SMALL_FILLED_YELLOW_LIGHT0
+rotate: false
+xy: 80, 400
+size: 16, 16
+orig: 16, 16
+offset: 0, 0
+index: -1
+DOT_SMALL_FILLED_ORANGE0
+rotate: false
+xy: 96, 400
+size: 16, 16
+orig: 16, 16
+offset: 0, 0
+index: -1
+DOT_SMALL_FILLED_WHITE0
+rotate: false
+xy: 112, 400
+size: 16, 16
+orig: 16, 16
+offset: 0, 0
+index: -1
+DOT_MEDIUM_BLACK0
+rotate: false
+xy: 288, 480
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+DOT_MEDIUM_RED_DARK0
+rotate: false
+xy: 320, 480
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+DOT_MEDIUM_RED0
+rotate: false
+xy: 160, 480
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+DOT_MEDIUM_PURPLE0
+rotate: false
+xy: 192, 480
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+DOT_MEDIUM_BLUE0
+rotate: false
+xy: 352, 480
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+DOT_MEDIUM_GREEN0
+rotate: false
+xy: 384, 480
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+DOT_MEDIUM_GREEN_LIGHT0
+rotate: false
+xy: 224, 480
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+DOT_MEDIUM_YELLOW0
+rotate: false
+xy: 416, 480
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+DOT_MEDIUM_YELLOW_LIGHT0
+rotate: false
+xy: 256, 480
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+DOT_MEDIUM_WHITE0
+rotate: false
+xy: 128, 480
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+STAR_BLACK0
+rotate: false
+xy: 0, 320
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+STAR_RED_DARK0
+rotate: false
+xy: 32, 320
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+STAR_RED0
+rotate: false
+xy: 64, 320
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+STAR_PURPLE0
+rotate: false
+xy: 96, 320
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+STAR_PINK0
+rotate: false
+xy: 128, 320
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+STAR_BLUE_DARK0
+rotate: false
+xy: 160, 320
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+STAR_BLUE0
+rotate: false
+xy: 192, 320
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+STAR_CYAN0
+rotate: false
+xy: 224, 320
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+STAR_CYAN_LIGHT0
+rotate: false
+xy: 256, 320
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+STAR_GREEN0
+rotate: false
+xy: 288, 320
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+STAR_GREEN_LIGHT0
+rotate: false
+xy: 320, 320
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+STAR_GREEN_LIGHTER0
+rotate: false
+xy: 352, 320
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+STAR_YELLOW0
+rotate: false
+xy: 384, 320
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+STAR_YELLOW_LIGHT0
+rotate: false
+xy: 416, 320
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+STAR_ORANGE0
+rotate: false
+xy: 448, 320
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+STAR_WHITE0
+rotate: false
+xy: 480, 320
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+BULLET_BLACK0
+rotate: false
+xy: 0, 256
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+BULLET_RED_DARK0
+rotate: false
+xy: 32, 256
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+BULLET_RED0
+rotate: false
+xy: 64, 256
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+BULLET_PURPLE0
+rotate: false
+xy: 96, 256
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+BULLET_PINK0
+rotate: false
+xy: 128, 256
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+BULLET_BLUE_DARK0
+rotate: false
+xy: 160, 256
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+BULLET_BLUE0
+rotate: false
+xy: 192, 256
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+BULLET_CYAN0
+rotate: false
+xy: 224, 256
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+BULLET_CYAN_LIGHT0
+rotate: false
+xy: 256, 256
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+BULLET_GREEN0
+rotate: false
+xy: 288, 256
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+BULLET_GREEN_LIGHT0
+rotate: false
+xy: 320, 256
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+BULLET_GREEN_LIGHTER0
+rotate: false
+xy: 352, 256
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+BULLET_YELLOW0
+rotate: false
+xy: 384, 256
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+BULLET_YELLOW_LIGHT0
+rotate: false
+xy: 416, 256
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+BULLET_ORANGE0
+rotate: false
+xy: 448, 256
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+BULLET_WHITE0
+rotate: false
+xy: 480, 256
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+RICE_BLACK0
+rotate: false
+xy: 0, 288
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+RICE_RED_DARK0
+rotate: false
+xy: 32, 288
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+RICE_RED0
+rotate: false
+xy: 64, 288
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+RICE_PURPLE0
+rotate: false
+xy: 96, 288
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+RICE_PINK0
+rotate: false
+xy: 128, 288
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+RICE_BLUE_DARK0
+rotate: false
+xy: 160, 288
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+RICE_BLUE0
+rotate: false
+xy: 192, 288
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+RICE_CYAN0
+rotate: false
+xy: 224, 288
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+RICE_CYAN_LIGHT0
+rotate: false
+xy: 256, 288
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+RICE_GREEN0
+rotate: false
+xy: 288, 288
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+RICE_GREEN_LIGHT0
+rotate: false
+xy: 320, 288
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+RICE_GREEN_LIGHTER0
+rotate: false
+xy: 352, 288
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+RICE_YELLOW0
+rotate: false
+xy: 384, 288
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+RICE_YELLOW_LIGHT0
+rotate: false
+xy: 416, 288
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+RICE_ORANGE0
+rotate: false
+xy: 448, 288
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+RICE_WHITE0
+rotate: false
+xy: 480, 288
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+SEAL_BLACK0
+rotate: false
+xy: 0, 224
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+SEAL_RED_DARK0
+rotate: false
+xy: 32, 224
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+SEAL_RED0
+rotate: false
+xy: 64, 224
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+SEAL_PURPLE0
+rotate: false
+xy: 96, 224
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+SEAL_PINK0
+rotate: false
+xy: 128, 224
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+SEAL_BLUE_DARK0
+rotate: false
+xy: 160, 224
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+SEAL_BLUE0
+rotate: false
+xy: 192, 224
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+SEAL_CYAN0
+rotate: false
+xy: 224, 224
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+SEAL_CYAN_LIGHT0
+rotate: false
+xy: 256, 224
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+SEAL_GREEN0
+rotate: false
+xy: 288, 224
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+SEAL_GREEN_LIGHT0
+rotate: false
+xy: 320, 224
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+SEAL_GREEN_LIGHTER0
+rotate: false
+xy: 352, 224
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+SEAL_YELLOW0
+rotate: false
+xy: 384, 224
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+SEAL_YELLOW_LIGHT0
+rotate: false
+xy: 416, 224
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+SEAL_ORANGE0
+rotate: false
+xy: 448, 224
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+SEAL_WHITE0
+rotate: false
+xy: 480, 224
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+RAIN_BLACK0
+rotate: false
+xy: 0, 128
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+RAIN_RED_DARK0
+rotate: false
+xy: 32, 128
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+RAIN_RED0
+rotate: false
+xy: 64, 128
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+RAIN_PURPLE0
+rotate: false
+xy: 96, 128
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+RAIN_PINK0
+rotate: false
+xy: 128, 128
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+RAIN_BLUE_DARK0
+rotate: false
+xy: 160, 128
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+RAIN_BLUE0
+rotate: false
+xy: 192, 128
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+RAIN_CYAN0
+rotate: false
+xy: 224, 128
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+RAIN_CYAN_LIGHT0
+rotate: false
+xy: 256, 128
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+RAIN_GREEN0
+rotate: false
+xy: 288, 128
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+RAIN_GREEN_LIGHT0
+rotate: false
+xy: 320, 128
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+RAIN_GREEN_LIGHTER0
+rotate: false
+xy: 352, 128
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+RAIN_YELLOW0
+rotate: false
+xy: 384, 128
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+RAIN_YELLOW_LIGHT0
+rotate: false
+xy: 416, 128
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+RAIN_ORANGE0
+rotate: false
+xy: 448, 128
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+RAIN_WHITE0
+rotate: false
+xy: 480, 128
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+KUNAI_BLACK0
+rotate: false
+xy: 0, 160
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+KUNAI_RED_DARK0
+rotate: false
+xy: 32, 160
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+KUNAI_RED0
+rotate: false
+xy: 64, 160
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+KUNAI_PURPLE0
+rotate: false
+xy: 96, 160
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+KUNAI_PINK0
+rotate: false
+xy: 128, 160
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+KUNAI_BLUE_DARK0
+rotate: false
+xy: 160, 160
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+KUNAI_BLUE0
+rotate: false
+xy: 192, 160
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+KUNAI_CYAN0
+rotate: false
+xy: 224, 160
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+KUNAI_CYAN_LIGHT0
+rotate: false
+xy: 256, 160
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+KUNAI_GREEN0
+rotate: false
+xy: 288, 160
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+KUNAI_GREEN_LIGHT0
+rotate: false
+xy: 320, 160
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+KUNAI_GREEN_LIGHTER0
+rotate: false
+xy: 352, 160
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+KUNAI_YELLOW0
+rotate: false
+xy: 384, 160
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+KUNAI_YELLOW_LIGHT0
+rotate: false
+xy: 416, 160
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+KUNAI_ORANGE0
+rotate: false
+xy: 448, 160
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+KUNAI_WHITE0
+rotate: false
+xy: 480, 160
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+CRYSTAL_BLACK0
+rotate: false
+xy: 0, 192
+size: 32, 31
+orig: 32, 31
+offset: 0, 0
+index: -1
+CRYSTAL_RED_DARK0
+rotate: false
+xy: 32, 192
+size: 32, 31
+orig: 32, 31
+offset: 0, 0
+index: -1
+CRYSTAL_RED0
+rotate: false
+xy: 64, 192
+size: 32, 31
+orig: 32, 31
+offset: 0, 0
+index: -1
+CRYSTAL_PURPLE0
+rotate: false
+xy: 96, 192
+size: 32, 31
+orig: 32, 31
+offset: 0, 0
+index: -1
+CRYSTAL_PINK0
+rotate: false
+xy: 128, 192
+size: 32, 31
+orig: 32, 31
+offset: 0, 0
+index: -1
+CRYSTAL_BLUE_DARK0
+rotate: false
+xy: 160, 192
+size: 32, 31
+orig: 32, 31
+offset: 0, 0
+index: -1
+CRYSTAL_BLUE0
+rotate: false
+xy: 192, 192
+size: 32, 31
+orig: 32, 31
+offset: 0, 0
+index: -1
+CRYSTAL_CYAN0
+rotate: false
+xy: 224, 192
+size: 32, 31
+orig: 32, 31
+offset: 0, 0
+index: -1
+CRYSTAL_CYAN_LIGHT0
+rotate: false
+xy: 256, 192
+size: 32, 31
+orig: 32, 31
+offset: 0, 0
+index: -1
+CRYSTAL_GREEN0
+rotate: false
+xy: 288, 192
+size: 32, 31
+orig: 32, 31
+offset: 0, 0
+index: -1
+CRYSTAL_GREEN_LIGHT0
+rotate: false
+xy: 320, 192
+size: 32, 31
+orig: 32, 31
+offset: 0, 0
+index: -1
+CRYSTAL_GREEN_LIGHTER0
+rotate: false
+xy: 352, 192
+size: 32, 31
+orig: 32, 31
+offset: 0, 0
+index: -1
+CRYSTAL_YELLOW0
+rotate: false
+xy: 384, 192
+size: 32, 31
+orig: 32, 31
+offset: 0, 0
+index: -1
+CRYSTAL_YELLOW_LIGHT0
+rotate: false
+xy: 416, 192
+size: 32, 31
+orig: 32, 31
+offset: 0, 0
+index: -1
+CRYSTAL_ORANGE0
+rotate: false
+xy: 448, 192
+size: 32, 31
+orig: 32, 31
+offset: 0, 0
+index: -1
+CRYSTAL_WHITE0
+rotate: false
+xy: 480, 192
+size: 32, 31
+orig: 32, 31
+offset: 0, 0
+index: -1
+
+bullet5.png
+format: RGBA8888
+filter: MipMapLinearNearest,Nearest
+repeat: xy
+NOTE_EIGHT_RED0
+rotate: false
+xy: 0, 0
+size: 64, 64
+orig: 64, 64
+offset: 0, 0
+index: -1
+NOTE_EIGHT_RED1
+rotate: false
+xy: 64, 0
+size: 64, 64
+orig: 64, 64
+offset: 0, 0
+index: -1
+NOTE_EIGHT_RED2
+rotate: false
+xy: 128, 0
+size: 64, 64
+orig: 64, 64
+offset: 0, 0
+index: -1
+NOTE_EIGHT_PURPLE0
+rotate: false
+xy: 192, 64
+size: 64, 64
+orig: 64, 64
+offset: 0, 0
+index: -1
+NOTE_EIGHT_PURPLE1
+rotate: false
+xy: 256, 64
+size: 64, 64
+orig: 64, 64
+offset: 0, 0
+index: -1
+NOTE_EIGHT_PURPLE2
+rotate: false
+xy: 320, 64
+size: 64, 64
+orig: 64, 64
+offset: 0, 0
+index: -1
+NOTE_EIGHT_BLUE0
+rotate: false
+xy: 192, 0
+size: 64, 64
+orig: 64, 64
+offset: 0, 0
+index: -1
+NOTE_EIGHT_BLUE1
+rotate: false
+xy: 256, 0
+size: 64, 64
+orig: 64, 64
+offset: 0, 0
+index: -1
+NOTE_EIGHT_BLUE2
+rotate: false
+xy: 320, 0
+size: 64, 64
+orig: 64, 64
+offset: 0, 0
+index: -1
+NOTE_EIGHT_YELLOW0
+rotate: false
+xy: 0, 64
+size: 64, 64
+orig: 64, 64
+offset: 0, 0
+index: -1
+NOTE_EIGHT_YELLOW1
+rotate: false
+xy: 64, 64
+size: 64, 64
+orig: 64, 64
+offset: 0, 0
+index: -1
+NOTE_EIGHT_YELLOW2
+rotate: false
+xy: 128, 64
+size: 64, 64
+orig: 64, 64
+offset: 0, 0
+index: -1
+NOTE_QUARTER_REST_BLACK0
+rotate: false
+xy: 0, 129
+size: 64, 63
+orig: 64, 63
+offset: 0, 0
+index: -1
+NOTE_QUARTER_REST_RED0
+rotate: false
+xy: 64, 129
+size: 64, 63
+orig: 64, 63
+offset: 0, 0
+index: -1
+NOTE_QUARTER_REST_PURPLE0
+rotate: false
+xy: 128, 129
+size: 64, 63
+orig: 64, 63
+offset: 0, 0
+index: -1
+NOTE_QUARTER_REST_BLUE0
+rotate: false
+xy: 192, 129
+size: 64, 63
+orig: 64, 63
+offset: 0, 0
+index: -1
+NOTE_QUARTER_REST_CYAN0
+rotate: false
+xy: 256, 129
+size: 64, 63
+orig: 64, 63
+offset: 0, 0
+index: -1
+NOTE_QUARTER_REST_GREEN0
+rotate: false
+xy: 320, 129
+size: 64, 63
+orig: 64, 63
+offset: 0, 0
+index: -1
+NOTE_QUARTER_REST_YELLOW0
+rotate: false
+xy: 384, 129
+size: 64, 63
+orig: 64, 63
+offset: 0, 0
+index: -1
+NOTE_QUARTER_REST_WHITE0
+rotate: false
+xy: 448, 129
+size: 64, 63
+orig: 64, 63
+offset: 0, 0
+index: -1
+
+bullet3.png
+format: RGBA8888
+filter: MipMapLinearNearest,Nearest
+repeat: xy
+FIREBALL_RED0
+rotate: false
+xy: 0, 256
+size: 64, 64
+orig: 64, 64
+offset: 0, 0
+index: -1
+FIREBALL_RED1
+rotate: false
+xy: 64, 256
+size: 64, 64
+orig: 64, 64
+offset: 0, 0
+index: -1
+FIREBALL_RED2
+rotate: false
+xy: 128, 256
+size: 64, 64
+orig: 64, 64
+offset: 0, 0
+index: -1
+FIREBALL_RED3
+rotate: false
+xy: 192, 256
+size: 64, 64
+orig: 64, 64
+offset: 0, 0
+index: -1
+FIREBALL_PURPLE0
+rotate: false
+xy: 256, 256
+size: 64, 64
+orig: 64, 64
+offset: 0, 0
+index: -1
+FIREBALL_PURPLE1
+rotate: false
+xy: 320, 256
+size: 64, 64
+orig: 64, 64
+offset: 0, 0
+index: -1
+FIREBALL_PURPLE2
+rotate: false
+xy: 384, 256
+size: 64, 64
+orig: 64, 64
+offset: 0, 0
+index: -1
+FIREBALL_PURPLE3
+rotate: false
+xy: 448, 256
+size: 64, 62
+orig: 64, 62
+offset: 0, 0
+index: -1
+FIREBALL_BLUE0
+rotate: false
+xy: 0, 320
+size: 64, 64
+orig: 64, 64
+offset: 0, 0
+index: -1
+FIREBALL_BLUE1
+rotate: false
+xy: 64, 320
+size: 64, 64
+orig: 64, 64
+offset: 0, 0
+index: -1
+FIREBALL_BLUE2
+rotate: false
+xy: 128, 320
+size: 64, 64
+orig: 64, 64
+offset: 0, 0
+index: -1
+FIREBALL_BLUE3
+rotate: false
+xy: 192, 320
+size: 64, 64
+orig: 64, 64
+offset: 0, 0
+index: -1
+FIREBALL_YELLOW0
+rotate: false
+xy: 256, 320
+size: 64, 64
+orig: 64, 64
+offset: 0, 0
+index: -1
+FIREBALL_YELLOW1
+rotate: false
+xy: 320, 320
+size: 64, 64
+orig: 64, 64
+offset: 0, 0
+index: -1
+FIREBALL_YELLOW2
+rotate: false
+xy: 384, 320
+size: 64, 64
+orig: 64, 64
+offset: 0, 0
+index: -1
+FIREBALL_YELLOW3
+rotate: false
+xy: 448, 320
+size: 64, 62
+orig: 64, 62
+offset: 0, 0
+index: -1
+ORB_BLACK0
+rotate: false
+xy: 0, 129
+size: 64, 62
+orig: 64, 62
+offset: 0, 0
+index: -1
+ORB_RED0
+rotate: false
+xy: 64, 129
+size: 64, 62
+orig: 64, 62
+offset: 0, 0
+index: -1
+ORB_PURPLE0
+rotate: false
+xy: 128, 129
+size: 64, 62
+orig: 64, 62
+offset: 0, 0
+index: -1
+ORB_BLUE0
+rotate: false
+xy: 192, 129
+size: 64, 62
+orig: 64, 62
+offset: 0, 0
+index: -1
+ORB_CYAN0
+rotate: false
+xy: 256, 129
+size: 64, 62
+orig: 64, 62
+offset: 0, 0
+index: -1
+ORB_GREEN0
+rotate: false
+xy: 320, 129
+size: 64, 62
+orig: 64, 62
+offset: 0, 0
+index: -1
+ORB_YELLOW0
+rotate: false
+xy: 384, 129
+size: 64, 62
+orig: 64, 62
+offset: 0, 0
+index: -1
+ORB_WHITE0
+rotate: false
+xy: 448, 129
+size: 64, 62
+orig: 64, 62
+offset: 0, 0
+index: -1
+HEART_BLACK0
+rotate: false
+xy: 0, 0
+size: 64, 64
+orig: 64, 64
+offset: 0, 0
+index: -1
+HEART_RED0
+rotate: false
+xy: 64, 0
+size: 64, 64
+orig: 64, 64
+offset: 0, 0
+index: -1
+HEART_PURPLE0
+rotate: false
+xy: 128, 0
+size: 64, 64
+orig: 64, 64
+offset: 0, 0
+index: -1
+HEART_BLUE0
+rotate: false
+xy: 192, 0
+size: 64, 64
+orig: 64, 64
+offset: 0, 0
+index: -1
+HEART_CYAN0
+rotate: false
+xy: 256, 0
+size: 64, 64
+orig: 64, 64
+offset: 0, 0
+index: -1
+HEART_GREEN0
+rotate: false
+xy: 320, 0
+size: 64, 64
+orig: 64, 64
+offset: 0, 0
+index: -1
+HEART_YELLOW0
+rotate: false
+xy: 384, 0
+size: 64, 64
+orig: 64, 64
+offset: 0, 0
+index: -1
+HEART_WHITE0
+rotate: false
+xy: 448, 0
+size: 64, 64
+orig: 64, 64
+offset: 0, 0
+index: -1
+ARROW_BLACK0
+rotate: false
+xy: 0, 64
+size: 64, 64
+orig: 64, 64
+offset: 0, 0
+index: -1
+ARROW_RED0
+rotate: false
+xy: 64, 64
+size: 64, 64
+orig: 64, 64
+offset: 0, 0
+index: -1
+ARROW_PURPLE0
+rotate: false
+xy: 128, 64
+size: 64, 64
+orig: 64, 64
+offset: 0, 0
+index: -1
+ARROW_BLUE0
+rotate: false
+xy: 192, 64
+size: 64, 64
+orig: 64, 64
+offset: 0, 0
+index: -1
+ARROW_CYAN0
+rotate: false
+xy: 256, 64
+size: 64, 64
+orig: 64, 64
+offset: 0, 0
+index: -1
+ARROW_GREEN0
+rotate: false
+xy: 320, 64
+size: 64, 64
+orig: 64, 64
+offset: 0, 0
+index: -1
+ARROW_YELLOW0
+rotate: false
+xy: 384, 64
+size: 64, 64
+orig: 64, 64
+offset: 0, 0
+index: -1
+ARROW_WHITE0
+rotate: false
+xy: 448, 64
+size: 64, 64
+orig: 64, 64
+offset: 0, 0
+index: -1
+UNKNOWN_1_RED0
+rotate: false
+xy: 0, 256
+size: 64, 64
+orig: 64, 64
+offset: 0, 0
+index: -1
+UNKNOWN_1_RED1
+rotate: false
+xy: 64, 256
+size: 64, 64
+orig: 64, 64
+offset: 0, 0
+index: -1
+UNKNOWN_1_RED2
+rotate: false
+xy: 128, 256
+size: 64, 64
+orig: 64, 64
+offset: 0, 0
+index: -1
+UNKNOWN_1_RED3
+rotate: false
+xy: 192, 256
+size: 64, 64
+orig: 64, 64
+offset: 0, 0
+index: -1
+UNKNOWN_1_PURPLE0
+rotate: false
+xy: 0, 320
+size: 64, 64
+orig: 64, 64
+offset: 0, 0
+index: -1
+UNKNOWN_1_PURPLE1
+rotate: false
+xy: 64, 320
+size: 64, 64
+orig: 64, 64
+offset: 0, 0
+index: -1
+UNKNOWN_1_PURPLE2
+rotate: false
+xy: 128, 320
+size: 64, 64
+orig: 64, 64
+offset: 0, 0
+index: -1
+UNKNOWN_1_PURPLE3
+rotate: false
+xy: 192, 320
+size: 64, 64
+orig: 64, 64
+offset: 0, 0
+index: -1
+UNKNOWN_1_PINK0
+rotate: false
+xy: 256, 256
+size: 64, 64
+orig: 64, 64
+offset: 0, 0
+index: -1
+UNKNOWN_1_PINK1
+rotate: false
+xy: 320, 256
+size: 64, 64
+orig: 64, 64
+offset: 0, 0
+index: -1
+UNKNOWN_1_PINK2
+rotate: false
+xy: 384, 256
+size: 64, 64
+orig: 64, 64
+offset: 0, 0
+index: -1
+UNKNOWN_1_PINK3
+rotate: false
+xy: 448, 256
+size: 64, 64
+orig: 64, 64
+offset: 0, 0
+index: -1
+UNKNOWN_1_ORANGE0
+rotate: false
+xy: 256, 320
+size: 64, 64
+orig: 64, 64
+offset: 0, 0
+index: -1
+UNKNOWN_1_ORANGE1
+rotate: false
+xy: 320, 320
+size: 64, 64
+orig: 64, 64
+offset: 0, 0
+index: -1
+UNKNOWN_1_ORANGE2
+rotate: false
+xy: 384, 320
+size: 64, 64
+orig: 64, 64
+offset: 0, 0
+index: -1
+UNKNOWN_1_ORANGE3
+rotate: false
+xy: 448, 320
+size: 64, 64
+orig: 64, 64
+offset: 0, 0
+index: -1
+UNKNOWN_2_BLACK0
+rotate: false
+xy: 0, 448
+size: 64, 64
+orig: 64, 64
+offset: 0, 0
+index: -1
+UNKNOWN_2_RED0
+rotate: false
+xy: 64, 448
+size: 64, 64
+orig: 64, 64
+offset: 0, 0
+index: -1
+UNKNOWN_2_PURPLE0
+rotate: false
+xy: 128, 448
+size: 64, 64
+orig: 64, 64
+offset: 0, 0
+index: -1
+UNKNOWN_2_BLUE0
+rotate: false
+xy: 192, 448
+size: 64, 64
+orig: 64, 64
+offset: 0, 0
+index: -1
+UNKNOWN_2_CYAN0
+rotate: false
+xy: 256, 448
+size: 64, 64
+orig: 64, 64
+offset: 0, 0
+index: -1
+UNKNOWN_2_GREEN0
+rotate: false
+xy: 320, 448
+size: 64, 64
+orig: 64, 64
+offset: 0, 0
+index: -1
+UNKNOWN_2_YELLOW0
+rotate: false
+xy: 384, 448
+size: 64, 64
+orig: 64, 64
+offset: 0, 0
+index: -1
+UNKNOWN_2_WHITE0
+rotate: false
+xy: 448, 448
+size: 64, 64
+orig: 64, 64
+offset: 0, 0
+index: -1
+UNKNOWN_3_BLACK0
+rotate: false
+xy: 0, 384
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+UNKNOWN_3_RED_DARK0
+rotate: false
+xy: 32, 384
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+UNKNOWN_3_RED0
+rotate: false
+xy: 64, 384
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+UNKNOWN_3_PURPLE0
+rotate: false
+xy: 96, 384
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+UNKNOWN_3_PINK0
+rotate: false
+xy: 128, 384
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+UNKNOWN_3_BLUE_DARK0
+rotate: false
+xy: 160, 384
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+UNKNOWN_3_BLUE0
+rotate: false
+xy: 192, 384
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+UNKNOWN_3_CYAN0
+rotate: false
+xy: 224, 384
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+UNKNOWN_3_CYAN_LIGHT0
+rotate: false
+xy: 256, 384
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+UNKNOWN_3_GREEN0
+rotate: false
+xy: 288, 384
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+UNKNOWN_3_GREEN_LIGHT0
+rotate: false
+xy: 320, 384
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+UNKNOWN_3_GREEN_LIGHTER0
+rotate: false
+xy: 352, 384
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+UNKNOWN_3_YELLOW0
+rotate: false
+xy: 384, 384
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+UNKNOWN_3_YELLOW_LIGHT0
+rotate: false
+xy: 416, 384
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+UNKNOWN_3_ORANGE0
+rotate: false
+xy: 448, 384
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+UNKNOWN_3_WHITE0
+rotate: false
+xy: 480, 384
+size: 32, 32
+orig: 32, 32
+offset: 0, 0
+index: -1
+
+bullet2.png
+format: RGBA8888
+filter: MipMapLinearNearest,Nearest
+repeat: xy
+BALL_BIG_BLACK0
+rotate: false
+xy: 0, 64
+size: 64, 64
+orig: 64, 64
+offset: 0, 0
+index: -1
+BALL_BIG_RED0
+rotate: false
+xy: 64, 64
+size: 64, 64
+orig: 64, 64
+offset: 0, 0
+index: -1
+BALL_BIG_PURPLE0
+rotate: false
+xy: 128, 64
+size: 64, 64
+orig: 64, 64
+offset: 0, 0
+index: -1
+BALL_BIG_BLUE0
+rotate: false
+xy: 192, 64
+size: 64, 64
+orig: 64, 64
+offset: 0, 0
+index: -1
+BALL_BIG_CYAN0
+rotate: false
+xy: 256, 64
+size: 64, 64
+orig: 64, 64
+offset: 0, 0
+index: -1
+BALL_BIG_GREEN0
+rotate: false
+xy: 320, 64
+size: 64, 64
+orig: 64, 64
+offset: 0, 0
+index: -1
+BALL_BIG_YELLOW0
+rotate: false
+xy: 384, 64
+size: 64, 64
+orig: 64, 64
+offset: 0, 0
+index: -1
+BALL_BIG_WHITE0
+rotate: false
+xy: 448, 64
+size: 64, 64
+orig: 64, 64
+offset: 0, 0
+index: -1
+BALL_LARGE_HOLLOW_RED0
+rotate: false
+xy: 0, 384
+size: 128, 128
+orig: 128, 128
+offset: 0, 0
+index: -1
+BALL_LARGE_HOLLOW_BLUE0
+rotate: false
+xy: 128, 384
+size: 128, 128
+orig: 128, 128
+offset: 0, 0
+index: -1
+BALL_LARGE_HOLLOW_GREEN0
+rotate: false
+xy: 256, 384
+size: 128, 128
+orig: 128, 128
+offset: 0, 0
+index: -1
+BALL_LARGE_HOLLOW_YELLOW0
+rotate: false
+xy: 384, 384
+size: 128, 128
+orig: 128, 128
+offset: 0, 0
+index: -1
+BUTTERFLY_BLACK0
+rotate: false
+xy: 0, 128
+size: 64, 64
+orig: 64, 64
+offset: 0, 0
+index: -1
+BUTTERFLY_RED0
+rotate: false
+xy: 64, 128
+size: 64, 64
+orig: 64, 64
+offset: 0, 0
+index: -1
+BUTTERFLY_PURPLE0
+rotate: false
+xy: 128, 128
+size: 64, 64
+orig: 64, 64
+offset: 0, 0
+index: -1
+BUTTERFLY_BLUE0
+rotate: false
+xy: 192, 128
+size: 64, 64
+orig: 64, 64
+offset: 0, 0
+index: -1
+BUTTERFLY_CYAN0
+rotate: false
+xy: 256, 128
+size: 64, 64
+orig: 64, 64
+offset: 0, 0
+index: -1
+BUTTERFLY_GREEN0
+rotate: false
+xy: 320, 128
+size: 64, 64
+orig: 64, 64
+offset: 0, 0
+index: -1
+BUTTERFLY_YELLOW0
+rotate: false
+xy: 384, 128
+size: 64, 64
+orig: 64, 64
+offset: 0, 0
+index: -1
+BUTTERFLY_WHITE0
+rotate: false
+xy: 448, 128
+size: 64, 64
+orig: 64, 64
+offset: 0, 0
+index: -1
+ORB_MEDIUM_BLACK0
+rotate: false
+xy: 0, 320
+size: 64, 64
+orig: 64, 64
+offset: 0, 0
+index: -1
+ORB_MEDIUM_RED0
+rotate: false
+xy: 64, 320
+size: 64, 64
+orig: 64, 64
+offset: 0, 0
+index: -1
+ORB_MEDIUM_PURPLE0
+rotate: false
+xy: 128, 320
+size: 64, 64
+orig: 64, 64
+offset: 0, 0
+index: -1
+ORB_MEDIUM_BLUE0
+rotate: false
+xy: 192, 320
+size: 64, 64
+orig: 64, 64
+offset: 0, 0
+index: -1
+ORB_MEDIUM_CYAN0
+rotate: false
+xy: 256, 320
+size: 64, 64
+orig: 64, 64
+offset: 0, 0
+index: -1
+ORB_MEDIUM_GREEN0
+rotate: false
+xy: 320, 320
+size: 64, 64
+orig: 64, 64
+offset: 0, 0
+index: -1
+ORB_MEDIUM_YELLOW0
+rotate: false
+xy: 384, 320
+size: 64, 64
+orig: 64, 64
+offset: 0, 0
+index: -1
+ORB_MEDIUM_WHITE0
+rotate: false
+xy: 448, 320
+size: 64, 64
+orig: 64, 64
+offset: 0, 0
+index: -1
+STAR_LARGE_BLACK0
+rotate: false
+xy: 0, 0
+size: 64, 64
+orig: 64, 64
+offset: 0, 0
+index: -1
+STAR_LARGE_RED0
+rotate: false
+xy: 64, 0
+size: 64, 64
+orig: 64, 64
+offset: 0, 0
+index: -1
+STAR_LARGE_PURPLE0
+rotate: false
+xy: 128, 0
+size: 64, 64
+orig: 64, 64
+offset: 0, 0
+index: -1
+STAR_LARGE_BLUE0
+rotate: false
+xy: 192, 0
+size: 64, 64
+orig: 64, 64
+offset: 0, 0
+index: -1
+STAR_LARGE_CYAN0
+rotate: false
+xy: 256, 0
+size: 64, 64
+orig: 64, 64
+offset: 0, 0
+index: -1
+STAR_LARGE_GREEN0
+rotate: false
+xy: 320, 0
+size: 64, 64
+orig: 64, 64
+offset: 0, 0
+index: -1
+STAR_LARGE_YELLOW0
+rotate: false
+xy: 384, 0
+size: 64, 64
+orig: 64, 64
+offset: 0, 0
+index: -1
+STAR_LARGE_WHITE0
+rotate: false
+xy: 448, 0
+size: 64, 64
+orig: 64, 64
+offset: 0, 0
+index: -1
+RICE_LARGE_BLACK0
+rotate: false
+xy: 0, 256
+size: 64, 64
+orig: 64, 64
+offset: 0, 0
+index: -1
+RICE_LARGE_RED0
+rotate: false
+xy: 64, 256
+size: 64, 64
+orig: 64, 64
+offset: 0, 0
+index: -1
+RICE_LARGE_PURPLE0
+rotate: false
+xy: 128, 256
+size: 64, 64
+orig: 64, 64
+offset: 0, 0
+index: -1
+RICE_LARGE_BLUE0
+rotate: false
+xy: 192, 256
+size: 64, 64
+orig: 64, 64
+offset: 0, 0
+index: -1
+RICE_LARGE_CYAN0
+rotate: false
+xy: 256, 256
+size: 64, 64
+orig: 64, 64
+offset: 0, 0
+index: -1
+RICE_LARGE_GREEN0
+rotate: false
+xy: 320, 256
+size: 64, 64
+orig: 64, 64
+offset: 0, 0
+index: -1
+RICE_LARGE_YELLOW0
+rotate: false
+xy: 384, 256
+size: 64, 64
+orig: 64, 64
+offset: 0, 0
+index: -1
+RICE_LARGE_WHITE0
+rotate: false
+xy: 448, 256
+size: 64, 64
+orig: 64, 64
+offset: 0, 0
+index: -1
+KNIFE_BLACK0
+rotate: false
+xy: 0, 192
+size: 64, 64
+orig: 64, 64
+offset: 0, 0
+index: -1
+KNIFE_RED0
+rotate: false
+xy: 64, 192
+size: 64, 64
+orig: 64, 64
+offset: 0, 0
+index: -1
+KNIFE_PURPLE0
+rotate: false
+xy: 128, 192
+size: 64, 64
+orig: 64, 64
+offset: 0, 0
+index: -1
+KNIFE_BLUE0
+rotate: false
+xy: 192, 192
+size: 64, 64
+orig: 64, 64
+offset: 0, 0
+index: -1
+KNIFE_CYAN0
+rotate: false
+xy: 256, 192
+size: 64, 64
+orig: 64, 64
+offset: 0, 0
+index: -1
+KNIFE_GREEN0
+rotate: false
+xy: 320, 192
+size: 64, 64
+orig: 64, 64
+offset: 0, 0
+index: -1
+KNIFE_YELLOW0
+rotate: false
+xy: 384, 192
+size: 64, 64
+orig: 64, 64
+offset: 0, 0
+index: -1
+KNIFE_WHITE0
+rotate: false
+xy: 448, 192
+size: 64, 64
+orig: 64, 64
+offset: 0, 0
+index: -1
+
