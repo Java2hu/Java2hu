@@ -2,7 +2,7 @@ package java2hu.object.bullet;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Animation;
-import com.sun.istack.internal.Nullable;
+import javax.annotation.Nullable;
 
 public interface IBulletType
 {

@@ -14,7 +14,7 @@ import com.badlogic.gdx.graphics.Texture.TextureWrap;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.math.Vector2;
-import com.sun.istack.internal.Nullable;
+import javax.annotation.Nullable;
 
 /**
  * Boss aura that is applied to the background of the game.
