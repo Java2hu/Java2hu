@@ -22,7 +22,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.utils.Disposable;
-import com.sun.istack.internal.Nullable;
+import javax.annotation.Nullable;
 
 public abstract class StageObject extends J2hObject implements IPosition
 {
