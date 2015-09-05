@@ -2,8 +2,8 @@ package java2hu.pathing;
 
 import java.util.ArrayList;
 import java2hu.Game;
+import java2hu.IPosition;
 import java2hu.J2hGame;
-import java2hu.Position;
 import java2hu.events.pathing.PathingFinishEvent;
 import java2hu.object.StageObject;
 import java2hu.util.Duration;
@@ -29,6 +29,12 @@ public class PathingHelper
 			getCurrentPath().tick();
 	}
 	
+	public void tickDelta(float delta)
+	{
+		if(getCurrentPath() != null)
+			getCurrentPath().tickDelta(delta);
+	}
+	
 	/**
 	 * Sets the objects path to this one, the previous path will be deleted.
 	 */
@@ -39,29 +45,29 @@ public class PathingHelper
 	
 	public static class Path
 	{
-		private ArrayList<Position> path = new ArrayList<Position>();
+		private ArrayList<IPosition> path = new ArrayList<IPosition>();
 		
 		/**
-		 * Returns a read only list of the positions in this path.
+		 * Returns a list of the positions in this path.
 		 */
-		public ArrayList<Position> getPositions()
+		public ArrayList<IPosition> getPositions()
 		{
-			return new ArrayList<Position>(path);
+			return path;
 		}
-		
-		public void addPosition(Position pos)
+
+		public void addPosition(IPosition pos)
 		{
-			path.add(pos);
+			getPositions().add(pos);
 			recalculate();
 		}
 		
-		public void removePosition(Position pos)
+		public void removePosition(IPosition pos)
 		{
-			path.remove(pos);
+			getPositions().remove(pos);
 			recalculate();
 		}
 		
-		private StageObject object;
+		protected StageObject object;
 		
 		/**
 		 * Creates a path with the specified speed.
@@ -123,10 +129,15 @@ public class PathingHelper
 			return done;
 		}
 		
-		private void onDone()
+		public void onDone()
 		{
 			PathingFinishEvent event = new PathingFinishEvent(object, this);
 			Game.getGame().callEvent(event);
+		}
+		
+		public void tickDelta(float delta)
+		{
+			
 		}
 		
 		public void tick()
@@ -134,14 +145,14 @@ public class PathingHelper
 			if(done)
 				return;
 			
-			if(index >= path.size())
+			if(index >= getPositions().size())
 			{
 				done = true;
 				onDone();
 				return;
 			}
 			
-			Position to = path.get(index);
+			IPosition to = getPositions().get(index);
 			
 			double angle = MathUtil.getAngle(to, object);
 			double rad = Math.toRadians(angle);
@@ -208,16 +219,16 @@ public class PathingHelper
 		 */
 		public double getDistance()
 		{
-			if(path.isEmpty() || index >= path.size())
+			if(getPositions().isEmpty() || index >= getPositions().size())
 				return 0d;
 			
-			Position last = path.get(index);
+			IPosition last = getPositions().get(index);
 			
 			double distance = MathUtil.getDistance(object, last);
 			
-			for(int i = index + 1; i < path.size(); i++)
+			for(int i = index + 1; i < getPositions().size(); i++)
 			{
-				final Position next = path.get(i);
+				final IPosition next = getPositions().get(i);
 				
 				distance += MathUtil.getDistance(last, next);
 				last = next;

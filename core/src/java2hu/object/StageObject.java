@@ -16,13 +16,14 @@ import java2hu.plugin.Plugin;
 import java2hu.util.Duration;
 import java2hu.util.Duration.Unit;
 
+import javax.annotation.Nullable;
+
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.utils.Disposable;
-import javax.annotation.Nullable;
 
 public abstract class StageObject extends J2hObject implements IPosition
 {
@@ -707,6 +708,8 @@ public abstract class StageObject extends J2hObject implements IPosition
 	public void update(float second)
 	{
 		onUpdateDelta(second);
+		
+		getPathing().tickDelta(second);
 		
 		for(Entry<StageObject, OwnedObjectData> owned : ownedObjects.entrySet())
 		{

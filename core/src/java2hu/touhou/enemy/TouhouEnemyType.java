@@ -6,6 +6,7 @@ import java2hu.StartupLoopAnimation;
 import java2hu.object.enemy.IEnemyType;
 import java2hu.util.AnimationUtil;
 import java2hu.util.Getter;
+import java2hu.util.ImageSplitter;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
@@ -30,7 +31,7 @@ public enum TouhouEnemyType implements IEnemyType
 
 				for(int i = 0; i < 4; i++)
 				{
-					array.add(new HitboxSprite(new TextureRegion(texture, 0 + i * 64, 640, 64, 64)));
+					array.add(new HitboxSprite(new TextureRegion(enemyTexture, 0 + i * 64, 640, 64, 64)));
 				}
 				
 				saved = new Animation(5f, array);
@@ -78,7 +79,7 @@ public enum TouhouEnemyType implements IEnemyType
 				{
 					Array<TextureRegion> array = i < 3 ? startup : loop;
 					
-					array.add(new HitboxSprite(new TextureRegion(texture, 5 * 64 + i * 64, 640, 64, 64)));
+					array.add(new HitboxSprite(new TextureRegion(enemyTexture, 5 * 64 + i * 64, 640, 64, 64)));
 				}
 				
 				saved = new StartupLoopAnimation(startup, loop, 5f);
@@ -96,12 +97,36 @@ public enum TouhouEnemyType implements IEnemyType
 		}
 	});
 	
-	private static Texture texture;
+	private static Texture auraTexture;
+	private static Texture enemyTexture;
+	
+	public static Texture getAuraTexture()
+	{
+		return auraTexture;
+	}
+	
+	public static Texture getEnemyTexture()
+	{
+		return enemyTexture;
+	}
+	
+	private static Animation auraAnimation;
+	
+	public static Animation getAuraAnimation()
+	{
+		return AnimationUtil.copyAnimation(auraAnimation);
+	}
 	
 	static
 	{
-		 texture = Loader.texture(Gdx.files.internal("enemy.png"));
-		 texture.setFilter(TextureFilter.MipMapLinearNearest, TextureFilter.Nearest);
+		 auraTexture = Loader.texture(Gdx.files.internal("sprites/enemy/enemy_aura.png"));
+		 auraTexture.setFilter(TextureFilter.MipMapLinearNearest, TextureFilter.Nearest);
+		 
+		 auraAnimation = ImageSplitter.getAnimationFromSprite(auraTexture, 48, 48, 0.25f, 1,2,3,4,5,6,7,8);
+		 auraAnimation.setPlayMode(PlayMode.LOOP);
+		
+		 enemyTexture = Loader.texture(Gdx.files.internal("enemy.png"));
+		 enemyTexture.setFilter(TextureFilter.MipMapLinearNearest, TextureFilter.Nearest);
 	}
 	
 	private Getter<Animation> idle, left, right, special;

@@ -53,7 +53,7 @@ public class Days extends J2hObject
 	{
 		final J2hGame game = Game.getGame();
 		final float startX = game.getMinX() + (game.getMaxX() - game.getMinX()) / 2;
-		final float startY = Game.getGame().getHeight() - 150;
+		final float startY = Game.getGame().getHeight() - 200;
 		final float startHP = 100f;
 		
 		int day = 1;

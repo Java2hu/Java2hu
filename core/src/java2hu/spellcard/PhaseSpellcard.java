@@ -41,6 +41,11 @@ public class PhaseSpellcard<T extends StageObject> extends BossSpellcard<T>
 		phases.add(phase);
 	}
 	
+	public void removePhase(Phase<T> phase)
+	{
+		phases.remove(phase);
+	}
+	
 	private int correctedPhaseInterval(Phase phase)
 	{
 		return phase.getPhaseInterval();

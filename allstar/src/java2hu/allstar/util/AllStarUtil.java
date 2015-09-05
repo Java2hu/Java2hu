@@ -448,14 +448,12 @@ public class AllStarUtil extends J2hObject
 		});
 	}
 	
-	private static BitmapFont spellCardFont = TouhouFont.get(50);
+	public static BitmapFont spellCardFont = TouhouFont.get(30);
 	
 	private static void spawnSpellName(final String spellName, final Getter<Boolean> start)
 	{
 		final Texture spellcard = Loader.texture(Gdx.files.internal("spellcard.png"));
 		final Sprite sprite = new Sprite(spellcard);
-		
-		spellCardFont = TouhouFont.get(30);
 		
 		game.spawn(new DrawObject()
 		{

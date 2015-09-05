@@ -88,7 +88,10 @@ public class Enemy extends LivingObject
 
 		if(getPlayerHitHitbox() != null)
 		if(Intersector.overlapConvexPolygons(g.getPlayer().getHitbox(), getPlayerHitHitbox()))
+		{
 			g.getPlayer().onHit(this);
+			Game.getGame().delete(this);
+		}
 		
 		if(doKill())
 		{
@@ -123,6 +126,12 @@ public class Enemy extends LivingObject
 	public boolean useDeathSound()
 	{
 		return useDeathSound;
+	}
+	
+	public void deleteSilent()
+	{
+		useDeathSound(false);
+		game.delete(this);
 	}
 	
 	@Override
