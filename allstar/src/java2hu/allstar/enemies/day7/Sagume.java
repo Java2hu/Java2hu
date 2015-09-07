@@ -804,22 +804,17 @@ public class Sagume extends AllStarBoss
 				}
 			});
 			
-			addPhase(new Phase<Sagume>(300)
+			addPhase(new Phase<Sagume>(360)
 			{
-				private ThBulletColor color = ThBulletColor.WHITE;
-				
-				public void randomize()
-				{
-					color = Math.random() > 0.5 ? ThBulletColor.RED : ThBulletColor.BLUE;
-				}
+				private boolean right = false;
 				
 				@Override
 				public void tick(int tick, J2hGame game, Sagume boss)
 				{
 					if (tick == 0)
 					{
+						right = !right;
 						boss.spellCardNameChanger.transform("Predictable Danmaku Maze");
-						randomize();
 					}
 					
 					if (tick == 100)
@@ -831,9 +826,16 @@ public class Sagume extends AllStarBoss
 						TouhouSounds.Stage.TIMEOUT.play(1f, 0.7f, 0.7f);
 					}
 					
-					if (tick < 140 && (tick % 50 < 20))
+					boolean after = tick > 100 && tick < 300 && tick % 2 == 0;
+					
+					boolean before = tick < 140 && (tick % 50 < 20);
+					
+					if (before)
+						after = false;
+					
+					if (before || after)
 					{
-						if(tick % 5 == 0)
+						if(tick % 5 == 0 && !after || after && tick % 20 == 0)
 							TouhouSounds.Enemy.BULLET_2.play(0.4f);
 						
 						int directions = 10;
@@ -849,7 +851,7 @@ public class Sagume extends AllStarBoss
 							double startX = game.getPlayer().getX() + (Math.cos(rad) * 800);
 							double startY = game.getPlayer().getY() + (Math.sin(rad) * 800);
 
-							Bullet bullet = new Bullet(new ThBullet(ThBulletType.BALL_2, color), (float)startX, (float)startY)
+							Bullet bullet = new Bullet(new ThBullet(after ? ThBulletType.ORB_LARGE : ThBulletType.BALL_2, right ? ThBulletColor.BLUE : ThBulletColor.RED), (float)startX, (float)startY)
 							{
 								@Override
 								public int getDeleteDistance()
@@ -886,8 +888,18 @@ public class Sagume extends AllStarBoss
 							
 							bullet.setZIndex(bullet.getZIndex() + tick);
 
-							bullet.setDirectionDeg((MathUtil.getAngle(bullet, game.getPlayer())) - (((tick - 100) / 100f) * 20f), 600f - Math.min(550, ((tick / 160f) * 550f)));
-
+							float speed = 600f - Math.min(550, ((tick / 160f) * 550f));
+							float offset = ((tick - 100) / 100f) * 20f;
+							
+							if (after)
+							{
+								speed = 1000f;
+								offset = 15 + (((tick - 140f) / (300f - 140f)) * 15);
+							}
+							
+							bullet.setDirectionDeg((MathUtil.getAngle(bullet, game.getPlayer())) + (right ? -offset : offset), speed);
+							bullet.setRotationFromVelocity(-90);
+							
 							game.spawn(bullet);
 						}
 					}
