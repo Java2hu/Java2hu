@@ -32,7 +32,6 @@ allprojects {
 project(":allstarlauncher") {
     apply plugin: "java"
 
-
     dependencies {
         compile project(":core")
         compile project(":allstar")
@@ -64,6 +63,8 @@ project(":core") {
         compile "com.badlogicgames.gdx:gdx-box2d:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-bullet:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
+        compile "com.google.code.gson:gson:2.3.1"
+        compile "org.reflections:reflections:0.9.10"
         compile fileTree(dir: 'lib', include: '*.jar')
     }
 }
