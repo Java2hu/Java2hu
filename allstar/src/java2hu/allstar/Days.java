@@ -19,6 +19,7 @@ import java2hu.allstar.enemies.day1.Doremy;
 import java2hu.allstar.enemies.day1.Wakasagihime;
 import java2hu.allstar.enemies.day2.Kagerou;
 import java2hu.allstar.enemies.day2.Mokou;
+import java2hu.allstar.enemies.day4.Nitori;
 import java2hu.allstar.enemies.day5.Iku;
 import java2hu.allstar.enemies.day5.Seiran;
 import java2hu.allstar.enemies.day5.Tenshi;
@@ -166,7 +167,17 @@ public class Days extends J2hObject
 			// Youkai Mountain:
 			// Aki Sisters
 			// Hina
-			// Nitori
+			
+			addCharacter(day, type, Nitori.FULL_NAME, new Getter<AllStarBoss>()
+			{
+				@Override
+				public AllStarBoss get()
+				{
+					final Nitori boss = new Nitori(startHP, startX, startY);
+					return boss;
+				}
+			});
+			
 			// Momiji
 			// Hatate
 			// Aya
