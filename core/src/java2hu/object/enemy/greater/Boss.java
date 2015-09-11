@@ -5,7 +5,7 @@ import java2hu.J2hGame;
 import java2hu.MovementAnimation;
 import java2hu.SmartTimer;
 import java2hu.StartupLoopAnimation;
-import java2hu.object.LivingObject;
+import java2hu.object.enemy.Enemy;
 import java2hu.touhou.sounds.TouhouSounds;
 import java2hu.util.AnimationUtil;
 import java2hu.util.HitboxUtil;
@@ -18,7 +18,7 @@ import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Polygon;
 import com.badlogic.gdx.math.Rectangle;
 
-public abstract class Boss extends LivingObject
+public abstract class Boss extends Enemy
 {
 	public Sprite fullBodySprite = null;
 	
@@ -48,7 +48,7 @@ public abstract class Boss extends LivingObject
 	 */
 	public Boss(Sprite fullBodySprite, Animation idle, Animation left, Animation right, Animation special, float maxHealth, float x, float y)
 	{
-		super(HitboxUtil.textureRegionPolygon(idle.getKeyFrames()[0]), maxHealth, x, y);
+		super(idle, left, right, special, maxHealth, x, y);
 		
 		playerHitHitbox = HitboxUtil.rectangleHitbox(30);
 		
@@ -69,7 +69,7 @@ public abstract class Boss extends LivingObject
 	 */
 	public Boss(float maxHealth, float x, float y)
 	{
-		super(null, maxHealth, x, y);
+		super(null, null, null, null, maxHealth, x, y);
 		
 		playerHitHitbox = HitboxUtil.rectangleHitbox(30);
 		
@@ -92,6 +92,7 @@ public abstract class Boss extends LivingObject
 		addDisposable(special);
 	}
 	
+	@Override
 	public void playSpecial(boolean bool)
 	{
 		if(special == null)
@@ -221,26 +222,42 @@ public abstract class Boss extends LivingObject
 		return getX();
 	}
 	
+	@Override
+	public boolean doKill()
+	{
+		return false; // Bosses need to be manually killed.
+	}
+	
+	@Override
+	public boolean useDeathSound()
+	{
+		return false;
+	}
+	
 	public Sprite getFullBodySprite()
 	{
 		return fullBodySprite;
 	}
 	
+	@Override
 	public HitboxSprite getCurrentSprite()
 	{
 		return (HitboxSprite) idle.getKeyFrame(getAnimationTime());
 	}
 	
+	@Override
 	public float getAnimationTime()
 	{
 		return Game.getGame().getTick();
 	}
 	
+	@Override
 	public float getSpecialAnimationTime()
 	{
 		return specialTimer;
 	}
 	
+	@Override
 	public Polygon getPlayerHitHitbox()
 	{
 		return playerHitHitbox;

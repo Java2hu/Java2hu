@@ -32,7 +32,7 @@ public class Enemy extends LivingObject
 	
 	public Enemy(IEnemyType type, float maxHealth, float x, float y)
 	{
-		this(type.getIdleAnimation(), type.getLeftAnimation(), type.getRightAnimation(), type.getSpecialAnimation(), maxHealth, x, y);
+		this(type == null ? null : type.getIdleAnimation(), type == null ? null : type.getLeftAnimation(), type == null ? null : type.getRightAnimation(), type == null ? null : type.getSpecialAnimation(), maxHealth, x, y);
 	}
 
 	/**
@@ -48,7 +48,7 @@ public class Enemy extends LivingObject
 	 */
 	public Enemy(Animation idle, Animation left, Animation right, Animation special, float maxHealth, float x, float y)
 	{
-		super(HitboxUtil.textureRegionPolygon(idle.getKeyFrames()[0]), maxHealth, x, y);
+		super(idle == null ? null : HitboxUtil.textureRegionPolygon(idle.getKeyFrames()[0]), maxHealth, x, y);
 
 		playerHitHitbox = HitboxUtil.rectangleHitbox(10); // SMALL! Easy player collision is infuriating to the player.
 
@@ -114,6 +114,22 @@ public class Enemy extends LivingObject
 	public boolean doKill()
 	{
 		return getHealth() <= 0;
+	}
+	
+	/**
+	 * @return if this enemy does not take damage.
+	 */
+	public boolean isInvulnerable()
+	{
+		return false;
+	}
+	
+	/**
+	 * @return if collision should be checked on this enemy.
+	 */
+	public boolean doCheckCollision()
+	{
+		return true;
 	}
 	
 	private boolean useDeathSound = true;

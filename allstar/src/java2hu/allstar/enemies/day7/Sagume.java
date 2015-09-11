@@ -15,6 +15,7 @@ import java2hu.background.BackgroundBossAura;
 import java2hu.background.ClearBackground;
 import java2hu.background.SwirlingBackground;
 import java2hu.gameflow.GameFlowScheme.WaitConditioner;
+import java2hu.helpers.ZIndexHelper;
 import java2hu.object.DrawObject;
 import java2hu.object.StageObject;
 import java2hu.object.bullet.Bullet;
@@ -33,8 +34,8 @@ import java2hu.system.SaveableObject;
 import java2hu.touhou.bullet.ThBullet;
 import java2hu.touhou.bullet.ThBulletColor;
 import java2hu.touhou.bullet.ThBulletType;
-import java2hu.touhou.enemy.Sentinel;
-import java2hu.touhou.enemy.Sentinel.SentinelColor;
+import java2hu.touhou.enemy.FlyingYingYangOrb;
+import java2hu.touhou.enemy.FlyingYingYangOrb.FlyingYingYangOrbColor;
 import java2hu.touhou.sounds.TouhouSounds;
 import java2hu.util.BossUtil;
 import java2hu.util.Duration;
@@ -523,7 +524,11 @@ public class Sagume extends AllStarBoss
 			super(owner);
 			
 			owner.setDamageModifier(0.6f);
+			
+			setSpellcardTime(Duration.seconds(35));
 		}
+		
+		private ZIndexHelper indexer = new ZIndexHelper(1000);
 
 		@Override
 		public void tick(int tick, J2hGame game, Sagume boss)
@@ -542,7 +547,7 @@ public class Sagume extends AllStarBoss
 			{
 				TouhouSounds.Enemy.HUM_1.play(0.8f);
 				
-				Sentinel s = new Sentinel(SentinelColor.PURPLE, 20, boss.getX(), boss.getY())
+				FlyingYingYangOrb s = new FlyingYingYangOrb(FlyingYingYangOrbColor.PURPLE, 20, boss.getX(), boss.getY())
 				{
 					@Override
 					public void decreaseHealth(float decrease)
@@ -553,12 +558,12 @@ public class Sagume extends AllStarBoss
 					};
 				};
 				
-				s.update(3f);
+				s.skipEntrance();
 				
-				s.addEffect(new Plugin<Sentinel>()
+				s.addEffect(new Plugin<FlyingYingYangOrb>()
 				{
 					@Override
-					public void update(Sentinel object, long tick)
+					public void update(FlyingYingYangOrb object, long tick)
 					{
 						if(object.getTicksAlive() > 100 && !game.inBoundary(object.getX(), object.getY()))
 							object.deleteSilent();
@@ -582,7 +587,7 @@ public class Sagume extends AllStarBoss
 			{
 				for(boolean flip : RNG.BOOLS)
 				{
-					Sentinel s = new Sentinel(SentinelColor.RED, 100, boss.getX(), boss.getY());
+					FlyingYingYangOrb s = new FlyingYingYangOrb(flip ? FlyingYingYangOrbColor.BLUE : FlyingYingYangOrbColor.RED, 100, boss.getX(), boss.getY());
 
 					Path p = new Path(s, Duration.seconds(6))
 					{
@@ -613,7 +618,7 @@ public class Sagume extends AllStarBoss
 
 						p.addPosition(pos);
 					}
-
+					
 					for(float angle = 0; angle < 360; angle += 5)
 					{
 						float rad = (float) Math.toRadians(flip ? 180 - angle : angle);
@@ -640,10 +645,10 @@ public class Sagume extends AllStarBoss
 
 					game.spawn(s);
 					
-					s.addEffect(new Plugin<Sentinel>()
+					s.addEffect(new Plugin<FlyingYingYangOrb>()
 					{
 						@Override
-						public void update(Sentinel object, long tick)
+						public void update(FlyingYingYangOrb object, long tick)
 						{
 							if (!Scheduler.isTracked("release", "release"))
 							{
@@ -666,7 +671,7 @@ public class Sagume extends AllStarBoss
 									b.update((i / 3f) * 0.5f); 
 									
 									b.setRotationFromVelocity();
-									b.setZIndex((int) (b.getZIndex() + tick));
+									indexer.index(b);
 									
 									game.spawn(b);
 								}
@@ -685,6 +690,7 @@ public class Sagume extends AllStarBoss
 			super(owner);
 			
 			owner.setDamageModifier(0.6f);
+			setSpellcardTime(Duration.seconds(40));
 			
 			addPhase(new Phase<Sagume>(100)
 			{
@@ -736,12 +742,12 @@ public class Sagume extends AllStarBoss
 										
 										game.delete(object);
 										
-										Sentinel s = new Sentinel(finalI % 2 == 0 ? SentinelColor.RED : SentinelColor.BLUE, 1, object.getX(), object.getY());
+										FlyingYingYangOrb s = new FlyingYingYangOrb(finalI % 2 == 0 ? FlyingYingYangOrbColor.RED : FlyingYingYangOrbColor.BLUE, 1, object.getX(), object.getY());
 										
-										s.addEffect(new Plugin<Sentinel>()
+										s.addEffect(new Plugin<FlyingYingYangOrb>()
 										{
 											@Override
-											public void update(Sentinel object, long tick)
+											public void update(FlyingYingYangOrb object, long tick)
 											{
 												if(object.getTicksAlive() > 100 && !game.inBoundary(object.getX(), object.getY()))
 													object.deleteSilent();
@@ -826,7 +832,7 @@ public class Sagume extends AllStarBoss
 						TouhouSounds.Stage.TIMEOUT.play(1f, 0.7f, 0.7f);
 					}
 					
-					boolean after = tick > 100 && tick < 300 && tick % 2 == 0;
+					boolean after = tick > 98 && tick < 300 && tick % 2 == 0;
 					
 					boolean before = tick < 140 && (tick % 50 < 20);
 					

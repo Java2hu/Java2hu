@@ -11,7 +11,7 @@ public class ZIndexHelper
 	private int indexLimit = -1;
 	
 	/**
-	 * Creates an indexer without an index limit.
+	 * Creates an indexer without an index limit, use with caution.
 	 * An index limit prevents overflows of stage objects to different z-index ranges by resetting the timer once the index limit is reached.
 	 */
 	public ZIndexHelper()

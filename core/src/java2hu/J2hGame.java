@@ -1440,15 +1440,18 @@ public class J2hGame extends ApplicationAdapter implements InputProcessor
 
 		for(StageObject object : stageObjects)
 		{
-			if(object instanceof LivingObject)
+			boolean enemy = object instanceof Enemy;
+			
+			if (enemy)
+			{
+				if (!((Enemy) object).doCheckCollision())
+					continue;
+			}
+			
+			if (object instanceof LivingObject)
 				HitboxUtil.drawHitbox(((LivingObject)object).getHitbox());
 
-			if(object instanceof Boss)
-			{
-				HitboxUtil.drawHitbox(((Boss)object).getPlayerHitHitbox());
-			}
-
-			if(object instanceof Enemy)
+			if (enemy)
 			{
 				HitboxUtil.drawHitbox(((Enemy)object).getPlayerHitHitbox());
 			}

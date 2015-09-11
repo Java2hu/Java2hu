@@ -6,10 +6,10 @@ import java2hu.HitboxSprite;
 import java2hu.J2hGame;
 import java2hu.Loader;
 import java2hu.object.FreeStageObject;
-import java2hu.object.LivingObject;
 import java2hu.object.StageObject;
 import java2hu.object.bullet.Bullet;
 import java2hu.object.bullet.IBulletType;
+import java2hu.object.enemy.Enemy;
 import java2hu.util.AnimationUtil;
 import java2hu.util.ImageSplitter;
 
@@ -188,9 +188,12 @@ public class PlayerBullet extends Bullet
 
 		for(StageObject obj : stageObjects)
 		{
-			if(obj instanceof LivingObject)
+			if(obj instanceof Enemy)
 			{
-				LivingObject lo = (LivingObject) obj;
+				Enemy lo = (Enemy) obj;
+				
+				if (!lo.doCheckCollision())
+					continue;
 
 				if(Intersector.overlapConvexPolygons(lo.getHitbox(), getCurrentSprite().getHitbox()))
 				{

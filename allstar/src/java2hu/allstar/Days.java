@@ -322,7 +322,7 @@ public class Days extends J2hObject
 			// Rei'sen (Reisen 2)
 			// Watatsuki's
 			
-			addCharacter(day, type, "Sagume", new Getter<AllStarBoss>()
+			addCharacter(day, type, Sagume.FULL_NAME, new Getter<AllStarBoss>()
 			{
 				@Override
 				public AllStarBoss get()

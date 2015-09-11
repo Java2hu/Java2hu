@@ -14,16 +14,16 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Polygon;
 
-public class Sentinel extends Enemy
+public class FlyingYingYangOrb extends Enemy
 {
-	public static enum SentinelColor
+	public static enum FlyingYingYangOrbColor
 	{
 		RED(256, 512, Color.RED), GREEN(320, 512, Color.GREEN), BLUE(384, 512, Color.BLUE), PURPLE(448, 512, Color.PURPLE);
 		
 		private Position pos;
 		private Color color;
 		
-		private SentinelColor(float x, float y, Color color)
+		private FlyingYingYangOrbColor(float x, float y, Color color)
 		{
 			pos = new Position(x, y);
 			this.color = color;
@@ -43,7 +43,7 @@ public class Sentinel extends Enemy
 	private final static int WIDTH = 64;
 	private final static int HEIGHT = 64;
 	
-	public Sentinel(SentinelColor color, float maxHealth, float x, float y)
+	public FlyingYingYangOrb(FlyingYingYangOrbColor color, float maxHealth, float x, float y)
 	{
 		super(new IEnemyType()
 		{
@@ -127,6 +127,8 @@ public class Sentinel extends Enemy
 	
 	private Polygon playerHitBox;
 	
+	private boolean invulnerable = true;
+	
 	@Override
 	public void onDraw()
 	{
@@ -170,6 +172,21 @@ public class Sentinel extends Enemy
 	private float scale = 0.4f;
 	private float grey = 1f;
 	
+	/**
+	 * Skips the ying yang orb spawning animation where they fade in from the background.
+	 */
+	public void skipEntrance()
+	{
+		scale = 1f;
+		grey = 0f;
+		invulnerable = false;
+		
+		if (playerHitHitbox == null)
+		{
+			playerHitHitbox = playerHitBox;
+		}
+	}
+	
 	@Override
 	public void onUpdateDelta(float delta)
 	{
@@ -188,9 +205,22 @@ public class Sentinel extends Enemy
 			scale = Math.min(1, scale + (0.5f * delta));
 		}
 		
-		if (playerHitHitbox == null && scale > 0.8f)
+		if (playerHitHitbox == null && grey <= 0.1f)
 		{
 			playerHitHitbox = playerHitBox;
+			invulnerable = false;
 		}
+	}
+	
+	@Override
+	public boolean isInvulnerable()
+	{
+		return invulnerable;
+	}
+	
+	@Override
+	public boolean doCheckCollision()
+	{
+		return !invulnerable;
 	}
 }
