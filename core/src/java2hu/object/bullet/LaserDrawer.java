@@ -6,6 +6,7 @@ import java2hu.HitboxSprite;
 import java2hu.J2hGame;
 import java2hu.Position;
 import java2hu.overwrite.J2hObject;
+import java2hu.util.GetterSetter;
 import java2hu.util.MathUtil;
 
 import com.badlogic.gdx.Gdx;
@@ -18,6 +19,7 @@ import com.badlogic.gdx.graphics.VertexAttribute;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Matrix4;
@@ -34,11 +36,11 @@ public class LaserDrawer extends Bullet
 	Polygon hitbox = new Polygon();
 	ShaderProgram sp = SpriteBatch.createDefaultShader();
 	LaserAnimation textures;
-	float thickness;
+	double thickness;
 	
-	private float hitboxThickness;
+	private double hitboxThickness;
 	
-	public LaserDrawer(LaserAnimation ani, float thickness, float hitboxThickness)
+	public LaserDrawer(LaserAnimation ani, double thickness, double hitboxThickness)
 	{
 		super((Animation)null, 0, 0);
 		
@@ -60,12 +62,12 @@ public class LaserDrawer extends Bullet
 		return 0;
 	}
 	
-	public void setThickness(float thickness)
+	public void setThickness(double thickness)
 	{
 		this.thickness = thickness;
 	}
 	
-	public float getThickness()
+	public double getThickness()
 	{
 		return thickness;
 	}
@@ -122,14 +124,14 @@ public class LaserDrawer extends Bullet
 	
 	@Deprecated
 	@Override
-	public void setDirectionDegTick(float degree, float speed)
+	public void setDirectionDegTick(double degree, double speed)
 	{
 		super.setDirectionDegTick(degree, speed);
 	}
 	
 	@Deprecated
 	@Override
-	public void setDirectionRadsTick(float radians, float speed)
+	public void setDirectionRadsTick(double radians, double speed)
 	{
 		super.setDirectionRadsTick(radians, speed);
 	}
@@ -183,27 +185,30 @@ public class LaserDrawer extends Bullet
 
 			sp.begin();
 
-			Texture texture = textures.getCurrentTexture(Game.getGame().getTick());
-
+			TextureRegion textureRegion = getCurrentTexture();
+			Texture texture = textureRegion.getTexture();
+			
 			texture.setFilter(TextureFilter.Nearest, TextureFilter.Nearest);
 
 			Matrix4 combined = new Matrix4().set(Game.getGame().camera.camera.combined);
 
 			sp.setUniformMatrix("u_projTrans", combined);
 
-			Gdx.graphics.getGL20().glEnable(GL20.GL_BLEND);
+			Gdx.gl.glEnable(GL20.GL_BLEND);
 			
 			Gdx.gl.glBlendFunc(getBlendFuncSrc(), getBlendFuncDst());
 			
-			Gdx.graphics.getGL20().glEnable(GL20.GL_TEXTURE_2D);
-			Gdx.graphics.getGL20().glActiveTexture(GL20.GL_TEXTURE0);
-
-			mesh.render(sp, 7 /* Quads */);
+			mesh.render(sp, GL20.GL_TRIANGLES);
 
 			sp.end();
 
 			Game.getGame().batch.begin();
 		}
+	}
+
+	private TextureRegion getCurrentTexture()
+	{
+		return textures.getCurrentTexture(Game.getGame().getTick());
 	}
 	
 	@Override
@@ -276,12 +281,12 @@ public class LaserDrawer extends Bullet
 			g.getPlayer().onHit(this);
 			onHit();
 			
-			float shortestDistance = Float.MAX_VALUE;
+			double shortestDistance = Float.MAX_VALUE;
 			Position shortestPoint = null;
 			
 			for(Position p : getPoints())
 			{
-				float distance = MathUtil.getDistance(p, g.getPlayer());
+				double distance = MathUtil.getDistance(p, g.getPlayer());
 				
 				if(shortestPoint == null || distance < shortestDistance)
 				{
@@ -357,6 +362,18 @@ public class LaserDrawer extends Bullet
 			
 			return this;
 		}
+		
+		@Override
+		public MeshData clone()
+		{
+			MeshData newData = new MeshData();
+			newData.x = x;
+			newData.y = y;
+			newData.u = u;
+			newData.v = v;
+			
+			return newData;
+		}
 	}
 	
 	public LaserData makeLaserMeshVertices()
@@ -374,6 +391,19 @@ public class LaserDrawer extends Bullet
 		ArrayList<Position> list = new ArrayList<Position>();
 		
 		laserSections.add(list);
+		
+		TextureRegion r = getCurrentTexture();
+		
+		double uMin = r.getU();
+		double uMax = r.getU2();
+		double uSize = uMax - uMin;
+		
+		double vMin = r.getV();
+		double vMax = r.getV2();
+		double vSize = vMax - vMin;
+		
+		GetterSetter<Double, Double> convertU = (f) -> (uMin + ((f - uMin) * uSize));
+		GetterSetter<Double, Double> convertV = (f) -> (vMin + ((f - vMin) * vSize));
 		
 		for(Position p : points)
 		{
@@ -403,91 +433,75 @@ public class LaserDrawer extends Bullet
 				totalDistance += distance;
 			}
 			
-			MeshData lastP11 = null;
-			MeshData lastP10 = null;
-			
-			MeshData lastH11 = null;
-			MeshData lastH10 = null;
-			
 			// Cant make a section that's so small...
 			if(sectionPoints.size() < 2)
 				continue;
 			
-			double lastAngle = 0;
+			Double lastAngle = null;
+			Position first = sectionPoints.get(0);
 			
-			for(int i = 0; i < sectionPoints.size() - 1; i++)
+			Float lastX = first.getX();
+			Float lastY = first.getY();
+			
+			for(int i = 1; i < sectionPoints.size(); i++)
 			{
-				Position p1 = sectionPoints.get(i);
-				Position p2 = sectionPoints.get(i + 1);
+				Position p = sectionPoints.get(i);
 				
-				double distance = MathUtil.getDistance(p1, p2);
+				double distance = MathUtil.getDistance(lastX, lastY, p.getX(), p.getY());
 				
-				double angle = MathUtil.getAngle(p1, p2);
+				double angle = MathUtil.getAngle(lastX, lastY, p.getX(), p.getY());
+				
+				if (lastAngle == null)
+					lastAngle = angle;
 				
 				if(Double.isNaN(angle))
 				{
 					angle = lastAngle;
-					distance = 0;
-				}
-				else
-				{
-					lastAngle = angle;
 				}
 				
-				double angleLeft = angle + 90f;
-				double angleRight = angle - 90f;
+				double angleLeft = angle + 90d;
+				double angleRight = angle - 90d;
 
 				double cosLeft = fastCos(angleLeft);
 				double cosRight = fastCos(angleRight);
 
-				double sinLeft = fastSin(angleLeft);
+				double sinLeft = fastSin(angleLeft); 
 				double sinRight = fastSin(angleRight);
 				
-				double U1 = currentDistance / totalDistance;
-				double U2 = ((currentDistance + distance) / totalDistance);
+				double angleLeftLast = lastAngle + 90d;
+				double angleRightLast = lastAngle - 90d;
 
-				MeshData p00 = null;
-				
-				if(lastP10 == null)
-					p00 = new MeshData().setPos((p1.getX() + cosLeft * getThickness()), (p1.getY() + sinLeft * getThickness())).setUV(U1, 0);
-				else
-					p00 = lastP10.setUV(U1, 0);
-				
-				MeshData p01 = null;
-				
-				if(lastP11 == null)
-					p01 = new MeshData().setPos((p1.getX() + cosRight * getThickness()), (p1.getY() + sinRight * getThickness())).setUV(U1, 1);
-				else
-					p01 = lastP11.setUV(U1, 1);
-				
-				MeshData p11 = new MeshData().setPos((p2.getX() + cosRight * getThickness()), (p2.getY() + sinRight * getThickness())).setUV(U2, 1);
-				MeshData p10 = new MeshData().setPos((p2.getX() + cosLeft * getThickness()), (p2.getY() + sinLeft * getThickness())).setUV(U2, 0);
+				double cosLeftLast = fastCos(angleLeftLast);
+				double cosRightLast = fastCos(angleRightLast);
 
-				lastP11 = p11;
-				lastP10 = p10;
+				double sinLeftLast = fastSin(angleLeftLast);
+				double sinRightLast = fastSin(angleRightLast);
 				
-				MeshData h00 = null;
+				double V1 = ((currentDistance / totalDistance));
+				double V2 = ((currentDistance + distance) / totalDistance);
 				
-				if(lastH10 == null)
-					h00 = new MeshData().setPos((p1.getX() + cosLeft * getHitboxThickness()), (p1.getY() + sinLeft * getHitboxThickness()));
-				else
-					h00 = lastH10;
+				double U1 = 0d;
+				double U2 = 1d;
 				
-				MeshData h01 = null;
+				double X = p.getX();
 				
-				if(lastH11 == null)
-					h01 = new MeshData().setPos((p1.getX() + cosRight * getHitboxThickness()), (p1.getY() + sinRight * getHitboxThickness()));
-				else
-					h01 = lastH11;
+				double Y = p.getY();
 				
-				MeshData h11 = new MeshData().setPos((p2.getX() + cosRight * getHitboxThickness()), (p2.getY() + sinRight * getHitboxThickness()));
-				MeshData h10 = new MeshData().setPos((p2.getX() + cosLeft * getHitboxThickness()), (p2.getY() + sinLeft * getHitboxThickness()));
-
-				lastH11 = h11;
-				lastH10 = h10;
+				MeshData p00 = new MeshData().setPos((lastX + cosLeftLast * getThickness()), (lastY + sinLeftLast * getThickness())).setUV(U1, V1);
+				MeshData p01 = new MeshData().setPos((lastX + cosRightLast * getThickness()), (lastY + sinRightLast * getThickness())).setUV(U2, V1);
+					
+				MeshData p10 = new MeshData().setPos((X + cosLeft * getThickness()), (Y + sinLeft * getThickness())).setUV(U1, V2);
+				MeshData p11 = new MeshData().setPos((X + cosRight * getThickness()), (Y + sinRight * getThickness())).setUV(U2, V2);
+				
+				MeshData h00 = new MeshData().setPos((lastX + cosLeft * getHitboxThickness()), (lastY + sinLeft * getHitboxThickness()));
+				MeshData h01 = new MeshData().setPos((lastX + cosRight * getHitboxThickness()), (lastY + sinRight * getHitboxThickness()));
+				
+				MeshData h11 = new MeshData().setPos((X + cosRight * getHitboxThickness()), (Y + sinRight * getHitboxThickness()));
+				MeshData h10 = new MeshData().setPos((X + cosLeft * getHitboxThickness()), (Y + sinLeft * getHitboxThickness()));
 				
 				MeshData[] info = { 
-						p00, p01, p11, p10, // Quad
+						p00, p01, p11,
+						p00, p10, p11,
 						};
 				
 				MeshData[] forward = { 
@@ -505,8 +519,8 @@ public class LaserDrawer extends Bullet
 					
 					mesh.add(color.toFloatBits());
 					
-					mesh.add((float) v.v);
-					mesh.add((float) v.u);
+					mesh.add(convertU.get(v.u).floatValue());
+					mesh.add(convertV.get(v.v).floatValue());
 				}
 				
 				for(MeshData h : forward)
@@ -520,6 +534,10 @@ public class LaserDrawer extends Bullet
 				}
 				
 				currentDistance += distance;
+				
+				lastAngle = angle;
+				lastX = p.getX();
+				lastY = p.getY();
 			}
 		}
 		
@@ -570,11 +588,14 @@ public class LaserDrawer extends Bullet
 		return newArray;
 	}
 	
+	/**
+	 * Make use of fast math.
+	 */
+	private static final boolean FAST = true;
+	
 	public double fastSin(double degree)
 	{
-		boolean fast = true;
-		
-		if(fast)
+		if(FAST)
 			return MathUtil.fastSin(degree);
 		
 		return Math.sin(Math.toRadians(degree));
@@ -582,20 +603,18 @@ public class LaserDrawer extends Bullet
 	
 	public double fastCos(double degree)
 	{
-		boolean fast = true;
-		
-		if(fast)
+		if(FAST)
 			return MathUtil.fastCos(degree);
 		
 		return Math.cos(Math.toRadians(degree));
 	}
 	
-	public float getHitboxThickness()
+	public double getHitboxThickness()
 	{
 		return hitboxThickness;
 	}
 
-	public void setHitboxThickness(float hitboxThickness)
+	public void setHitboxThickness(double hitboxThickness)
 	{
 		this.hitboxThickness = hitboxThickness;
 	}
@@ -611,29 +630,54 @@ public class LaserDrawer extends Bullet
 	
 	public static class LaserAnimation extends J2hObject
 	{
-		Array<Texture> frames;
+		Array<TextureRegion> frames;
 		float timePerFrame;
 		
+		/**
+		 * Creates a laser animation from textures, assuming UV {0, 0 - 1, 1}
+		 * @param timePerFrame
+		 * @param frames
+		 */
 		public LaserAnimation(float timePerFrame, Texture... frames)
 		{
 			this(timePerFrame, getArrayFrom(frames));
 		}
 		
-		static Array<Texture> getArrayFrom(Texture... frames)
+		/**
+		 * Creates a laser animation
+		 * @param timePerFrame
+		 * @param frames
+		 */
+		public LaserAnimation(float timePerFrame, TextureRegion... frames)
 		{
-			Array<Texture> array = new Array<Texture>();
+			this(timePerFrame, getArrayFrom(frames));
+		}
+		
+		static Array<TextureRegion> getArrayFrom(Texture... frames)
+		{
+			Array<TextureRegion> array = new Array<TextureRegion>();
+			
+			for (Texture t : frames)
+				array.add(new TextureRegion(t));
+			
+			return array;
+		}
+		
+		static Array<TextureRegion> getArrayFrom(TextureRegion... frames)
+		{
+			Array<TextureRegion> array = new Array<TextureRegion>();
 			array.addAll(frames);
 			
 			return array;
 		}
 		
-		public LaserAnimation(float timePerFrame, Array<Texture> frames)
+		public LaserAnimation(float timePerFrame, Array<TextureRegion> frames)
 		{
 			this.frames = frames;
 			this.timePerFrame = timePerFrame;
 		}
 		
-		public Texture getCurrentTexture(float time)
+		public TextureRegion getCurrentTexture(float time)
 		{
 			int frameId = getKeyFrameIndex(time) % frames.size;
 			
@@ -645,7 +689,7 @@ public class LaserDrawer extends Bullet
 			return (int) (stateTime / timePerFrame);
 		}
 		
-		public Array<Texture> getFrames()
+		public Array<TextureRegion> getFrames()
 		{
 			return frames;
 		}

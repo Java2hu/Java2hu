@@ -449,7 +449,7 @@ public class Ringo extends AllStarBoss
 					Bullet bullet = ThBullet.makeBullet(ThBulletType.BALL_BIG, ThBulletColor.PURPLE, boss);
 					bullet.setScale(0.2f, 4f);
 					
-					final float finalAngle = MathUtil.getAngle(bullet, player) + ((bool ? 1f : -1f) * 60f);
+					final float finalAngle = (float) (MathUtil.getAngle(bullet, player) + ((bool ? 1f : -1f) * 60f));
 					final float finalRad = (float) Math.toRadians(finalAngle);
 					
 					bullet.setDirectionDeg(finalAngle, 300f);

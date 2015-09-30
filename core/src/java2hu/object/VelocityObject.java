@@ -27,9 +27,9 @@ public abstract class VelocityObject extends FreeStageObject
 	 * @param velocityX
 	 */
 	@Deprecated
-	public void setVelocityXTick(float velocityX)
+	public void setVelocityXTick(double velocityX)
 	{
-		float perSecond = velocityX * game.currentTPS;
+		float perSecond = (float) (velocityX * game.currentTPS);
 		
 		this.velocityX = perSecond;
 	}
@@ -39,9 +39,9 @@ public abstract class VelocityObject extends FreeStageObject
 	 * @param velocityY
 	 */
 	@Deprecated
-	public void setVelocityYTick(float velocityY)
+	public void setVelocityYTick(double velocityY)
 	{
-		float perSecond = velocityY * game.currentTPS;
+		float perSecond = (float) (velocityY * game.currentTPS);
 		
 		this.velocityY = perSecond;
 	}
@@ -64,22 +64,22 @@ public abstract class VelocityObject extends FreeStageObject
 		return velocityY / game.currentTPS;
 	}
 	
-	public void setVelocityX(float velocityX)
+	public void setVelocityX(double velocityX)
 	{
-		this.velocityX = velocityX;
+		this.velocityX = (float) velocityX;
 	}
 	
-	public void setVelocityY(float velocityY)
+	public void setVelocityY(double velocityY)
 	{
-		this.velocityY = velocityY;
+		this.velocityY = (float) velocityY;
 	}
 	
-	public float getVelocityX()
+	public double getVelocityX()
 	{
 		return velocityX;
 	}
 	
-	public float getVelocityY()
+	public double getVelocityY()
 	{
 		return velocityY;
 	}
@@ -90,9 +90,9 @@ public abstract class VelocityObject extends FreeStageObject
 	 * @param speed
 	 */
 	@Deprecated
-	public void setDirectionDegTick(float degree, float speed)
+	public void setDirectionDegTick(double degree, double speed)
 	{
-		setDirectionRadsTick((float) Math.toRadians(degree), speed);
+		setDirectionRadsTick(Math.toRadians(degree), speed);
 	}
 	
 	/**
@@ -101,10 +101,10 @@ public abstract class VelocityObject extends FreeStageObject
 	 * @param speed
 	 */
 	@Deprecated
-	public void setDirectionRadsTick(float radians, float speed)
+	public void setDirectionRadsTick(double radians, double speed)
 	{
-		setVelocityXTick((float) (Math.cos(radians) * speed));
-		setVelocityYTick((float) (Math.sin(radians) * speed));
+		setVelocityXTick((Math.cos(radians) * speed));
+		setVelocityYTick((Math.sin(radians) * speed));
 	}
 	
 	/**
@@ -112,9 +112,9 @@ public abstract class VelocityObject extends FreeStageObject
 	 * @param radians
 	 * @param speed
 	 */
-	public void setDirectionDeg(float degree, float speed)
+	public void setDirectionDeg(double degree, double speed)
 	{
-		setDirectionRads((float) Math.toRadians(degree), speed);
+		setDirectionRads(Math.toRadians(degree), speed);
 	}
 	
 	/**
@@ -122,7 +122,7 @@ public abstract class VelocityObject extends FreeStageObject
 	 * @param radians
 	 * @param speed
 	 */
-	public void setDirectionRads(float radians, float speed)
+	public void setDirectionRads(double radians, double speed)
 	{
 		setVelocityX((float) (Math.cos(radians) * speed));
 		setVelocityY((float) (Math.sin(radians) * speed));

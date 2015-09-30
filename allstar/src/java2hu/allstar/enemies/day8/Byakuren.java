@@ -843,7 +843,7 @@ public class Byakuren extends AllStarBoss
 								return;
 							}
 							
-							radius = MathUtil.getDistance(first.getX(), first.getY(), xPos, yPos);
+							radius = (float) MathUtil.getDistance(first.getX(), first.getY(), xPos, yPos);
 						}
 						
 						public Bullet getFirst()

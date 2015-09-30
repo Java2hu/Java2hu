@@ -20,7 +20,6 @@ import java2hu.object.StageObject;
 import java2hu.object.UpdateObject;
 import java2hu.object.bullet.Bullet;
 import java2hu.object.bullet.Laser;
-import java2hu.object.bullet.LaserDrawer.LaserAnimation;
 import java2hu.object.bullet.StationaryLaser;
 import java2hu.object.enemy.greater.Boss;
 import java2hu.object.player.Player;
@@ -35,6 +34,7 @@ import java2hu.touhou.bullet.ThBulletType;
 import java2hu.touhou.bullet.ThLaser;
 import java2hu.touhou.bullet.ThLaserColor;
 import java2hu.touhou.bullet.ThLaserType;
+import java2hu.touhou.bullet.ThStationaryLaserType;
 import java2hu.touhou.sounds.TouhouSounds;
 import java2hu.util.BossUtil;
 import java2hu.util.Duration;
@@ -483,9 +483,7 @@ public class GetsusGeneral implements SpecialFlowScheme<AllStarStageScheme>
 				
 				if(tick % total >= 630 && tick % total < 700 && tick % 20 == 0)
 				{
-					LaserAnimation ani = new LaserAnimation(1, new ThBullet(ThBulletType.LAZER_STATIONARY, ThBulletColor.RED).getAnimation().getKeyFrames()[0].getTexture());
-					
-					StationaryLaser laser = new StationaryLaser(ani, 0, 0)
+					StationaryLaser laser = new StationaryLaser(ThStationaryLaserType.RED, 0, 0)
 					{
 						boolean hitbox = false;
 						float timer = 1;
@@ -564,7 +562,7 @@ public class GetsusGeneral implements SpecialFlowScheme<AllStarStageScheme>
 						final float bulX = (float) (x + Math.cos(rad) * (Math.random() * radius));
 						final float bulY = (float) (y + Math.sin(rad) * (Math.random() * radius));
 
-						final float distance = MathUtil.getDistance(x, y, bulX, bulY);
+						final float distance = (float) MathUtil.getDistance(x, y, bulX, bulY);
 
 						if(i % 9 <= 2)
 						{
@@ -577,8 +575,8 @@ public class GetsusGeneral implements SpecialFlowScheme<AllStarStageScheme>
 
 									if(getTicksAlive() < 130)
 									{
-										float angle = MathUtil.getAngle(getX(), getY(), bulX, bulY);
-										float distance = MathUtil.getDistance(getX(), getY(), bulX, bulY);
+										float angle = (float) MathUtil.getAngle(getX(), getY(), bulX, bulY);
+										float distance = (float) MathUtil.getDistance(getX(), getY(), bulX, bulY);
 
 										float speed = distance / (180 - getTicksAlive());
 
@@ -617,8 +615,8 @@ public class GetsusGeneral implements SpecialFlowScheme<AllStarStageScheme>
 
 									if(getTicksAlive() < 130)
 									{
-										float angle = MathUtil.getAngle(getX(), getY(), bulX, bulY);
-										float distance = MathUtil.getDistance(getX(), getY(), bulX, bulY);
+										float angle = (float) MathUtil.getAngle(getX(), getY(), bulX, bulY);
+										float distance = (float) MathUtil.getDistance(getX(), getY(), bulX, bulY);
 
 										float speed = distance / (180 - getTicksAlive());
 
@@ -665,8 +663,8 @@ public class GetsusGeneral implements SpecialFlowScheme<AllStarStageScheme>
 
 									if(getTicksAlive() < 130)
 									{
-										float angle = MathUtil.getAngle(getX(), getY(), bulX, bulY);
-										float distance = MathUtil.getDistance(getX(), getY(), bulX, bulY);
+										float angle = (float) MathUtil.getAngle(getX(), getY(), bulX, bulY);
+										float distance = (float) MathUtil.getDistance(getX(), getY(), bulX, bulY);
 
 										float speed = distance / (180 - getTicksAlive());
 
@@ -1785,7 +1783,7 @@ public class GetsusGeneral implements SpecialFlowScheme<AllStarStageScheme>
 				
 				if(tick % 130 >= 0 && tick % 130 <= 10 && tick % 2 == 0)
 				{
-					float playerAngle = MathUtil.getAngle(mugetsu, player);
+					float playerAngle = (float) MathUtil.getAngle(mugetsu, player);
 					
 					final String id = "kunaiRelease";
 					
@@ -1821,7 +1819,7 @@ public class GetsusGeneral implements SpecialFlowScheme<AllStarStageScheme>
 										Scheduler.track(id, id, 20L);
 									}
 									
-									float angle = MathUtil.getAngle(object, player);
+									float angle = (float) MathUtil.getAngle(object, player);
 									
 									object.setDirectionDeg(angle + mul * 90, 300f);
 									object.setRotationFromVelocity(-90);
@@ -1836,8 +1834,8 @@ public class GetsusGeneral implements SpecialFlowScheme<AllStarStageScheme>
 										Scheduler.track(id, id, 20L);
 									}
 									
-									float angle = MathUtil.getAngle(object, player);
-									float distance = MathUtil.getDistance(object, player);
+									float angle = (float) MathUtil.getAngle(object, player);
+									float distance = (float) MathUtil.getDistance(object, player);
 									
 									float meanDistance = 500;
 									
@@ -1857,7 +1855,7 @@ public class GetsusGeneral implements SpecialFlowScheme<AllStarStageScheme>
 				{
 					TouhouSounds.Enemy.BULLET_2.play();
 					
-					final float playerAngle = MathUtil.getAngle(gengetsu, player);
+					final float playerAngle = (float) MathUtil.getAngle(gengetsu, player);
 					
 					for(float angle = -90; angle <= 90; angle += 10)
 					{

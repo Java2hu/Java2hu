@@ -652,7 +652,7 @@ public class Kagerou extends AllStarBoss
 
 										if(getTicksAlive() >= 100)
 										{
-											float distance = MathUtil.getDistance(this, player);
+											float distance = (float) MathUtil.getDistance(this, player);
 
 											distances.put(this, (double) distance);
 												
@@ -904,7 +904,7 @@ public class Kagerou extends AllStarBoss
 							bullet.setX(bullet.getX() + addX);
 							bullet.setY(bullet.getY() + addY);
 							
-							bullet.setRotationDeg(MathUtil.getAngle(bullet, player) + offset);
+							bullet.setRotationDeg((float) (MathUtil.getAngle(bullet, player) + offset));
 
 							game.spawn(bullet);
 						}

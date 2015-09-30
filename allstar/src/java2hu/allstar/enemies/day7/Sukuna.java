@@ -657,7 +657,7 @@ public class Sukuna extends AllStarBoss
 					}
 					
 					float rotation = (float) Math.toDegrees(Math.atan2(laser.getVelocityYTick(), laser.getVelocityXTick()));
-					rotation = MathUtil.normalizeDegree(rotation);
+					rotation = (float) MathUtil.normalizeDegree(rotation);
 					
 					float modifier = laser.getCurrentSprite().getHeight() * laser.getCurrentSprite().getScaleY();
 					modifier *= 0.51f; // Half
@@ -763,7 +763,7 @@ public class Sukuna extends AllStarBoss
 			double maxY = getY();
 			
 			float entry = (float) Math.toDegrees(Math.atan2(getVelocityYTick(), getVelocityXTick()));
-			entry = MathUtil.normalizeDegree(entry);
+			entry = (float) MathUtil.normalizeDegree(entry);
 			
 			if(entry > 0 && entry <= 90)
 			{
@@ -859,7 +859,7 @@ public class Sukuna extends AllStarBoss
 				Game.getGame().spawn(laser);
 				
 				float rotation = newDirection;
-				rotation = MathUtil.normalizeDegree(rotation);
+				rotation = (float) MathUtil.normalizeDegree(rotation);
 				
 				float modifierY = getCurrentSprite().getHeight() * getCurrentSprite().getScaleY();
 				

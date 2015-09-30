@@ -567,7 +567,7 @@ public class SettingsWindow extends JFrame
 		settings.height = Integer.parseInt(heightField.getText());
 		settings.viewportWidth = Integer.parseInt(viewportWidth.getText());
 		settings.viewportHeight = Integer.parseInt(viewportHeight.getText());
-		settings.samples = Integer.parseInt(samplesField.getText());
+		settings.samples = 16;//Integer.parseInt(samplesField.getText());
 		settings.fullScreen = fullScreenCheckBox.isSelected();
 		settings.showAtStartup = showOnStartCheckBox.isSelected();
 		settings.fps = Integer.parseInt(fpsField.getText());

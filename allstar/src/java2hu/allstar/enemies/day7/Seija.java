@@ -789,7 +789,7 @@ public class Seija extends AllStarBoss
 					TouhouSounds.Enemy.RELEASE_1.play(0.3F);
 				}
 			
-			float gravity = MathUtil.normalizeDegree(gravityGetter.get());
+			float gravity = (float) MathUtil.normalizeDegree(gravityGetter.get());
 			
 			if(speed < terminalVelocity)
 				speed += decrease;

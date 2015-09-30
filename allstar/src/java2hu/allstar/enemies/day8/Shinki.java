@@ -18,7 +18,6 @@ import java2hu.gameflow.GameFlowScheme.WaitConditioner;
 import java2hu.object.DrawObject;
 import java2hu.object.StageObject;
 import java2hu.object.bullet.Bullet;
-import java2hu.object.bullet.LaserDrawer.LaserAnimation;
 import java2hu.object.bullet.StationaryLaser;
 import java2hu.object.enemy.greater.Boss;
 import java2hu.object.player.Player;
@@ -32,6 +31,7 @@ import java2hu.system.SaveableObject;
 import java2hu.touhou.bullet.ThBullet;
 import java2hu.touhou.bullet.ThBulletColor;
 import java2hu.touhou.bullet.ThBulletType;
+import java2hu.touhou.bullet.ThStationaryLaserType;
 import java2hu.touhou.sounds.TouhouSounds;
 import java2hu.util.BossUtil;
 import java2hu.util.BossUtil.BossEffectsResult;
@@ -795,7 +795,7 @@ public class Shinki extends AllStarBoss
 							
 							if(!done)
 							{
-								float distance = MathUtil.getDistance(getX(), getY(), getGame().getPlayer().getX(), getGame().getPlayer().getY());
+								float distance = (float) MathUtil.getDistance(getX(), getY(), getGame().getPlayer().getX(), getGame().getPlayer().getY());
 
 								float x = (getX() - getGame().getPlayer().getX()) / distance * 1.8F;
 								float y = (getY() - getGame().getPlayer().getY()) / distance * 1.8F;
@@ -981,9 +981,7 @@ public class Shinki extends AllStarBoss
 				
 				for(final boolean bool : left)
 				{
-					LaserAnimation ani = new LaserAnimation(1, new ThBullet(ThBulletType.LAZER_STATIONARY, ThBulletColor.RED).getAnimation().getKeyFrames()[0].getTexture());
-					
-					final StationaryLaser laser = new StationaryLaser(ani, 0, 0)
+					final StationaryLaser laser = new StationaryLaser(ThStationaryLaserType.RED, 0, 0)
 					{
 						long doneTick = -1;
 						

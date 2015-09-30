@@ -90,7 +90,7 @@ public class Enemy extends LivingObject
 		if(Intersector.overlapConvexPolygons(g.getPlayer().getHitbox(), getPlayerHitHitbox()))
 		{
 			g.getPlayer().onHit(this);
-			Game.getGame().delete(this);
+			onHitPlayer();
 		}
 		
 		if(doKill())
@@ -109,6 +109,11 @@ public class Enemy extends LivingObject
 			if(special.getPlayMode() == PlayMode.NORMAL && special.isAnimationFinished(getSpecialAnimationTime()))
 				playSpecial = false;
 		}
+	}
+	
+	public void onHitPlayer()
+	{
+		Game.getGame().delete(this);
 	}
 	
 	public boolean doKill()

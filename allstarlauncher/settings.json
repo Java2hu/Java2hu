@@ -1,3 +1,11 @@
-{"width":1920,"height":1080,"viewportWidth":1280,"viewportHeight":960,
-  "samples":16,"fullScreen":true,"showAtStartup":true,"vsync":true,"fps":
-  144}
+{
+  "width": 1920,
+  "height": 1080,
+  "viewportWidth": 1280,
+  "viewportHeight": 960,
+  "samples": 16,
+  "fullScreen": false,
+  "showAtStartup": true,
+  "vsync": true,
+  "fps": 144
+}

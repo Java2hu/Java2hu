@@ -581,7 +581,7 @@ public class Mokou extends AllStarBoss
 							else
 								complete = true;
 
-							float distance = MathUtil.getDistance(getX(), getY(), getGame().getPlayer().getX(), getGame().getPlayer().getY());
+							float distance = (float) MathUtil.getDistance(getX(), getY(), getGame().getPlayer().getX(), getGame().getPlayer().getY());
 
 							float x = (getX() - getGame().getPlayer().getX()) / distance * 1.8F;
 							float y = (getY() - getGame().getPlayer().getY()) / distance * 1.8F;
@@ -688,7 +688,7 @@ public class Mokou extends AllStarBoss
 					
 					if(Game.getGame().getPlayer().getY() > Game.getGame().getMaxY() * 0.4f)
 					{
-						float distance = MathUtil.getDistance(getX(), getY(), getGame().getPlayer().getX(), getGame().getPlayer().getY());
+						float distance = (float) MathUtil.getDistance(getX(), getY(), getGame().getPlayer().getX(), getGame().getPlayer().getY());
 
 						float x = (getX() - getGame().getPlayer().getX()) / distance * 1.8F;
 						float y = (getY() - getGame().getPlayer().getY()) / distance * 3F;

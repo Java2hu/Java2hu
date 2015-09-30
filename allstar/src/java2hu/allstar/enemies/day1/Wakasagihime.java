@@ -639,7 +639,7 @@ public class Wakasagihime extends AllStarBoss
 			float y = (float) (player.getY() + (Math.random() > 0.5 ? -1 : 1) * (Math.random() * 260 + 200));
 			float x = (float) (player.getX() + Math.cos(Math.toRadians(Math.random() * 360)) * 500);
 			
-			float rotation = MathUtil.getAngle(x, y, player.getX(), player.getY());
+			float rotation = (float) MathUtil.getAngle(x, y, player.getX(), player.getY());
 			boolean firstFish = tick == 150;
 			
 			if(firstFish)
@@ -650,7 +650,7 @@ public class Wakasagihime extends AllStarBoss
 				
 				y = player.getY() - 50;
 				
-				rotation = MathUtil.getAngle(x, y, player.getX(), player.getY());
+				rotation = (float) MathUtil.getAngle(x, y, player.getX(), player.getY());
 			}
 			
 			if(tick > 120 && tick % 300 == 0)

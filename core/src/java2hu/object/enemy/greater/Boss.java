@@ -229,6 +229,12 @@ public abstract class Boss extends Enemy
 	}
 	
 	@Override
+	public void onHitPlayer()
+	{
+		// Nothing
+	}
+	
+	@Override
 	public boolean useDeathSound()
 	{
 		return false;

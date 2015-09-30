@@ -432,7 +432,7 @@ public class BossUtil extends J2hObject
 						setX((float) (pos.getX() + Math.cos(rotationRad) * (radius * Math.random())));
 						setY((float) (pos.getY() + Math.sin(rotationRad) * (radius * Math.random())));
 						
-						float distance = MathUtil.getDistance(this, pos);
+						float distance = (float) MathUtil.getDistance(this, pos);
 
 						float x = (pos.getX() - getX()) / distance * 1.8F;
 						float y = (pos.getY() - getY()) / distance * 1.8F;
@@ -742,7 +742,7 @@ public class BossUtil extends J2hObject
 							game.delete(this);
 						}
 						
-						distance = MathUtil.getDistance(0, 0, x, y);
+						distance = (float) MathUtil.getDistance(0, 0, x, y);
 						
 						if(distance < 2f)
 						{
@@ -1429,7 +1429,7 @@ public class BossUtil extends J2hObject
 					sizeMinLeft = Math.min(size - width, sizeMinLeft);
 				}
 				
-				float distance = MathUtil.getDistance(getX(), getY(), boss.getX(), boss.getY());
+				float distance = (float) MathUtil.getDistance(getX(), getY(), boss.getX(), boss.getY());
 				
 				if(Float.isNaN(distance) || distance < 10)
 					return;
@@ -1681,7 +1681,7 @@ public class BossUtil extends J2hObject
 		{
 			float modifier = clockWise ? -1 : 1;
 			
-			float angleOffset = MathUtil.getAngle(start, to) + modifier * startAngle;
+			float angleOffset = (float) (MathUtil.getAngle(start, to) + modifier * startAngle);
 
 			float rad = (float) Math.toRadians(angleOffset);
 
@@ -2024,7 +2024,7 @@ public class BossUtil extends J2hObject
 			this.pos = posGetter;
 			
 			this.startAngle = startAngle;
-			angle = MathUtil.getAngle(x, y, pos.getX(), pos.getY()) - startAngle;
+			angle = (float) (MathUtil.getAngle(x, y, pos.getX(), pos.getY()) - startAngle);
 			
 			sprite.setScale((float) (0.3f + 0.7f * Math.random()));
 			
@@ -2093,7 +2093,7 @@ public class BossUtil extends J2hObject
 		{
 			int modifier = clockwise ? 1 : -1;
 			@Deprecated
-			float dist = MathUtil.getDistance(this, pos);
+			float dist = (float) MathUtil.getDistance(this, pos);
 			
 			if(dist < 20)
 			{
@@ -2113,7 +2113,7 @@ public class BossUtil extends J2hObject
 			if(getTicksAlive() > 500)
 				game.delete(this);
 			
-			float angle = MathUtil.getAngle(this, pos) + modifier * startAngle;
+			float angle = (float) (MathUtil.getAngle(this, pos) + modifier * startAngle);
 			
 			double diff = angle - this.angle;
 			

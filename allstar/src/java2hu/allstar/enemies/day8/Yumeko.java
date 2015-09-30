@@ -644,7 +644,7 @@ public class Yumeko extends AllStarBoss
 				boss.playSpecial(true);
 				TouhouSounds.Enemy.BULLET_1.play();
 				
-				final float angle = MathUtil.getAngle(boss, player);
+				final float angle = (float) MathUtil.getAngle(boss, player);
 				final float finalTick = tick;
 				
 				for(int i = 0; i < 30; i += 7)

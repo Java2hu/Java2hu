@@ -271,7 +271,7 @@ public class FaceToFaceDialogue extends UpdateObject implements EventListener
 	public void enterLeft()
 	{
 		if(waitTimeLeft == -1)
-			waitTimeLeft = getWaitTime(MathUtil.getDistance(leftHolder, leftInactive));
+			waitTimeLeft = getWaitTime((float) MathUtil.getDistance(leftHolder, leftInactive));
 		
 		leftTask = PathUtil.moveTo(leftHolder, leftInactive, (int) waitTimeLeft);
 		leftTask.setOnDone(new Runnable()
@@ -285,9 +285,9 @@ public class FaceToFaceDialogue extends UpdateObject implements EventListener
 		});
 	}
 	
-	private float getWaitTime(float distance)
+	private float getWaitTime(double d)
 	{
-		float time = distance / 10f;
+		float time = (float) (d / 10f);
 		
 		return time;
 	}

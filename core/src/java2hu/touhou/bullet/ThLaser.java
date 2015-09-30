@@ -10,6 +10,7 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
 
 public class ThLaser implements ILaserType
@@ -54,7 +55,7 @@ public class ThLaser implements ILaserType
 		
 		FileHandle textureFolder = Gdx.files.internal("lasers/" + type.name() + "/");
 		
-		Array<Texture> array = new Array<Texture>();
+		Array<TextureRegion> array = new Array<TextureRegion>();
 		
 		String[] fileNames;
 		float frameDelay = 1f;
@@ -82,7 +83,7 @@ public class ThLaser implements ILaserType
 			Texture text = Loader.texture(frame);
 			text.setFilter(TextureFilter.MipMapLinearNearest, TextureFilter.Nearest);
 		
-			array.add(text);
+			array.add(new TextureRegion(text));
 		}
 			
 		LaserAnimation la = new LaserAnimation(frameDelay, array);

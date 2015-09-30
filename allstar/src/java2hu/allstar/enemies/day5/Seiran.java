@@ -408,7 +408,7 @@ public class Seiran extends AllStarBoss
 				{
 					final Bullet bullet = new Bullet(new ThBullet(ThBulletType.RICE_LARGE, ThBulletColor.BLUE), boss.getX(), boss.getY());
 					
-					final float degree = offset + MathUtil.getAngle(boss, player);
+					final float degree = (float) (offset + MathUtil.getAngle(boss, player));
 					
 					bullet.setDirectionDeg(degree, (float) 400d);
 					bullet.setRotationFromVelocity();

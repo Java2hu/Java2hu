@@ -38,7 +38,7 @@ public class LaserTestSpell extends Spellcard
 				{
 					super.onUpdate(tick);
 					
-					float distance = MathUtil.getDistance(getX(), getY(), getGame().getPlayer().getX(), getGame().getPlayer().getY());
+					float distance = (float) MathUtil.getDistance(getX(), getY(), getGame().getPlayer().getX(), getGame().getPlayer().getY());
 
 					float x = (getX() - getGame().getPlayer().getX()) / distance * 1.8F;
 					float y = (getY() - getGame().getPlayer().getY()) / distance * 1.8F;

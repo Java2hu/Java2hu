@@ -168,7 +168,7 @@ public class Marisa extends Player
 						setX(marisa.getX() + cos);
 						setY(marisa.getY() - 20 + (float) (Math.sin(Math.toRadians(rotation + rotate)) * 10));
 
-						float rotNorm = MathUtil.normalizeDegree(rotation + rotate);
+						float rotNorm = (float) MathUtil.normalizeDegree(rotation + rotate);
 
 						if(rotNorm > 0 && rotNorm <= 180)
 						{
@@ -181,7 +181,7 @@ public class Marisa extends Player
 					}
 					
 					rotate += 5f;
-					rotate = MathUtil.normalizeDegree(rotate);
+					rotate = (float) MathUtil.normalizeDegree(rotate);
 
 				}
 			};

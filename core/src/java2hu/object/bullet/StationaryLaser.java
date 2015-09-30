@@ -1,6 +1,7 @@
 package java2hu.object.bullet;
 
 import java2hu.Position;
+import java2hu.touhou.bullet.ThStationaryLaserType;
 
 
 public class StationaryLaser extends LaserDrawer
@@ -10,9 +11,24 @@ public class StationaryLaser extends LaserDrawer
 	float endX = 0;
 	float endY = 0;
 	
+	public StationaryLaser(ThStationaryLaserType type)
+	{
+		this(type, type.getThickness(), type.getHitboxThickness());
+	}
+	
+	public StationaryLaser(ThStationaryLaserType type, float thickness, float hitboxThickness)
+	{
+		this(type.getAnimation(), thickness, hitboxThickness);
+	}
+	
 	public StationaryLaser(LaserAnimation ani, float thickness, float hitboxThickness)
 	{
 		this(ani, thickness, hitboxThickness, 0, 0, 0, 0);
+	}
+	
+	public StationaryLaser(ThStationaryLaserType type, float thickness, float hitboxThickness, float startX, float startY, float endX, float endY)
+	{
+		this(type.getAnimation(), thickness, hitboxThickness, startX, startY, endX, endY);
 	}
 	
 	public StationaryLaser(LaserAnimation ani, float thickness, float hitboxThickness, float startX, float startY, float endX, float endY)
@@ -24,7 +40,7 @@ public class StationaryLaser extends LaserDrawer
 		this.endX = endX;
 		this.endY = endY;
 	}
-	
+
 	@Override
 	public void update(long tick)
 	{

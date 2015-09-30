@@ -662,7 +662,7 @@ public class Sekibanki extends AllStarBoss
 
 			for(SekibankiHead head : heads)
 			{
-				float degree = MathUtil.normalizeDegree(tick * 2 + i);
+				float degree = (float) MathUtil.normalizeDegree(tick * 2 + i);
 
 				float x = (float) (Math.sin(Math.toRadians(degree)) * (tick % 800));
 				float y = (float) (Math.cos(Math.toRadians(degree)) * (tick % 400));

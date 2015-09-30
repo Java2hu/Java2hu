@@ -49,7 +49,7 @@ public class BambooForestBG extends Background3D
 		for(float i = 10; i < 1000; i += 1)
 		{
 			float offsetAngle = i / 20f * 360f;
-			offsetAngle = MathUtil.normalizeDegree(offsetAngle);
+			offsetAngle = (float) MathUtil.normalizeDegree(offsetAngle);
 			
 			float xOffset = (float) (Math.cos(Math.toRadians(offsetAngle)) * 0.5f);
 		

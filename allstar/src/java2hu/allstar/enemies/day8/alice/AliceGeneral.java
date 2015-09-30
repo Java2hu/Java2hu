@@ -14,7 +14,6 @@ import java2hu.object.FreeStageObject;
 import java2hu.object.StageObject;
 import java2hu.object.bullet.Bullet;
 import java2hu.object.bullet.Laser;
-import java2hu.object.bullet.LaserDrawer.LaserAnimation;
 import java2hu.object.bullet.StationaryLaser;
 import java2hu.object.enemy.greater.Boss;
 import java2hu.object.player.Player;
@@ -27,6 +26,7 @@ import java2hu.touhou.bullet.ThBulletType;
 import java2hu.touhou.bullet.ThLaser;
 import java2hu.touhou.bullet.ThLaserColor;
 import java2hu.touhou.bullet.ThLaserType;
+import java2hu.touhou.bullet.ThStationaryLaserType;
 import java2hu.touhou.sounds.TouhouSounds;
 import java2hu.util.BossUtil;
 import java2hu.util.Duration;
@@ -649,9 +649,7 @@ public class AliceGeneral implements SpecialFlowScheme<AllStarStageScheme>
 							{
 								TouhouSounds.Enemy.LAZER_2.play(0.5f);
 								
-								LaserAnimation ani = new LaserAnimation(1, new ThBullet(ThBulletType.LAZER_STATIONARY, ThBulletColor.PURPLE).getAnimation().getKeyFrames()[0].getTexture());
-
-								StationaryLaser laser = new StationaryLaser(ani, 0, 0)
+								StationaryLaser laser = new StationaryLaser(ThStationaryLaserType.PURPLE, 0, 0)
 								{
 									boolean hitbox = false;
 									float timer = 1;
@@ -706,7 +704,7 @@ public class AliceGeneral implements SpecialFlowScheme<AllStarStageScheme>
 
 								laser.setStart(getX(), getY());
 
-								float deg = MathUtil.getAngle(player, this);
+								float deg = (float) MathUtil.getAngle(player, this);
 								
 								laser.setEnd(getX() + (float) (Math.cos(Math.toRadians(deg)) * 2000f), getY() + (float) (Math.sin(Math.toRadians(deg)) * 2000f));
 								

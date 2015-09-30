@@ -8,7 +8,7 @@ import java2hu.overwrite.J2hObject;
  */
 public class MathUtil extends J2hObject
 {
-	public static float getAngle(IPosition a, IPosition b)
+	public static double getAngle(IPosition a, IPosition b)
 	{
 		if(a == null || b == null)
 			return 0;
@@ -16,10 +16,10 @@ public class MathUtil extends J2hObject
 		return getAngle(a.getX(), a.getY(), b.getX(), b.getY());
 	}
 
-	public static float getAngle(float xa, float ya, float xb, float yb)
+	public static double getAngle(float xa, float ya, float xb, float yb)
 	{
-		float deltaX = xa - xb;
-		float deltaY = ya - yb;
+		double deltaX = xa - xb;
+		double deltaY = ya - yb;
 		
 		double distanceSquared = deltaX * deltaX + deltaY * deltaY;
 		double distance = Math.sqrt(distanceSquared);
@@ -32,19 +32,18 @@ public class MathUtil extends J2hObject
 		return degree;
 	}
 	
-	public static float getDistance(float xa, float ya, float xb, float yb)
+	public static double getDistance(float xa, float ya, float xb, float yb)
 	{
-		float deltaX = xa - xb;
-		float deltaY = ya - yb;
+		double deltaX = xa - xb;
+		double deltaY = ya - yb;
 		
 		double distanceSquared = deltaX * deltaX + deltaY * deltaY;
 		double distance = Math.sqrt(distanceSquared);
 		
-		return (float) distance;
+		return distance;
 	}
 	
-
-	public static float getDistance(IPosition from, IPosition to)
+	public static double getDistance(IPosition from, IPosition to)
 	{
 		return getDistance(from.getX(), from.getY(), to.getX(), to.getY());
 	}
@@ -60,7 +59,7 @@ public class MathUtil extends J2hObject
 	 * @param angle
 	 * @return
 	 */
-	public static float normalizeDegree(float angle)
+	public static double normalizeDegree(float angle)
 	{  
 		angle = ((angle % 360) + 360) % 360;
 		

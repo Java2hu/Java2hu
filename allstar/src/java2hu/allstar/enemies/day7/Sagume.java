@@ -355,7 +355,7 @@ public class Sagume extends AllStarBoss
 			@Override
 			public void onUpdate(long tick)
 			{
-				float distance = MathUtil.getDistance(x + image.getWidth() / 2, stage.getBoundary().getX() + stage.getBoundary().getWidth() / 2, stage.getBoundary().getX() + stage.getBoundary().getWidth() / 2, stage.getBoundary().getY() + stage.getBoundary().getHeight() / 2) / 50;
+				float distance = (float) (MathUtil.getDistance(x + image.getWidth() / 2, stage.getBoundary().getX() + stage.getBoundary().getWidth() / 2, stage.getBoundary().getX() + stage.getBoundary().getWidth() / 2, stage.getBoundary().getY() + stage.getBoundary().getHeight() / 2) / 50);
 				
 				x -= 1F + (distance * 2f);
 				
@@ -690,7 +690,7 @@ public class Sagume extends AllStarBoss
 			super(owner);
 			
 			owner.setDamageModifier(0.6f);
-			setSpellcardTime(Duration.seconds(40));
+			setSpellcardTime(Duration.seconds(43));
 			
 			addPhase(new Phase<Sagume>(100)
 			{

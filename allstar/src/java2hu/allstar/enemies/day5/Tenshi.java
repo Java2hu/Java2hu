@@ -319,7 +319,7 @@ public class Tenshi extends AllStarBoss
 			
 			if(totalTick == 0)
 			{
-				angleOffset = MathUtil.getAngle(player, boss) + 90;
+				angleOffset = (float) (MathUtil.getAngle(player, boss) + 90);
 			}
 			
 			if(totalTick < time)

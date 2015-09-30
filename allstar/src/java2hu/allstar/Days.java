@@ -24,6 +24,7 @@ import java2hu.allstar.enemies.day5.Iku;
 import java2hu.allstar.enemies.day5.Seiran;
 import java2hu.allstar.enemies.day5.Tenshi;
 import java2hu.allstar.enemies.day6.Sekibanki;
+import java2hu.allstar.enemies.day7.Clownpiece;
 import java2hu.allstar.enemies.day7.Junko;
 import java2hu.allstar.enemies.day7.Raiko;
 import java2hu.allstar.enemies.day7.Ringo;
@@ -321,6 +322,17 @@ public class Days extends J2hObject
 			
 			// Rei'sen (Reisen 2)
 			// Watatsuki's
+			
+			addCharacter(day, type, Clownpiece.FULL_NAME, new Getter<AllStarBoss>()
+			{
+				@Override
+				public AllStarBoss get()
+				{
+					final Clownpiece boss = new Clownpiece(startHP, startX, startY);
+
+					return boss;
+				}
+			});
 			
 			addCharacter(day, type, Sagume.FULL_NAME, new Getter<AllStarBoss>()
 			{

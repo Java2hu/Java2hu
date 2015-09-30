@@ -1,13 +1,12 @@
 package java2hu.allstar.stage;
 
 import java.util.ArrayList;
-
 import java2hu.Border;
 import java2hu.Game;
 import java2hu.HitboxSprite;
 import java2hu.J2hGame;
-import java2hu.Loader;
 import java2hu.J2hGame.ClearType;
+import java2hu.Loader;
 import java2hu.allstar.AllStarStageScheme;
 import java2hu.gameflow.GameFlowScheme.WaitConditioner;
 import java2hu.gameflow.SpecialFlowScheme;
@@ -50,7 +49,7 @@ public class MakaiStage implements SpecialFlowScheme<AllStarStageScheme>
 		final J2hGame game = Game.getGame();
 		final Player player = game.getPlayer();
 		
-		float offset = MathUtil.getAngle(obj, player);
+		float offset = (float) MathUtil.getAngle(obj, player);
 		for(float angle = offset; angle < 360 + offset; angle += 30)
 		{
 			for(int i = 0; i < 3; i++)
@@ -376,7 +375,7 @@ public class MakaiStage implements SpecialFlowScheme<AllStarStageScheme>
 								{
 									boolean left = i > total / 2f;
 									
-									float angle = MathUtil.getAngle(this, player);
+									float angle = (float) MathUtil.getAngle(this, player);
 									float offsetAngle = angle + (left ? 90 : 270);
 									float rad = (float) Math.toRadians(offsetAngle);
 									float cos = (float) Math.cos(rad);
@@ -575,7 +574,7 @@ public class MakaiStage implements SpecialFlowScheme<AllStarStageScheme>
 										for(int i = 0; i < 4; i++)
 										{
 											int delay = (int) (i * 7f);
-											final float finalAngle = MathUtil.getAngle(enemy, player);
+											final float finalAngle = (float) MathUtil.getAngle(enemy, player);
 											
 											game.addTaskGame(new Runnable()
 											{
@@ -716,7 +715,7 @@ public class MakaiStage implements SpecialFlowScheme<AllStarStageScheme>
 									{
 										SoundUtil.playSoundSingle(TouhouSounds.Enemy.BULLET_1, 0.5f, "bullet_4", 10);
 										
-										float angle = MathUtil.getAngle(this, player);
+										float angle = (float) MathUtil.getAngle(this, player);
 										
 										Bullet bullet = new Bullet(new ThBullet(ThBulletType.BUTTERFLY, ThBulletColor.BLUE), getX(), getY());
 										bullet.setDirectionDegTick(angle, 4f);

@@ -747,7 +747,7 @@ public class Raiko extends AllStarBoss
 											
 											Player player = Game.getGame().getPlayer();
 											
-											float distance = MathUtil.getDistance(this.getX(), this.getY(), player.getX(), player.getY());
+											float distance = (float) MathUtil.getDistance(this.getX(), this.getY(), player.getX(), player.getY());
 											
 											if(distance < activationDistance)
 											{
@@ -788,18 +788,18 @@ public class Raiko extends AllStarBoss
 														{
 															Player player = Game.getGame().getPlayer();
 															
-															float degree = MathUtil.getAngle(this, player);
+															float degree = (float) MathUtil.getAngle(this, player);
 															
 															setDirectionRadsTick((float) Math.toRadians(degree), 4F);
 															
-															float distance = MathUtil.getDistance(this.getX(), this.getY(), player.getX(), player.getY());
+															float distance = (float) MathUtil.getDistance(this.getX(), this.getY(), player.getX(), player.getY());
 															
 															if(distance < activationDistance)
 															{
 																set = true;
 																setBullet(new ThBullet(ThBulletType.POINTER, ThBulletColor.RED));
 																spawnAnimation();
-																setRotationDeg(MathUtil.normalizeDegree(degree - 90F - 180F));
+																setRotationDeg((float) MathUtil.normalizeDegree(degree - 90F - 180F));
 															}
 														}
 													};

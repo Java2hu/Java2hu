@@ -184,7 +184,7 @@ public class CloudsBG extends Background3D
 					int i = (int) tick;
 					
 					float offsetAngle = i / 500f * 360f;
-					offsetAngle = MathUtil.normalizeDegree(offsetAngle);
+					offsetAngle = (float) MathUtil.normalizeDegree(offsetAngle);
 
 					float xOffset = (float) (Math.cos(Math.toRadians(offsetAngle)) * 0.5f);
 					

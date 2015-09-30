@@ -109,7 +109,7 @@ public class Laser extends LaserDrawer
 		{
 			Position last = lastPositions.isEmpty() ? null : lastPositions.getLast();
 			
-			float distance = last != null ? MathUtil.getDistance(this, last) : getUnitsPerPoint() + 1;
+			float distance = (float) (last != null ? MathUtil.getDistance(this, last) : getUnitsPerPoint() + 1);
 			
 			{
 				if(getUnitsPerPoint() <= 0 || distance >= getUnitsPerPoint())
@@ -254,13 +254,13 @@ public class Laser extends LaserDrawer
 	}
 	
 	@Override
-	public void setDirectionDegTick(float degree, float speed)
+	public void setDirectionDegTick(double degree, double speed)
 	{
 		super.setDirectionDegTick(degree, speed);
 	}
 	
 	@Override
-	public void setDirectionRadsTick(float radians, float speed)
+	public void setDirectionRadsTick(double radians, double speed)
 	{
 		super.setDirectionRadsTick(radians, speed);
 	}

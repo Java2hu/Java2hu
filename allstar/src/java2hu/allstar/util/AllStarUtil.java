@@ -294,7 +294,7 @@ public class AllStarUtil extends J2hObject
 			@Override
 			public void onUpdate(long tick)
 			{
-				float distance = MathUtil.getDistance(x + image.getWidth() / 2, stage.getBoundary().getX() + stage.getBoundary().getWidth() / 2, stage.getBoundary().getX() + stage.getBoundary().getWidth() / 2, stage.getBoundary().getY() + stage.getBoundary().getHeight() / 2) / 50;
+				float distance = (float) (MathUtil.getDistance(x + image.getWidth() / 2, stage.getBoundary().getX() + stage.getBoundary().getWidth() / 2, stage.getBoundary().getX() + stage.getBoundary().getWidth() / 2, stage.getBoundary().getY() + stage.getBoundary().getHeight() / 2) / 50);
 				
 				x -= 1F + (distance * 2f);
 				
@@ -371,7 +371,7 @@ public class AllStarUtil extends J2hObject
 			@Override
 			public void onUpdate(long tick)
 			{
-				float distance = MathUtil.getDistance(x + image.getWidth() / 2, stage.getBoundary().getX() + stage.getBoundary().getWidth() / 2, stage.getBoundary().getX() + stage.getBoundary().getWidth() / 2, stage.getBoundary().getY() + stage.getBoundary().getHeight() / 2) / 30;
+				float distance = (float) (MathUtil.getDistance(x + image.getWidth() / 2, stage.getBoundary().getX() + stage.getBoundary().getWidth() / 2, stage.getBoundary().getX() + stage.getBoundary().getWidth() / 2, stage.getBoundary().getY() + stage.getBoundary().getHeight() / 2) / 30);
 				
 				x -= 1F + distance;
 				
@@ -421,7 +421,7 @@ public class AllStarUtil extends J2hObject
 			@Override
 			public void onUpdate(long tick)
 			{
-				float distance = MathUtil.getDistance(x + image2.getWidth() / 2, stage.getBoundary().getX() + stage.getBoundary().getWidth() / 2, stage.getBoundary().getX() + stage.getBoundary().getWidth() / 2, stage.getBoundary().getY() + stage.getBoundary().getHeight() / 2) / 30;
+				float distance = (float) (MathUtil.getDistance(x + image2.getWidth() / 2, stage.getBoundary().getX() + stage.getBoundary().getWidth() / 2, stage.getBoundary().getX() + stage.getBoundary().getWidth() / 2, stage.getBoundary().getY() + stage.getBoundary().getHeight() / 2) / 30);
 				
 				x -= 1F + distance;
 

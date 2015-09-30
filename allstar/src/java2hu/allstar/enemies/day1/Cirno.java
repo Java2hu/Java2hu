@@ -498,7 +498,7 @@ public class Cirno extends AllStarBoss
 						
 						TouhouSounds.Enemy.BULLET_1.play(1f);
 						
-						float angle = MathUtil.getAngle(boss, game.getPlayer());
+						float angle = (float) MathUtil.getAngle(boss, game.getPlayer());
 						
 						for(int i = 0; i < 360; i += 360 / 6f)
 						{

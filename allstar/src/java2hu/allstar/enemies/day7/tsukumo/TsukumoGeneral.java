@@ -593,7 +593,7 @@ public class TsukumoGeneral implements SpecialFlowScheme<AllStarStageScheme>
 			{
 				TouhouSounds.Notes.NOTE_2.play();
 				
-				float angle = MathUtil.getAngle(yatsuhashi, player);
+				float angle = (float) MathUtil.getAngle(yatsuhashi, player);
 				
 				for(int i = -10; i <= 10; i += 2)
 				{
@@ -635,7 +635,7 @@ public class TsukumoGeneral implements SpecialFlowScheme<AllStarStageScheme>
 								
 								setPosition(Game.getGame().getWidth() + 200, 500 + finalI * 100);
 
-								angle = MathUtil.getAngle(this, player) + 5.1f;
+								angle = (float) (MathUtil.getAngle(this, player) + 5.1f);
 								
 								setDirectionDegTick(angle, 10f);
 							}
@@ -653,7 +653,7 @@ public class TsukumoGeneral implements SpecialFlowScheme<AllStarStageScheme>
 								
 								setPosition(Game.getGame().getWidth()/2f + finalI * 100f, Game.getGame().getHeight() + 400);
 
-								angle = MathUtil.getAngle(this, player) + 5.1f;
+								angle = (float) (MathUtil.getAngle(this, player) + 5.1f);
 								
 								setDirectionDegTick(angle, 10f);
 							}
@@ -671,7 +671,7 @@ public class TsukumoGeneral implements SpecialFlowScheme<AllStarStageScheme>
 								
 								setPosition(- 600, 500 + finalI * 100);
 
-								angle = MathUtil.getAngle(this, player) - 5.1f;
+								angle = (float) (MathUtil.getAngle(this, player) - 5.1f);
 								
 								setDirectionDegTick(angle, 10f);
 							}
@@ -691,7 +691,7 @@ public class TsukumoGeneral implements SpecialFlowScheme<AllStarStageScheme>
 								
 								setPosition(- 800, Game.getGame().getHeight() + 800 + finalI * 100);
 
-								angle = MathUtil.getAngle(this, player) - 5.1f;
+								angle = (float) (MathUtil.getAngle(this, player) - 5.1f);
 								
 								setDirectionDegTick(angle, 10f);
 							}
@@ -709,7 +709,7 @@ public class TsukumoGeneral implements SpecialFlowScheme<AllStarStageScheme>
 								
 								setPosition(Game.getGame().getWidth() + 800, Game.getGame().getHeight() + 800 + finalI * 100);
 
-								angle = MathUtil.getAngle(this, player) - 5.1f;
+								angle = (float) (MathUtil.getAngle(this, player) - 5.1f);
 								
 								setDirectionDegTick(angle, 10f);
 							}
