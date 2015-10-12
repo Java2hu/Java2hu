@@ -5,7 +5,6 @@ import java2hu.J2hGame;
 import java2hu.J2hGame.ClearType;
 import java2hu.Loader;
 import java2hu.MovementAnimation;
-import java2hu.Position;
 import java2hu.RNG;
 import java2hu.StartupLoopAnimation;
 import java2hu.allstar.AllStarStageScheme;
@@ -14,6 +13,7 @@ import java2hu.allstar.util.AllStarUtil;
 import java2hu.background.Background;
 import java2hu.background.BackgroundBossAura;
 import java2hu.gameflow.GameFlowScheme.WaitConditioner;
+import java2hu.helpers.ZIndexHelper;
 import java2hu.object.bullet.Bullet;
 import java2hu.object.player.Player;
 import java2hu.object.ui.CircleHealthBar;
@@ -279,6 +279,8 @@ public class Nitori extends AllStarBoss
 			super(owner);
 			setSpellcardTime(Duration.seconds(25));
 		}
+		
+		private ZIndexHelper indexer = new ZIndexHelper();
 
 		@Override
 		public void tick(int tick, J2hGame game, Nitori boss)
@@ -305,6 +307,9 @@ public class Nitori extends AllStarBoss
 						Bullet b = new Bullet(ThBullet.make(ThBulletType.BULLET, ThBulletColor.CYAN_LIGHT), boss.getX(), boss.getY());
 						b.setDirectionDeg(90 + (120 * j) + (10 * i) - ((cycle > 45 ? 4.5f : 5.5f) * numBullets), 500f);
 						b.setRotationFromVelocity(-90f);
+						
+						indexer.index(b);
+						
 						game.spawn(b);
 					}
 				}
@@ -327,7 +332,7 @@ public class Nitori extends AllStarBoss
 		public Spell(Nitori owner)
 		{
 			super(owner);
-			setSpellcardTime(Duration.seconds(20));
+			setSpellcardTime(Duration.seconds(28));
 		}
 
 		@Override
@@ -338,9 +343,10 @@ public class Nitori extends AllStarBoss
 			if (tick == 0)
 			{
 				boss.playSpecial(true);
+				boss.setDamageModifier(0.1f);
 			}
 
-			if (tick % 2 == 0)
+			if (tick % 3 == 0)
 			{
 				TouhouSounds.Enemy.BULLET_1.play(0.2f);
 			}
@@ -381,8 +387,13 @@ public class Nitori extends AllStarBoss
 			b.setAlpha(0);
 			b.useSpawnAnimation(false);
 			game.spawn(b);
+			
+			final int startFiring = 300;
 
-			if (tick >= 300) {
+			if (tick == startFiring)
+				boss.setDamageModifier(1f);
+			
+			if (tick >= startFiring) {
 				int cycle = tick % 150;
 				if (cycle == 0 || cycle == 40) {
 					TouhouSounds.Enemy.BULLET_2.play(0.2f);
