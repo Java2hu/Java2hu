@@ -5,6 +5,7 @@ import java2hu.J2hGame;
 import java2hu.J2hGame.ClearType;
 import java2hu.Loader;
 import java2hu.MovementAnimation;
+import java2hu.Position;
 import java2hu.RNG;
 import java2hu.StartupLoopAnimation;
 import java2hu.allstar.AllStarStageScheme;
@@ -13,14 +14,21 @@ import java2hu.allstar.util.AllStarUtil;
 import java2hu.background.Background;
 import java2hu.background.BackgroundBossAura;
 import java2hu.gameflow.GameFlowScheme.WaitConditioner;
+import java2hu.object.bullet.Bullet;
 import java2hu.object.player.Player;
 import java2hu.object.ui.CircleHealthBar;
 import java2hu.overwrite.J2hMusic;
+import java2hu.pathing.SimpleTouhouBossPath;
 import java2hu.spellcard.BossSpellcard;
 import java2hu.system.SaveableObject;
+import java2hu.touhou.bullet.ThBullet;
+import java2hu.touhou.bullet.ThBulletColor;
+import java2hu.touhou.bullet.ThBulletType;
+import java2hu.touhou.sounds.TouhouSounds;
 import java2hu.util.AnimationUtil;
 import java2hu.util.BossUtil;
 import java2hu.util.ImageSplitter;
+import java2hu.util.MathUtil;
 import java2hu.util.ObjectUtil;
 import java2hu.util.SchemeUtil;
 import java2hu.util.Setter;
@@ -46,7 +54,7 @@ public class Nitori extends AllStarBoss
 	/**
 	 * Spell Card Name
 	 */
-	final static String SPELLCARD_NAME = "";
+	final static String SPELLCARD_NAME = "Water Sign \"Vast Waterfall\"";
 	
 	private Setter<BackgroundBossAura> backgroundSpawner;
 	
@@ -84,6 +92,8 @@ public class Nitori extends AllStarBoss
 	
 		Music bgm = new J2hMusic(Gdx.audio.newMusic(FOLDER.child("bgm.mp3")));
 		bgm.setLooping(true);
+
+		setBgmPosition(42f);
 		
 		setAuraColor(AllStarUtil.from255RGB(34, 85, 170));
 		setBgAuraColor(AllStarUtil.from255RGB(136, 187, 204));
@@ -273,7 +283,41 @@ public class Nitori extends AllStarBoss
 		public void tick(int tick, J2hGame game, Nitori boss)
 		{
 			final Player player = game.getPlayer();
+
+			int cycle = tick % 150 - 20;
+
+			if (cycle == 100) {
+				boss.getPathing().path(new SimpleTouhouBossPath(boss));
+			}
 			
+			if (cycle >= 0 && cycle < 96 && tick % 3 == 0) {
+				int numBullets = (cycle / 3) % 16;
+
+				if (numBullets <= 13) {
+					TouhouSounds.Enemy.BULLET_1.play(0.2f);
+				} else {
+					numBullets = -1;
+				}
+
+				for (int i = 0; i <= numBullets; i++) {
+					for (int j = 0; j < 3; j++) {
+						Bullet b = new Bullet(ThBullet.make(ThBulletType.BULLET, ThBulletColor.CYAN_LIGHT), boss.getX(), boss.getY());
+						b.setDirectionDeg(90 + (120 * j) + (10 * i) - ((cycle > 45 ? 4.5f : 5.5f) * numBullets), 500f);
+						b.setRotationFromVelocity(-90f);
+						game.spawn(b);
+					}
+				}
+			}
+
+			if (cycle == 120) {
+				TouhouSounds.Enemy.BULLET_1.play(0.2f);
+
+				for (int i = 0; i < 7; i++) {
+					Bullet b = new Bullet(ThBullet.make(ThBulletType.BALL_BIG, ThBulletColor.WHITE), boss.getX(), boss.getY());
+					b.setDirectionDeg(MathUtil.getAngle(boss, player) + 15 * i - 45, 600f);
+					game.spawn(b);
+				}
+			}
 		}
 	}
 
