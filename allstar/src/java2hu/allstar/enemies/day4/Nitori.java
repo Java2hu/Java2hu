@@ -27,6 +27,7 @@ import java2hu.touhou.bullet.ThBulletType;
 import java2hu.touhou.sounds.TouhouSounds;
 import java2hu.util.AnimationUtil;
 import java2hu.util.BossUtil;
+import java2hu.util.Duration;
 import java2hu.util.ImageSplitter;
 import java2hu.util.MathUtil;
 import java2hu.util.ObjectUtil;
@@ -276,7 +277,7 @@ public class Nitori extends AllStarBoss
 		public NonSpell(Nitori owner)
 		{
 			super(owner);
-//			setSpellcardTime(Duration.seconds(...));
+			setSpellcardTime(Duration.seconds(25));
 		}
 
 		@Override
@@ -326,14 +327,76 @@ public class Nitori extends AllStarBoss
 		public Spell(Nitori owner)
 		{
 			super(owner);
-//			setSpellcardTime(Duration.seconds(...));
+			setSpellcardTime(Duration.seconds(20));
 		}
 
 		@Override
 		public void tick(int tick, J2hGame game, Nitori boss)
 		{
 			final Player player = game.getPlayer();
-			
+
+			if (tick == 0)
+			{
+				boss.playSpecial(true);
+			}
+
+			if (tick % 2 == 0)
+			{
+				TouhouSounds.Enemy.BULLET_1.play(0.2f);
+			}
+
+			Bullet b = new Bullet(ThBullet.make(ThBulletType.ORB, ThBulletColor.CYAN), game.getMaxX() * (float) RNG.random(), 0) {
+				float v_Y = (float) -(game.getHeight() / Math.sqrt(2));
+				boolean live = false;
+				boolean bounced = false;
+
+				@Override
+				public void onUpdate(long tick)
+				{
+					v_Y += 4;
+					if (v_Y > 0 && !live) live = true;
+					if (live && !bounced && getY() < game.getMinY() + 5) {
+						v_Y = -300;
+						bounced = true;
+					}
+					setVelocityY(v_Y);
+					if (!live)
+					{
+						setAlpha(getTicksAlive() / (float) (game.getHeight() / Math.sqrt(32)));
+					}
+
+					super.onUpdate(tick);
+				}
+
+				@Override
+				public void checkCollision()
+				{
+					if (live)
+					{
+						super.checkCollision();
+					}
+				}
+			};
+			b.setVelocityX((game.getCenterX() - b.getX()) / 3);
+			b.setAlpha(0);
+			b.useSpawnAnimation(false);
+			game.spawn(b);
+
+			if (tick >= 300) {
+				int cycle = tick % 150;
+				if (cycle == 0 || cycle == 40) {
+					TouhouSounds.Enemy.BULLET_2.play(0.2f);
+					for (int i = 0; i < 5; i++) {
+						Bullet shot = new Bullet(ThBullet.make(ThBulletType.BALL_BIG, ThBulletColor.WHITE), boss.getX(), boss.getY());
+						shot.setDirectionDeg(MathUtil.getAngle(boss, player) + 20 * i - 40, 600f);
+						game.spawn(shot);
+					}
+				}
+
+				if (cycle == 75) {
+					boss.getPathing().path(new SimpleTouhouBossPath(boss));
+				}
+			}
 		}
 	}
 }
