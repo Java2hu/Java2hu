@@ -163,14 +163,14 @@ public abstract class StageObject extends J2hObject implements IPosition
 	
 	public void disposeAll()
 	{
+		disposeChildren();
+		
 		Game.getGame().addTask(new Runnable()
 		{
 			@Override
 			public void run()
 			{
 				disposeDisposables();
-				
-				disposeChildren();
 			}
 		}, 5 * 20);
 	}
@@ -180,19 +180,12 @@ public abstract class StageObject extends J2hObject implements IPosition
 	 */
 	public void disposeChildren()
 	{
-		Game.getGame().runAsync(new Runnable()
+		for(StageObject obj : children)
 		{
-			@Override
-			public void run()
-			{
-				for(StageObject obj : children)
-				{
-					game.delete(obj);
-				}
-				
-				children.clear();
-			}
-		});
+			game.delete(obj);
+		}
+
+		children.clear();
 	}
 	
 	/**
@@ -491,7 +484,7 @@ public abstract class StageObject extends J2hObject implements IPosition
 		}
 	}
 	
-	protected PathingHelper pathing = new PathingHelper();
+	protected PathingHelper pathing = new PathingHelper(this);
 	
 	public PathingHelper getPathing()
 	{
@@ -708,6 +701,22 @@ public abstract class StageObject extends J2hObject implements IPosition
 	public void update(float second)
 	{
 		onUpdateDelta(second);
+		
+		{
+			Iterator<Plugin> it = effects.iterator();
+
+			while(it.hasNext())
+			{
+				Plugin effect = it.next();
+
+				effect.update(this, second);
+
+				if(effect.doDelete())
+				{
+					it.remove();
+				}
+			}
+		}
 		
 		getPathing().tickDelta(second);
 		

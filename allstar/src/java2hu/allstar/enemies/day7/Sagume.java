@@ -589,16 +589,8 @@ public class Sagume extends AllStarBoss
 				{
 					FlyingYingYangOrb s = new FlyingYingYangOrb(flip ? FlyingYingYangOrbColor.BLUE : FlyingYingYangOrbColor.RED, 100, boss.getX(), boss.getY());
 
-					Path p = new Path(s, Duration.seconds(6))
-					{
-						@Override
-						public void onDone()
-						{
-							super.onDone();
-							
-							s.deleteSilent();
-						}
-					};
+					Path p = new Path(s, Duration.seconds(6));
+					p.onDone((path) -> s.deleteSilent());
 
 					float dist = 0;
 

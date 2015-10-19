@@ -48,6 +48,8 @@ public class LaserDrawer extends Bullet
 		this.thickness = thickness;
 		this.setHitboxThickness(hitboxThickness);
 		this.setZIndex(1000);
+		useDeleteAnimation = false;
+		useSpawnAnimation = false;
 	}
 
 	@Override
@@ -138,21 +140,30 @@ public class LaserDrawer extends Bullet
 	
 	@Deprecated
 	@Override
+	public void useDeathAnimation(boolean bool)
+	{
+
+	}
+	
+	@Deprecated
+	@Override
+	public void useSpawnAnimation(boolean useSpawnAnimation)
+	{
+
+	}
+	
+	@Deprecated
+	@Override
 	public void spawnAnimation()
 	{
 
 	}
 	
+	@Deprecated
 	@Override
 	public void deleteAnimation()
 	{
-		for(Position p : getPoints())
-		{
-			if(Float.isNaN(p.getX()) || Float.isNaN(p.getY()))
-				continue;
-			
-			spawnSwirl(p, false);
-		}
+
 	}
 	
 	@Deprecated
@@ -160,6 +171,20 @@ public class LaserDrawer extends Bullet
 	public void oldDeleteAnimation()
 	{
 
+	}
+	
+	@Override
+	public void onDelete()
+	{
+		super.onDelete();
+		
+		for(Position p : getPoints())
+		{
+			if(Float.isNaN(p.getX()) || Float.isNaN(p.getY()))
+				continue;
+			
+			spawnSwirl(p, false);
+		}
 	}
 	
 	@Override
@@ -500,8 +525,8 @@ public class LaserDrawer extends Bullet
 				MeshData h10 = new MeshData().setPos((X + cosLeft * getHitboxThickness()), (Y + sinLeft * getHitboxThickness()));
 				
 				MeshData[] info = { 
-						p00, p01, p11,
 						p00, p10, p11,
+						p00, p01, p11,
 						};
 				
 				MeshData[] forward = { 
@@ -519,8 +544,10 @@ public class LaserDrawer extends Bullet
 					
 					mesh.add(color.toFloatBits());
 					
-					mesh.add(convertU.get(v.u).floatValue());
-					mesh.add(convertV.get(v.v).floatValue());
+					float precision = 5f;
+					
+					mesh.add((float) MathUtil.roundOff(convertU.get(v.u).floatValue(), precision));
+					mesh.add((float) MathUtil.roundOff(convertV.get(v.v).floatValue(), precision));
 				}
 				
 				for(MeshData h : forward)

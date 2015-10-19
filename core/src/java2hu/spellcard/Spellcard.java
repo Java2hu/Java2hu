@@ -132,7 +132,7 @@ public abstract class Spellcard extends J2hObject
 			@Override
 			public void run()
 			{
-				game.setTimer(Duration.ZERO);
+				game.setTimer(Duration.zero());
 			}
 		}, 20);
 		

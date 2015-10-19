@@ -1,10 +1,8 @@
 package java2hu.pathing;
 
 import java.util.ArrayList;
-import java2hu.Game;
+import java.util.function.Consumer;
 import java2hu.IPosition;
-import java2hu.J2hGame;
-import java2hu.events.pathing.PathingFinishEvent;
 import java2hu.object.StageObject;
 import java2hu.util.Duration;
 import java2hu.util.Duration.Unit;
@@ -16,6 +14,21 @@ import java2hu.util.MathUtil;
  */
 public class PathingHelper
 {
+	public PathingHelper(StageObject owner)
+	{
+		this.owner = owner;
+	}
+	
+	private StageObject owner;
+	
+	/**
+	 * @return The StageObject this pathing helper is attached to.
+	 */
+	public StageObject getOwner()
+	{
+		return owner;
+	}
+	
 	private Path currentPath;
 	
 	public Path getCurrentPath()
@@ -43,9 +56,39 @@ public class PathingHelper
 		this.currentPath = currentPath;
 	}
 	
+	/**
+	 * Creates a path moving to a specific position using {@link SinglePositionPath}.
+	 * @param destination The position to move to.
+	 * @param duration How long the pathing will take.
+	 * @return The SinglePositionPath this helper is set to path to.
+	 */
+	public SinglePositionPath path(IPosition destination, Duration duration)
+	{
+		SinglePositionPath path = new SinglePositionPath(getOwner(), destination, duration);
+		
+		path(path);
+		
+		return path;
+	}
+	
+	/**
+	 * Uses {@link SimpleTouhouBossPath} to path to a random location on the top of the screen close to the player.
+	 * @param duration How long the pathing will take.
+	 * @return The SimpleTouhouBossPath this helper is set to path to.
+	 */
+	public SimpleTouhouBossPath pathAbovePlayer(Duration duration)
+	{
+		SimpleTouhouBossPath path = new SimpleTouhouBossPath(getOwner());
+		
+		path(path);
+		
+		return path;
+	}
+	
 	public static class Path
 	{
 		private ArrayList<IPosition> path = new ArrayList<IPosition>();
+		private ArrayList<Consumer<Path>> onDone = new ArrayList<Consumer<Path>>();
 		
 		/**
 		 * Returns a list of the positions in this path.
@@ -117,7 +160,7 @@ public class PathingHelper
 				speed = getDistance() / time.getValue(Unit.SECOND);
 			}
 			
-			speed = speed / J2hGame.currentTPS;
+//			speed = speed;
 		}
 		
 		private int index = 0;
@@ -129,18 +172,27 @@ public class PathingHelper
 			return done;
 		}
 		
-		public void onDone()
+		private void done()
 		{
-			PathingFinishEvent event = new PathingFinishEvent(object, this);
-			Game.getGame().callEvent(event);
+			onDone.stream().forEach((c) -> c.accept(this));
+		}
+		
+		/**
+		 * Registers a consumer to be called on the finishing of this path.
+		 */
+		public void onDone(Consumer<Path> consumer)
+		{
+			onDone.add(consumer);
+		}
+		
+		private Double lastAngle = null;
+		
+		public Double getLastAngle()
+		{
+			return lastAngle;
 		}
 		
 		public void tickDelta(float delta)
-		{
-			
-		}
-		
-		public void tick()
 		{
 			if(done)
 				return;
@@ -148,7 +200,7 @@ public class PathingHelper
 			if(index >= getPositions().size())
 			{
 				done = true;
-				onDone();
+				done();
 				return;
 			}
 			
@@ -164,20 +216,29 @@ public class PathingHelper
 				return;
 			}
 			
-			final double x = Math.cos(rad) * speed;
+			lastAngle = angle;
+			
+			double distanceBefore = MathUtil.getDistance(object, to);
+			
+			final double x = Math.cos(rad) * speed * delta;
 			
 			object.setX((float) (object.getX() + x));
 			
-			final double y = Math.sin(rad) * speed;
+			final double y = Math.sin(rad) * speed * delta;
 			
 			object.setY((float) (object.getY() + y));
 			
 			double distance = MathUtil.getDistance(object, to);
 			
-			if(distance <= speed)
+			if(distanceBefore <= distance) // Check if it passed it's destination in this movement.
 			{
 				index++;
 			}
+		}
+		
+		public void tick()
+		{
+			
 		}
 		
 		/**

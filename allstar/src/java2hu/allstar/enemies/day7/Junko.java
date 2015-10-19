@@ -54,7 +54,6 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Animation.PlayMode;
 import com.badlogic.gdx.graphics.g2d.Sprite;
@@ -93,7 +92,6 @@ public class Junko extends AllStarBoss
 		int chunkWidth = 192;
 
 		Texture sprite = Loader.texture(FOLDER.child("anm.png"));
-		sprite.setFilter(TextureFilter.MipMapLinearNearest, TextureFilter.Nearest);
 		
 		Sprite fbs = new Sprite(Loader.texture(FOLDER.child("fbs.png")));
 		fbs.setScale(2F);
@@ -558,7 +556,7 @@ public class Junko extends AllStarBoss
 
 							Laser laser = new Laser(new ThLaser(ThLaserType.NORMAL, ThLaserColor.RED), boss.getX(), boss.getY(), 400);
 							laser.setDirectionDeg(finalAngle, speed);
-							laser.setThickness(20);
+							laser.setThickness(60);//20);
 							laser.setHitboxThickness(4);
 							laser.setGlowing();
 							laser.setMaxPoints(60);

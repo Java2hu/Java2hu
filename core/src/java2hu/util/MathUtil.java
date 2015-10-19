@@ -144,4 +144,11 @@ public class MathUtil extends J2hObject
 	{
 		return table.cos(degree);
 	}
+
+	public static double roundOff(double doubleValue, float places)
+	{
+		double multiplier = Math.pow(10, places);
+		
+		return Math.round(doubleValue * multiplier) / multiplier;
+	}
 }

@@ -278,7 +278,7 @@ public class SettingsWindow extends JFrame
 		samplesField = new JTextField();
 		samplesField.setEnabled(false);
 		samplesField.setFont(new Font("Calibri", Font.PLAIN, 12));
-		samplesField.setText("0");
+		samplesField.setText("16");
 		samplesField.setColumns(10);
 		
 		samplesField.getDocument().addDocumentListener(new DocumentListener()
@@ -602,16 +602,16 @@ public class SettingsWindow extends JFrame
 		
 		config.width = Integer.parseInt(widthField.getText());
 		config.height = Integer.parseInt(heightField.getText());
-		config.samples = Integer.parseInt(samplesField.getText());
+//		config.samples = Integer.parseInt(samplesField.getText());
 		config.fullscreen = fullScreenCheckBox.isSelected();
-		config.vSyncEnabled = false;
+		config.vSyncEnabled = true;
 		config.backgroundFPS = 60;
 		config.foregroundFPS = Integer.parseInt(fpsField.getText());
-		config.allowSoftwareMode = true;
+//		config.allowSoftwareMode = true;
 		
 		System.out.println("Starting game with \n Width: " + config.width + " - Height: " + config.height + " (" + config.width + "x" + config.height + " @ " + viewportWidth.getText() + "x" + viewportHeight.getText() + "\n Samples: " + config.samples + "x  -  Fullscreen: " + config.fullscreen);
 		
-		config.audioDeviceSimultaneousSources = 1000;
+		config.audioDeviceSimultaneousSources = 100;
 		
 		new LwjglApplication(new AllStarGame(Integer.parseInt(viewportWidth.getText()), Integer.parseInt(viewportHeight.getText()))
 		{

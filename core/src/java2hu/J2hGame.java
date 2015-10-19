@@ -184,7 +184,7 @@ public class J2hGame extends ApplicationAdapter implements InputProcessor
 			getScheme().stopScheme();
 		
 		clear(ClearType.ALL, true);
-		setTimer(Duration.ZERO);
+		setTimer(Duration.zero());
 	}
 	
 	/**
@@ -295,7 +295,7 @@ public class J2hGame extends ApplicationAdapter implements InputProcessor
 		
 		spellcards.clear();
 		
-		setTimer(Duration.ZERO);
+		setTimer(Duration.zero());
 	}
 	
 	public Set<Spellcard> getSpellcards()
@@ -1800,7 +1800,7 @@ public class J2hGame extends ApplicationAdapter implements InputProcessor
 		}
 
 		batch.begin();
-
+		
 		ShaderProgram shader = null;
 		FrameBuffer buffer = null;
 		
@@ -1934,7 +1934,7 @@ public class J2hGame extends ApplicationAdapter implements InputProcessor
 			batch.setShader(null);
 	}
 	
-	private Duration timer = Duration.ZERO;
+	private Duration timer = Duration.zero();
 	
 	public void setTimer(Duration timer)
 	{
@@ -2218,8 +2218,6 @@ public class J2hGame extends ApplicationAdapter implements InputProcessor
 				}
 			}
 			
-			boolean skipDelta = false;
-			
 			if(updateLogic)
 			{
 				nextTick = nextTick + secondsPerTick;
@@ -2229,7 +2227,6 @@ public class J2hGame extends ApplicationAdapter implements InputProcessor
 				while(nextTick <= internalElapsedTime)
 				{
 					nextTick += secondsPerTick; // Skip frame
-					skipDelta = true;
 					ticks++;
 				}
 				

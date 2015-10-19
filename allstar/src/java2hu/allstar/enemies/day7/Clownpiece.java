@@ -5,7 +5,9 @@ import java2hu.Game;
 import java2hu.J2hGame;
 import java2hu.J2hGame.ClearType;
 import java2hu.Loader;
+import java2hu.Position;
 import java2hu.RNG;
+import java2hu.StartupLoopAnimation;
 import java2hu.allstar.AllStarStageScheme;
 import java2hu.allstar.enemies.AllStarBoss;
 import java2hu.allstar.util.AllStarUtil;
@@ -14,23 +16,28 @@ import java2hu.background.BackgroundBossAura;
 import java2hu.background.ClearBackground;
 import java2hu.gameflow.GameFlowScheme.WaitConditioner;
 import java2hu.object.bullet.Bullet;
+import java2hu.object.bullet.StationaryLaser;
 import java2hu.object.player.Player;
 import java2hu.object.ui.CircleHealthBar;
 import java2hu.overwrite.J2hMusic;
+import java2hu.pathing.SinglePositionPath;
+import java2hu.plugin.Plugin;
+import java2hu.plugin.sprites.RotatingSprite;
 import java2hu.spellcard.BossSpellcard;
 import java2hu.system.SaveableObject;
 import java2hu.touhou.bullet.ThBullet;
 import java2hu.touhou.bullet.ThBulletColor;
 import java2hu.touhou.bullet.ThBulletType;
+import java2hu.touhou.bullet.ThStationaryLaserType;
 import java2hu.util.BossUtil;
+import java2hu.util.Duration;
 import java2hu.util.ImageSplitter;
-import java2hu.util.InputUtil;
+import java2hu.util.MathUtil;
 import java2hu.util.ObjectUtil;
 import java2hu.util.SchemeUtil;
 import java2hu.util.Setter;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.GL20;
@@ -88,7 +95,7 @@ public class Clownpiece extends AllStarBoss
 		Animation left = builder.movement(17,18,-1, 19,20,21,-1, 8f);
 		Animation right = builder.movement(9,10,-1, 11,12,13,-1, 8f);
 
-		Animation special = ImageSplitter.getAnimationFromSprite(sprite, 0, 3 * chunkHeight, chunkHeight + 22, chunkWidth, 8f, 1,2,3,4,5,6,7,6,5,4,3,2,1);
+		Animation special = new StartupLoopAnimation(ImageSplitter.getAnimationFromSprite(sprite, 0, 3 * chunkHeight, chunkHeight + 22, chunkWidth, 8f, 1,2,3), ImageSplitter.getAnimationFromSprite(sprite, 0, 3 * chunkHeight, chunkHeight + 22, chunkWidth, 8f, 4,5,6,7), 8f);
 
 		Music bgm = new J2hMusic(Gdx.audio.newMusic(FOLDER.child("bgm.mp3")));
 		bgm.setLooping(true);
@@ -173,10 +180,6 @@ public class Clownpiece extends AllStarBoss
 	public void onUpdate(long tick)
 	{
 		super.onUpdate(tick);
-		
-		InputUtil.handleMovementArrowKeys(this, 20f, 10f); // To test.
-		
-		if(Gdx.input.isKeyJustPressed(Keys.V)) { playSpecial(!playSpecial); };
 	}
 	
 	@Override
@@ -295,32 +298,145 @@ public class Clownpiece extends AllStarBoss
 			super(owner);
 //			setSpellcardTime(Duration.seconds(...));
 		}
+		
+		private float offset = 0;
 
 		@Override
 		public void tick(int tick, J2hGame game, Clownpiece boss)
 		{
 			final Player player = game.getPlayer();
 			
-			if (tick % 2 == 0)
+			if (tick == 100)
+				boss.playSpecial(true);
+			
+			int angleRadius = 70;
+			int over = 100;
+
+			if (tick % 20 == 0)
+				offset = (float) RNG.random() * (angleRadius / (over / 2f));
+			
+			if (tick % 8 == 0)
 			{
-				double mul = RNG.multiplierMirror(20, tick);
+				double mul = RNG.multiplierMirror(over, tick);
 				
 				if (mul < 0)
 					mul = 1f - (mul + 1f);
-				
-				int angleRadius = 60;
 				
 				float angle = (float) ((angleRadius * 2) * mul);
 				
 				for (float xOffset : new float[] { -700, 700 })
 				{
 					Bullet bullet = new Bullet(ThBullet.make(ThBulletType.STAR_LARGE, ThBulletColor.BLUE), game.getCenterX() + xOffset, player.getY());
-					bullet.setDirectionDeg(angle - (xOffset < 0 ? 180 + angleRadius : angleRadius), 400f);
+					bullet.setDirectionDeg((xOffset < 0 ? angle : 135 - angle) - (xOffset < 0 ? 180 + angleRadius : angleRadius) + offset, 400f);
+					bullet.setGlowing();
+					bullet.addEffect(new RotatingSprite(() -> bullet.getCurrentSprite(), 160f));
 
 					game.spawn(bullet);
 				}
 			}
 			
+			if (tick % 200 == 0)
+				boss.getPathing().pathAbovePlayer(Duration.ticks(60));
+			
+			int directions = 4;
+			
+			float waitMul = Math.min(1, tick / 2000f);
+			int waitTime = (int) (20 + (waitMul * -10));
+			int extraWait = (int) (60 + (waitMul * -30));
+			int totalWaitTime = directions * waitTime;
+			
+			if (tick % (totalWaitTime + extraWait) == 0)
+			{
+				for (int direction = 0; direction < directions; direction++)
+				{
+					float angle = (((float)direction / (float)directions) * 360) + 45 + 90;
+
+					int amount = 4;
+					
+					for (int i = 0; i < amount; i++)
+					{
+						float finalAngle = angle + (i * (angle > (180 + 45) ? 5 : -5));
+						double rad = Math.toRadians(finalAngle);
+						
+						final float distanceFromPlayer = 500;
+						
+						double endY = game.getCenterY() + (Math.sin(rad) * distanceFromPlayer);
+
+						double endX = player.getX() + (Math.cos(rad) * distanceFromPlayer);
+						
+						double rangeX = 600;
+						
+						double diffX = MathUtil.getDifference(endX, game.getCenterX());
+						
+						if (diffX < rangeX) // Move balls further from the x of clownpiece.
+						{
+							double toAdd = ((game.getCenterX() - endX) / rangeX) * -300f;
+							
+							endX += toAdd;
+						}
+						
+						endX = Math.max(game.getMinX(), Math.min(game.getMaxX(), endX));
+						endY = Math.max(game.getMinY(), Math.min(game.getMaxY(), endY));
+						
+						Position destination = new Position(endX, endY);
+						
+						
+						Bullet bullet = new Bullet(ThBullet.make(ThBulletType.BALL_BIG, ThBulletColor.BLUE), boss.getX() + 10, boss.getY() + 80);
+						bullet.setGlowing();
+						bullet.updateRotationFromPath(true, -90);
+						
+						SinglePositionPath path = bullet.getPathing().path(destination, Duration.seconds(1));
+						
+						path.onDone((p) -> 
+						{
+							bullet.setBullet(ThBullet.make(ThBulletType.POINTER, ThBulletColor.BLUE));
+							bullet.updateRotationFromPath(false, 0);
+							Bullet.spawnSwirl(bullet);
+							
+							StationaryLaser laser = new StationaryLaser(ThStationaryLaserType.BLUE);
+							
+							laser.setDirectionDeg(bullet.getX(), bullet.getY(), (float) MathUtil.getAngle(player, bullet), 10f);
+							laser.setThickness(6);
+							laser.setHitboxThickness(3);
+
+							laser.addChild(bullet);
+							laser.setZIndex(bullet.getZIndex() - 1);
+							laser.setGlowing();
+							
+							laser.spawnAnimation(Duration.seconds(0.75f), Duration.seconds(1f));
+							
+							laser.addEffect(new Plugin<StationaryLaser>()
+							{
+								@Override
+								public void update(StationaryLaser object, float delta)
+								{
+									float speed = 600;
+									
+									if (object.getTicksAlive() < 40)
+										speed = 0;
+									
+									float increase = 50;
+									
+									object.extendAtEnd((speed + increase) * delta);
+									object.extendAtStart(-(speed * delta));
+									
+									bullet.setPosition(object.getEnd());
+									
+									bullet.setScale(0.8f, 1.5f);
+									
+									bullet.setRotationDeg((float) MathUtil.getAngle(object.getStart(), object.getEnd()) + 90);
+								}
+							});
+							
+							game.addTaskGame(() -> game.delete(laser), 500);
+							
+							game.spawn(laser);
+						});
+						
+						game.addTaskGame(() -> game.spawn(bullet), (directions - direction) * waitTime);
+					}
+				}
+			}
 		}
 	}
 

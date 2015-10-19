@@ -1,6 +1,7 @@
 package java2hu.object.bullet;
 import java2hu.Game;
 import java2hu.HitboxSprite;
+import java2hu.IPosition;
 import java2hu.J2hGame;
 import java2hu.Position;
 import java2hu.RNG;
@@ -12,6 +13,7 @@ import java2hu.object.VelocityObject;
 import java2hu.object.bullet.phase.PhaseAnimation;
 import java2hu.object.bullet.phase.TouhouBreakAnimation;
 import java2hu.object.bullet.phase.TouhouSpawnAnimation;
+import java2hu.pathing.PathingHelper.Path;
 import java2hu.util.AnimationUtil;
 import java2hu.util.ImageSplitter;
 import java2hu.util.Setter;
@@ -103,6 +105,21 @@ public class Bullet extends VelocityObject
 		if(hide)
 			return;
 		
+		if (setRotationFromPath)
+		{
+			Path path = getPathing().getCurrentPath();
+			
+			if (path != null)
+			{
+				Double angle = path.getLastAngle();
+				
+				if (angle != null)
+				{
+					current.setRotation((float) (angle + offsetDegree));
+				}
+			}
+		}
+		
 		if(current != null)
 		{
 			current.setPosition(getX() - getWidth() / 2, getY() - getHeight() / 2);
@@ -188,6 +205,20 @@ public class Bullet extends VelocityObject
 	public void setRotationFromVelocity(float offsetDegree)
 	{
 		setRotationDeg((float) (Math.atan2(velocityY, velocityX) * (180 / Math.PI) - offsetDegree));
+	}
+	
+	private boolean setRotationFromPath = false;
+	private float offsetDegree = 0;
+	
+	/**
+	 * Set this bullet to update from the path this bullet is bound to.
+	 * @param enabled To enable or disable this feature (default: disabled)
+	 * @param offsetDegree Offset for the resulting angle (in case your sprite is rotated)
+	 */
+	public void updateRotationFromPath(boolean enabled, float offsetDegree)
+	{
+		setRotationFromPath = enabled;
+		this.offsetDegree = offsetDegree;
 	}
 	
 	public void setRotationDeg(final float rotation)
@@ -412,7 +443,7 @@ public class Bullet extends VelocityObject
 	{
 		if(!useDeleteAnimation)
 		{
-			disposeAll();
+			super.onDelete();
 			return;
 		}
 		
@@ -457,6 +488,7 @@ public class Bullet extends VelocityObject
 			}
 		};
 		
+		breakAni.onComplete(() -> { super.onDelete(); });
 		breakAni.setPosition(bullet);
 		
 		game.spawn(breakAni);
@@ -469,9 +501,20 @@ public class Bullet extends VelocityObject
 		
 		spawnSwirl(pos, true);
 	}
-
-	protected void spawnSwirl(Position pos, final boolean dispose)
+	
+	public static void spawnSwirl(IPosition pos)
 	{
+		spawnSwirl(null, pos, false);
+	}
+	
+	protected void spawnSwirl(IPosition pos, final boolean dispose)
+	{
+		spawnSwirl(this, pos, dispose);
+	}
+
+	protected static void spawnSwirl(Bullet bullet, IPosition pos, final boolean dispose)
+	{
+		int BREAK_SIDE = 64;
 		if(BREAK_ANI == null)
 		{
 			BREAK = new Texture(Gdx.files.internal("sprites/bullet_break.png"))
@@ -484,20 +527,18 @@ public class Bullet extends VelocityObject
 					super.dispose();
 				}
 			};
-			BREAK_ANI = ImageSplitter.getAnimationFromSprite(BREAK, 64, 64, 2f, 1,2,3,4,5,6,7,8);
+			BREAK_ANI = ImageSplitter.getAnimationFromSprite(BREAK, BREAK_SIDE, BREAK_SIDE, 2f, 1,2,3,4,5,6,7,8);
 		}
 		
-		final Bullet bullet = this;
-		
-		final float width = bullet.getWidth();
-		final float height = bullet.getHeight();
+		final float width = bullet != null ? bullet.getWidth() : BREAK_SIDE;
+		final float height = bullet != null ? bullet.getHeight() : BREAK_SIDE;
 		
 		final Animation ani = AnimationUtil.copyAnimation(BREAK_ANI);
 		
-		Color effect = getType().getEffectColor();
+		Color effect = (bullet != null ? bullet.getType().getEffectColor() : null);
 		
-		if(effect == null)
-			effect = deletionColor;
+		if(effect == null && bullet != null)
+			effect = bullet.deletionColor;
 		
 		if(effect == null)
 			effect = Color.WHITE;
@@ -514,7 +555,7 @@ public class Bullet extends VelocityObject
 			
 			sprite.setSize(longest, longest);
 			
-			sprite.setPosition(bullet.getX() - (sprite.getWidth() / 2f), bullet.getY() - (sprite.getHeight() / 2f));
+			sprite.setPosition(pos.getX() - (sprite.getWidth() / 2f), pos.getY() - (sprite.getHeight() / 2f));
 			
 			sprite.setColor(effect);
 			sprite.setAlpha(0.3f);
@@ -529,10 +570,11 @@ public class Bullet extends VelocityObject
 			int ticks = 0;
 
 			{
-				setName("Death animation " + bullet.getName());
+				setName("Swirl" + (bullet != null ? " " + bullet.getName() : ""));
 				setGlowing();
 				
-				bullet.setOwnedBy(this);
+				if (bullet != null)
+					bullet.setOwnedBy(this);
 			}
 			
 			@Override
@@ -561,7 +603,7 @@ public class Bullet extends VelocityObject
 			{
 				ticks++;
 				
-				HitboxSprite cur = bullet.getCurrentSprite();
+				HitboxSprite cur = bullet != null ? bullet.getCurrentSprite() : null;
 				
 				if(cur != null)
 				{
@@ -585,7 +627,7 @@ public class Bullet extends VelocityObject
 			@Override
 			public void onDelete()
 			{
-				if(dispose)
+				if(dispose && bullet != null)
 					bullet.disposeAll();
 			}
 			
@@ -608,8 +650,11 @@ public class Bullet extends VelocityObject
 			}
 		};
 		
-		obj.setBlendFunc(getBlendFuncSrc(), getBlendFuncDst());
-		obj.setZIndex(getZIndex());
+		if (bullet != null)
+		{
+			obj.setBlendFunc(bullet.getBlendFuncSrc(), bullet.getBlendFuncDst());
+			obj.setZIndex(bullet.getZIndex());
+		}
 		
 		Game.getGame().spawn(obj);
 	}

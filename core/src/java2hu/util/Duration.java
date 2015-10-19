@@ -5,7 +5,13 @@ import java2hu.J2hGame;
 
 public class Duration
 {
-	public static Duration ZERO = milliseconds(0);
+	/**
+	 * @return A duration with 0 milliseconds as value.
+	 */
+	public static Duration zero()
+	{
+		return milliseconds(0);
+	}
 	
 	/**
 	 * Convenience method to create a Duration with Unit milliseconds.

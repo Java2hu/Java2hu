@@ -1,5 +1,6 @@
 package java2hu.object.bullet.phase;
 
+import java.util.ArrayList;
 import java2hu.Game;
 import java2hu.J2hGame;
 import java2hu.object.StageObject;
@@ -95,6 +96,7 @@ public class AnimationPhaseAnimation extends StageObject implements PhaseAnimati
 		if(getTicksAlive() > time.toTicks())
 		{
 			onComplete();
+			callOnComplete();
 		}
 	}
 	
@@ -110,7 +112,26 @@ public class AnimationPhaseAnimation extends StageObject implements PhaseAnimati
 		this.scaleAnimationToBullet = scaleAnimationToBullet;
 	}
 	
-	public void onComplete()
+	private ArrayList<Runnable> onComplete = new ArrayList<Runnable>();
+	
+	/**
+	 * Register the specified runnable to be called on completion of this animation.
+	 * @param run
+	 */
+	public void onComplete(Runnable run)
+	{
+		onComplete.add(run);
+	}
+	
+	protected void callOnComplete()
+	{
+		for (Runnable r : onComplete)
+		{
+			r.run();
+		}
+	}
+	
+	protected void onComplete()
 	{
 		animationPlaying = false;
 		bullet.removeOwnedObject(this);

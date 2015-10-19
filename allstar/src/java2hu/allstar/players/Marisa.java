@@ -19,7 +19,6 @@ import java2hu.util.PlayerUtil;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Animation.PlayMode;
 import com.badlogic.gdx.graphics.g2d.Sprite;
@@ -30,9 +29,8 @@ public class Marisa extends Player
 	public static Marisa newInstance(float x, float y)
 	{
 		Texture texture = Loader.texture(Gdx.files.internal("player/marisa/marisa.png"));
-		texture.setFilter(TextureFilter.MipMapLinearNearest, TextureFilter.Nearest);
 		
-		Animation idle = ImageSplitter.getAnimationFromSprite(texture, 96, 64, 6F, 1,2,3,4,5,6,7,8);
+		Animation idle = ImageSplitter.getAnimationFromSprite(texture, 95, 64, 6F, 1,2,3,4,5,6,7,8);
 		idle.setPlayMode(PlayMode.LOOP);
 		
 		Animation leftStart = ImageSplitter.getAnimationFromSprite(texture, 96, 64, 6F, 9,10,11,12,13,14);
