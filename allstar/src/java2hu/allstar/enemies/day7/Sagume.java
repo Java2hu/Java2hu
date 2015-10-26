@@ -542,8 +542,8 @@ public class Sagume extends AllStarBoss
 			
 			if(tick % 400 == 0)
 				boss.getPathing().path(new SimpleTouhouBossPath(boss));
-			
-			if(tick > 200 && tick % 30 == 0) 
+
+			if(tick > 200 && tick % 50 == 0) 
 			{
 				TouhouSounds.Enemy.HUM_1.play(0.8f);
 				
@@ -585,50 +585,48 @@ public class Sagume extends AllStarBoss
 			
 			if(tick % 100 == 0)
 			{
-				for(boolean flip : RNG.BOOLS)
+				for(int i = 0; i < 4; i++)
 				{
+					boolean flip = (i % 2 == 0);
+
 					FlyingYingYangOrb s = new FlyingYingYangOrb(flip ? FlyingYingYangOrbColor.BLUE : FlyingYingYangOrbColor.RED, 100, boss.getX(), boss.getY());
 
 					Path p = new Path(s, Duration.seconds(6));
 					p.onDone((path) -> s.deleteSilent());
 
 					float dist = 0;
-
-					Position last = null;
 					
-					float startAngle = 90;
+					float startAngle = 90 * i;
 
 					for(float angle = 0; angle < 360; angle += 5)
 					{
-						float rad = (float) Math.toRadians((flip ? -angle : angle) + startAngle);
+						float rad = (float) Math.toRadians(angle + startAngle);
 
 						dist += 3;
 
 						final Position pos = new Position(boss.getX() + (Math.cos(rad) * dist), boss.getY() + (Math.sin(rad) * dist));
 
-						last = pos;
+						p.addPosition(pos);
+					}
+
+					for(float angle = 0; angle < 720; angle += 5)
+					{
+						float rad = (float) Math.toRadians(angle + startAngle);
+
+						final Position pos = new Position(boss.getX() + (Math.cos(rad) * dist), boss.getY() + (Math.sin(rad) * dist));
+
+						dist += 1;
 
 						p.addPosition(pos);
 					}
 					
 					for(float angle = 0; angle < 360; angle += 5)
 					{
-						float rad = (float) Math.toRadians(flip ? 180 - angle : angle);
+						float rad = (float) Math.toRadians(angle + startAngle);
 
-						dist += 2;
+						dist += 10;
 
-						final Position pos = new Position(last.getX() + (Math.cos(rad) * dist), last.getY() + (Math.sin(rad) * dist));
-
-						p.addPosition(pos);
-					}
-					
-					for(float angle = 0; angle < 360; angle += 5)
-					{
-						float rad = (float) Math.toRadians(flip ? 180 - angle : angle);
-
-						dist += 4;
-
-						final Position pos = new Position(last.getX() + (Math.cos(rad) * dist), last.getY() + (Math.sin(rad) * dist));
+						final Position pos = new Position(boss.getX() + (Math.cos(rad) * dist), boss.getY() + (Math.sin(rad) * dist));
 
 						p.addPosition(pos);
 					}
@@ -648,25 +646,16 @@ public class Sagume extends AllStarBoss
 								Scheduler.track("release", "release", (long) 8);
 							}
 							
-							if(tick % 10 == 0)
+							if(tick % 5 == 0 && object.getTicksAlive() < 216)
 							{
-								for (int i = 0; i < 3; i++)
-								for (boolean up : RNG.BOOLS)
-								{
-									Bullet b = new Bullet(ThBullet.make(ThBulletType.SEAL, flip ? ThBulletColor.BLUE : ThBulletColor.RED), object.getX(), object.getY());
-									
-									b.setDirectionDeg((flip ? 180 : 0) + MathUtil.getAngle(object.getLastX(), object.getLastY(), object.getX(), object.getY()) + (flip ? 180 : 0), 200f);
-									
-									if (up)
-										b.setVelocityY(-b.getVelocityY());
-									
-									b.update((i / 3f) * 0.5f); 
-									
-									b.setRotationFromVelocity();
-									indexer.index(b);
-									
-									game.spawn(b);
-								}
+								Bullet b = new Bullet(ThBullet.make(ThBulletType.SEAL, flip ? ThBulletColor.BLUE : ThBulletColor.RED), object.getX(), object.getY());
+								
+								b.setDirectionDeg(MathUtil.getAngle(object.getLastX(), object.getLastY(), object.getX(), object.getY()), 300f);
+								
+								b.setRotationFromVelocity();
+								b.setZIndex((int) (b.getZIndex() + tick));
+								
+								game.spawn(b);
 							}
 						}
 					});
