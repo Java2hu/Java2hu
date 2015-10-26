@@ -18,6 +18,7 @@ import java2hu.allstar.enemies.day1.Cirno;
 import java2hu.allstar.enemies.day1.Doremy;
 import java2hu.allstar.enemies.day1.Wakasagihime;
 import java2hu.allstar.enemies.day2.Kagerou;
+import java2hu.allstar.enemies.day2.Kaguya;
 import java2hu.allstar.enemies.day2.Mokou;
 import java2hu.allstar.enemies.day4.Nitori;
 import java2hu.allstar.enemies.day5.Iku;
@@ -140,6 +141,16 @@ public class Days extends J2hObject
 			});
 			
 			// Kaguya
+
+			addCharacter(day, type, "Kaguya Houraisan", new Getter<AllStarBoss>()
+			{
+				@Override
+				public AllStarBoss get()
+				{
+					return new Kaguya(startHP, startX, startY);
+				}
+			});
+
 			// Eirin
 		}
 		
