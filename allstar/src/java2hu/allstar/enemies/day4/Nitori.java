@@ -352,7 +352,7 @@ public class Nitori extends AllStarBoss
 			}
 
 			Bullet b = new Bullet(ThBullet.make(ThBulletType.ORB, ThBulletColor.CYAN), game.getMaxX() * (float) RNG.random(), 0) {
-				float v_Y = (float) -(game.getHeight() / Math.sqrt(2));
+				float v_Y = (float) -(game.getHeight() / 1.4f);
 				boolean live = false;
 				boolean bounced = false;
 
