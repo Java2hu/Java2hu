@@ -787,7 +787,7 @@ public class Byakuren extends AllStarBoss
 									{
 										if(!turned)
 										{
-											if(MathUtil.getDifference(getX(), player.getX()) < 5)
+											if(MathUtil.getDifference(getX(), player.getX()) < 100)
 											{
 												setBullet(new ThBullet(ThBulletType.KNIFE, ThBulletColor.YELLOW));
 												setDirectionDegTick(90, -0.1f);
